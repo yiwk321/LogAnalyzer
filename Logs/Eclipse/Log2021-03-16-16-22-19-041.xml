@@ -1,0 +1,15 @@
+<Events startTimestamp="1615926139041" logVersion="1.0.0.202101171653">
+  <Command __id="9" _type="EclipseCommand" commandID="" date="Tue Mar 16 16:22:59 EDT 2021" starttimestamp="1615926139041" timestamp="40559" />
+  <Command __id="10" _type="ShellCommand" date="Tue Mar 16 16:23:01 EDT 2021" starttimestamp="1615926139041" timestamp="42359" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="11" _type="ShellCommand" date="Tue Mar 16 16:23:02 EDT 2021" starttimestamp="1615926139041" timestamp="43686" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="12" _type="ShellCommand" date="Tue Mar 16 16:23:07 EDT 2021" starttimestamp="1615926139041" timestamp="48294" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="15" _type="EclipseCommand" commandID="" date="Tue Mar 16 16:23:12 EDT 2021" starttimestamp="1615926139041" timestamp="53214" />
+  <Command __id="16" _type="ShellCommand" date="Tue Mar 16 16:23:15 EDT 2021" starttimestamp="1615926139041" timestamp="56470" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="19" _type="MoveCaretCommand" caretOffset="509" date="Tue Mar 16 16:23:49 EDT 2021" docOffset="721" starttimestamp="1615926139041" timestamp="90043" />
+  <Command __id="20" _type="ShellCommand" date="Tue Mar 16 16:23:49 EDT 2021" starttimestamp="1615926139041" timestamp="90900" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="21" _type="ShellCommand" date="Tue Mar 16 16:24:25 EDT 2021" starttimestamp="1615926139041" timestamp="126843" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="22" _type="EclipseCommand" commandID="org.eclipse.egit.ui.team.PushTags" date="Tue Mar 16 16:24:30 EDT 2021" starttimestamp="1615926139041" timestamp="131640" />
+  <Command __id="23" _type="ShellCommand" date="Tue Mar 16 16:24:31 EDT 2021" starttimestamp="1615926139041" timestamp="131977" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="24" _type="ShellCommand" date="Tue Mar 16 16:24:34 EDT 2021" starttimestamp="1615926139041" timestamp="135434" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="25" _type="ShellCommand" date="Tue Mar 16 16:24:41 EDT 2021" starttimestamp="1615926139041" timestamp="142772" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="26" _type="ShellCommand" date="Tue Mar 16 16:26:45 EDT 2021" starttimestamp="1615926139041" timestamp="266222" type="ECLIPSE_GAINED_FOCUS" />

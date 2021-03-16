@@ -1,0 +1,9 @@
+<Events startTimestamp="1612546133956" logVersion="1.0.0.202102051220">
+  <Command __id="8" _type="PauseCommand" date="Fri Feb 05 12:29:11 EST 2021" range="1s-2s" starttimestamp="1612546133956" timestamp="17061">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[1459]]></rest>
+    <prev><![CDATA[EclipseCommand]]></prev>
+    <next><![CDATA[EclipseCommand]]></next>
+  </Command>
+  <Command __id="7" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:29:11 EST 2021" starttimestamp="1612546133956" timestamp="17061" />
+</Events>

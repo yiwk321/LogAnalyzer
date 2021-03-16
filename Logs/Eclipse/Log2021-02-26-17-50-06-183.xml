@@ -1,0 +1,13 @@
+<Events startTimestamp="1614379806183" logVersion="1.0.0.202102091426">
+  <Command __id="3" _type="PauseCommand" date="Fri Feb 26 17:50:28 EST 2021" range="20s-30s" starttimestamp="1614379806183" timestamp="22001">
+    <prevType><![CDATA[Move Caret]]></prevType>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <pause><![CDATA[21673]]></pause>
+    <nextType><![CDATA[Other]]></nextType>
+    <next><![CDATA[EclipseCommand]]></next>
+  </Command>
+  <Command __id="2" _type="EclipseCommand" commandID="" date="Fri Feb 26 17:50:28 EST 2021" starttimestamp="1614379806183" timestamp="21997" />
+  <Command __id="4" _type="EclipseCommand" commandID="" date="Fri Feb 26 17:50:28 EST 2021" starttimestamp="1614379806183" timestamp="22044" />
+  <Command __id="5" _type="EclipseCommand" commandID="" date="Fri Feb 26 17:50:28 EST 2021" starttimestamp="1614379806183" timestamp="22045" />
+  <Command __id="6" _type="EclipseCommand" commandID="" date="Fri Feb 26 17:50:28 EST 2021" starttimestamp="1614379806183" timestamp="22101" />
+</Events>

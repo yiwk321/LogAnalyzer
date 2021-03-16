@@ -1,0 +1,18 @@
+<Events startTimestamp="1613063553861" logVersion="1.0.0.202102091426">
+  <Command __id="88" _type="PauseCommand" date="Thu Feb 11 12:23:57 EST 2021" range="10s-20s" starttimestamp="1613063553861" timestamp="683379">
+    <prevType><![CDATA[Move Caret]]></prevType>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <pause><![CDATA[18291]]></pause>
+    <nextType><![CDATA[Open File]]></nextType>
+    <next><![CDATA[DiffBasedFileOpenCommand]]></next>
+  </Command>
+  <Command __id="89" _type="SelectTextCommand" caretOffset="183" date="Thu Feb 11 12:23:57 EST 2021" end="183" start="171" starttimestamp="1613063553861" timestamp="683516" />
+  <Command __id="99" _type="PauseCommand" date="Thu Feb 11 12:35:06 EST 2021" range="10m-30m" starttimestamp="1613063553861" timestamp="1352709">
+    <prevType><![CDATA[Lost Focus]]></prevType>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <pause><![CDATA[612216]]></pause>
+    <nextType><![CDATA[Gained Focus]]></nextType>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="98" _type="ShellCommand" date="Thu Feb 11 12:35:06 EST 2021" starttimestamp="1613063553861" timestamp="1352709" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="101" _type="MoveCaretCommand" caretOffset="24870" date="Thu Feb 11 12:35:06 EST 2021" docOffset="26255" starttimestamp="1613063553861" timestamp="1353001" />

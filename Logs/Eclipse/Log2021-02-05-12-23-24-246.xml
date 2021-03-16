@@ -1,0 +1,734 @@
+<Events startTimestamp="1612545804246" logVersion="1.0.0.202102051220">
+  <Command __id="0" _type="DiffBasedFileOpenCommand" date="Fri Feb 05 12:23:24 EST 2021" docASTNodeCount="3290" docActiveCodeLength="20007" docExpressionCount="2281" docLength="20232" projectName="LogAnalyzer" starttimestamp="1612545804246" timestamp="293">
+    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\LogAnalyzer\src\logAnalyzer\AExperimentalReplayer.java]]></filePath>
+    <diff><![CDATA[null]]></diff>
+    <snapshot><![CDATA[package logAnalyzer;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
+import analyzer.Analyzer;
+import au.com.bytecode.opencsv.CSVWriter;
+import fluorite.commands.ConsoleInput;
+import fluorite.commands.ConsoleOutputCommand;
+import fluorite.commands.CopyCommand;
+import fluorite.commands.Delete;
+import fluorite.commands.EHExceptionCommand;
+import fluorite.commands.EHICommand;
+import fluorite.commands.ExceptionCommand;
+import fluorite.commands.GetHelpCommand;
+import fluorite.commands.InsertStringCommand;
+import fluorite.commands.PasteCommand;
+import fluorite.commands.PauseCommand;
+import fluorite.commands.Replace;
+import fluorite.commands.RequestHelpCommand;
+import fluorite.commands.RunCommand;
+import fluorite.commands.ShellCommand;
+import fluorite.commands.WebCommand;
+
+public class AExperimentalReplayer extends AReplayer{
+	private Map<String, List<List<EHICommand>>> data;
+	private static final int THREAD_LIM = 6;
+	
+	public AExperimentalReplayer(Analyzer anAnalyzer) {
+		super(anAnalyzer);
+		analyzer = anAnalyzer;
+		data = new HashMap<>();
+	}
+	
+	public void createPauseCommandLogs(String classFolderPath) {
+		File folder = new File(classFolderPath);
+		if (!folder.exists()) {
+			System.out.println("Class Folder does not exist");
+			System.exit(0);
+		}
+		File[] students = folder.listFiles(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
+		latch = new CountDownLatch(students.length);
+		for (int j = 0; j < students.length; j++) {
+			File studentFolder  = students[j];
+			File logFolder = new File(studentFolder,"Eclipse");
+			if (!logFolder.exists()) {
+				latch.countDown();
+				continue;
+			}
+			System.out.println("Reading " + studentFolder.getName());
+			File[] logs = new File(logFolder.getPath()).listFiles(new FileFilter() {
+				public boolean accept(File pathname) {
+					return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");
+				}
+			});
+			Thread thread = new Thread(new Runnable() {
+				public void run() {
+					if (logs == null) {
+						synchronized (this) {
+							threadCount--;
+						}
+						latch.countDown();
+						return;
+					}
+//					if (studentFolder.getName().equals("30")) {
+//						int a = 0;
+//					} else {
+//						latch.countDown();
+//						synchronized (this) {
+//							threadCount--;
+//						}
+//						return;
+//					}
+					try {
+						File browser = new File(studentFolder, "Browser");
+						List<EHICommand> webCommands = null;
+						Iterator<EHICommand> webCommandIterator = null;
+						if (browser.exists() && browser.listFiles().length != 0) {
+							webCommands = readWebCommands(browser.listFiles()[0]);
+							if (webCommands != null) {
+								webCommandIterator = webCommands.iterator();
+							}
+						}
+						for (File file : logs) {
+							long startTimestamp = getLogFileCreationTime(file);
+							List<EHICommand> commands = readOneLogFile(file.getPath(), analyzer);
+							if (commands.size() < 2) {
+								continue;
+							}
+							List<EHICommand> newCommands = new ArrayList<>();
+							EHICommand last = null;
+							EHICommand cur = null;
+							EHICommand webCommand = null;
+							webCommand = maybeAddWebCommandBeforeLogs(webCommandIterator, startTimestamp, newCommands);
+							for (EHICommand command : commands) {
+								if (cur == null) {
+									cur = command;
+									newCommands.add(command);
+								} else {
+									last = cur;
+									cur = command;
+									boolean webCommandAdded = false;
+									while(webCommand != null && maybeAddWebCommand(newCommands, last, cur, webCommand, startTimestamp)) {
+										webCommandAdded = true;
+										last = webCommand;
+										try {
+											webCommand = webCommandIterator.next();
+										} catch (NoSuchElementException e) {
+											webCommand = null;
+										}
+									} 
+									if (!webCommandAdded) {
+										maybeAddPauseCommand(newCommands, last, cur);
+									}
+								}
+							}
+							String logContent = XML_START1 + getLogFileCreationTime(file) + XML_START2 + XML_VERSION + XML_START3;
+							for (EHICommand c : newCommands) {
+								logContent += c.persist();
+							}
+							logContent += XML_FILE_ENDING;
+							try {
+								File newLog = new File(file.getParent()+File.separator+"Rest"+File.separator+file.getName());
+								if (newLog.exists()) {
+									newLog.delete();
+								}
+								newLog.getParentFile().mkdirs();
+								newLog.createNewFile();
+								BufferedWriter writer = new BufferedWriter(new FileWriter(newLog, true));
+								System.out.println("Writing to file " + newLog.getPath());
+								writer.write(logContent);
+								writer.close();
+								System.out.println("Finished writing to file " + newLog.getPath());
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						synchronized (this) {
+							threadCount--;
+						}
+						latch.countDown();
+					}
+				}							
+			});
+			while(true) {
+				if (threadCount > THREAD_LIM) {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				if (threadCount <= THREAD_LIM) {
+					synchronized (this) {
+						threadCount++;
+						thread.start();
+						break;
+					}
+				}
+			}
+		}
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			System.exit(0);
+		}
+	}
+
+	public void analyzeFolder(String classFolderPath) {
+		File folder = new File(classFolderPath);
+		if (!folder.exists()) {
+			System.exit(0);
+		}
+		File[] participants = folder.listFiles(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
+		for (int i = 0; i < participants.length; i++) {
+			File participantFolder = new File(participants[i],"Eclipse");
+			if (!participantFolder.exists()) {
+				continue;
+			}
+			System.out.println("Reading student " + participantFolder.getName());
+			data.put(participants[i].getName(), replayLogs(participantFolder.getPath(), analyzer));
+		}
+		createAssignData("Experiment", folder);
+		createDistributionData("Experiment", folder);
+		System.exit(0);
+	}
+
+	private void createAssignData(String assign, File folder) {
+		File csv = new File(folder,assign+".csv");
+		FileWriter fw;
+		File csv2 = new File(folder,assign+"Event.csv");
+		FileWriter fw2;
+		int[] sum = new int[10];
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			csv.createNewFile();
+			fw = new FileWriter(csv);
+			CSVWriter cw = new CSVWriter(fw);
+			String[] header = {"Student", "Total Time Spent", "Active Time", "Rest Time", "Wall Clock Time", "Pause", "Web Visit", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Exception", "Exception Breakdown"};
+			cw.writeNext(header);
+
+			if (csv2.exists()) {
+				csv2.delete();
+			}
+			csv2.createNewFile();
+			fw2 = new FileWriter(csv2);
+			CSVWriter cw2 = new CSVWriter(fw2);
+			String[] header2 = {"case_id", "timestamp", "activity", "user"};
+			cw2.writeNext(header2);
+
+			for (String student : data.keySet()) {
+				System.out.println("Writing " + assign + " student " + student + "to " + csv.getName());
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				List<String> retVal = new ArrayList<>();
+				retVal.add(student);
+				long totalTime = totalTimeSpent(nestedCommands);
+				long[] restTime = restTime(nestedCommands, FIVE_MIN, Long.MAX_VALUE);
+				long wallClockTime = wallClockTime(nestedCommands);
+				retVal.add(convertToHourMinuteSecond(totalTime));
+				retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
+				retVal.add(convertToHourMinuteSecond(restTime[0]));
+				retVal.add(convertToHourMinuteSecond(wallClockTime));
+				int[] numCommands = new int[9];
+				List<String> breakdownList = new ArrayList<>();
+				String list = "";
+				for (List<EHICommand> commands : nestedCommands) {
+					long lastTime = -1;
+					long curTime = -1;
+					for (int i = 0; i < commands.size(); i++) {
+						EHICommand command = commands.get(i);
+
+						if (i > 0) {
+							lastTime = curTime;
+						}
+						if (command != null) {
+							curTime = command.getTimestamp() + command.getStartTimestamp();
+						}
+						if (lastTime - curTime > 5*60*1000) {
+							writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
+						}
+						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
+							writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);
+						} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
+							writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);
+						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand ||
+								command instanceof Delete ||
+								command instanceof Replace || command instanceof PasteCommand || command instanceof ExceptionCommand ||
+								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
+								command instanceof RequestHelpCommand || command instanceof GetHelpCommand) {
+							writeOneLine(cw2, assign, curTime, getEventType(command), student);
+						}
+						if (command instanceof PauseCommand) {
+							numCommands[0]++;
+							list += "A";
+						}
+						if (command instanceof WebCommand) {
+							numCommands[1]++;
+							list += "W";
+						}
+						if (command instanceof InsertStringCommand) {
+							numCommands[2]++;
+							list += "I";
+						}
+						if (command instanceof Delete) {
+							numCommands[3]++;
+							list += "D";
+						}
+						if (command instanceof Replace) {
+							numCommands[4]++;
+							list += "R";
+						}
+						if (command instanceof CopyCommand) {
+							numCommands[5]++;
+							list += "C";
+						}
+						if (command instanceof PasteCommand) {
+							numCommands[6]++;
+							list += "P";
+						}
+						if (command instanceof RunCommand) {
+							numCommands[7]++;
+							list += "U";
+						}
+						if (command instanceof ExceptionCommand || command instanceof EHExceptionCommand) {
+							if(isException(command)) {
+								if (command instanceof EHExceptionCommand) {
+									ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
+									ex.setTimestamp(command.getTimestamp());
+									ex.setStartTimestamp(command.getStartTimestamp());
+								}
+								numCommands[8]++;
+								list += "E";
+								if (i < commands.size()-1) {
+									command = commands.get(i+1);
+								} else {
+									continue;
+								}
+								while(!(command instanceof InsertStringCommand || command instanceof Replace 
+										|| command instanceof Delete 
+										|| command instanceof CopyCommand || command instanceof PasteCommand)) {
+									if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
+											command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof ExceptionCommand ||
+											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_LOST_FOCUS")) ||
+											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_CLOSED"))) {
+										if (i > 0) {
+											lastTime = curTime;
+										}
+										curTime = command.getTimestamp() + command.getStartTimestamp();
+										if (lastTime - curTime > 5*60*1000) {
+											writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
+										}
+										if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
+											writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);
+										} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
+											writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);
+										} else {
+											writeOneLine(cw2, assign, curTime, getEventType(command), student);
+										}
+									}
+									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand) && isException(command)) {
+										if (command instanceof EHExceptionCommand) {
+											ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
+											ex.setTimestamp(command.getTimestamp());
+											ex.setStartTimestamp(command.getStartTimestamp());
+											if (i > 0) {
+												lastTime = curTime;
+											}
+											curTime = command.getTimestamp() + command.getStartTimestamp();
+											if (lastTime - curTime > 5*60*1000) {
+												writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
+											}
+											writeOneLine(cw2, assign, curTime, getEventType(ex), student);
+										}
+										numCommands[8]++;
+										list += "E";
+									}
+									i++;
+									if (i+1 < commands.size()) {
+										command = commands.get(i+1);
+									} else {
+										break;
+									}
+								}
+								breakdownList.add(countConsecutiveCommands(list));
+								list = "";
+							}
+						}
+					}
+				}
+				if (!list.equals("")) {
+					breakdownList.add(countConsecutiveCommands(list));
+				}
+				for(int i = 0; i < numCommands.length; i++) {
+					retVal.add(i+5, numCommands[i]+"");
+					sum[i] += numCommands[i];
+					if (i > 1) {
+						sum[9] += numCommands[i];
+					}
+				}
+				for(int i = 0; i < breakdownList.size(); i++) {
+					retVal.add(i+14, breakdownList.get(i));
+				}
+				String[] nextLine = retVal.toArray(new String[1]);
+				cw.writeNext(nextLine);
+				
+				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
+			}
+			List<String> retVal = new ArrayList<>();
+			retVal.add("Sum");
+			retVal.add("");
+			retVal.add("");
+			retVal.add("");
+			retVal.add("");
+			for (int i = 0; i < sum.length; i++) {
+				retVal.add(sum[i]+"");
+			}
+			String[] nextLine = retVal.toArray(new String[1]);
+			cw.writeNext(nextLine);
+			fw.close();
+			cw.close();
+
+			fw2.close();
+			cw2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void createDistributionData(String assign, File folder) {
+		File csv = new File(folder,assign+"Distribution.csv");
+		FileWriter fw;
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			csv.createNewFile();
+			fw = new FileWriter(csv);
+			CSVWriter cw = new CSVWriter(fw);
+			String[] header = getHeader();
+			cw.writeNext(header);
+			
+			String[] sum = new String[header.length];
+			long[] restTimeSum = new long[REST.length];
+			sum[0] = "Sum";
+			for (int i = 1; i < sum.length; i++) {
+				sum[i] = "";
+			}
+			int[] restSum = new int[REST.length];
+			for (String student : data.keySet()) {
+				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				List<String> retVal = new ArrayList<>();
+				retVal.add(student);
+				long totalTime = totalTimeSpent(nestedCommands);
+				if (totalTime == 0) {
+					continue;
+				}
+				long wallClockTime = wallClockTime(nestedCommands);
+				retVal.add(convertToHourMinuteSecond(totalTime));
+				retVal.add(convertToHourMinuteSecond(wallClockTime));
+
+				long[] restTime = {0,0};
+				for (int i = 0; i < REST.length; i++) {
+					if (i < REST.length-1) {
+						restTime = restTime(nestedCommands, REST[i], REST[i+1]);
+					} else {
+						restTime = restTime(nestedCommands, REST[i], Long.MAX_VALUE);
+					}
+					retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
+					retVal.add(convertToHourMinuteSecond(restTime[0]));
+					retVal.add(restTime[1]+"");
+					retVal.add(getTime(restTime[1] == 0? 0:1.0*restTime[2]/restTime[1]));
+					restSum[i] += restTime[1];
+					restTimeSum[i] += restTime[2];
+				}
+				
+				String[] days = daysSpent(nestedCommands);
+				if (days != null) {
+					for (int i = 0; i < days.length; i++) {
+						retVal.add(days[i]);
+					}
+				}
+				
+				String[] nextLine = retVal.toArray(new String[1]);
+				cw.writeNext(nextLine);
+				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
+			}
+			int sum2 = 0;
+			for (int i = 0; i < restSum.length; i++) {
+				sum[4*i+5] = restSum[i]+"";
+				sum2 += restSum[i];
+				sum[4*i+6] = getTime(restSum[i] == 0? 0:1.0*restTimeSum[i]/restSum[i]);
+			}
+			sum[1] = sum2+"";
+			cw.writeNext(sum);
+			fw.close();
+			cw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	private void writeOneLine(CSVWriter cw, String assign, long time, String type, String pid) {
+		String[] nextLine = new String[4]; 
+		nextLine[0] = assign + " " + pid;
+		Date date = new Date(time);
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		nextLine[1] = df.format(date);
+		nextLine[2] = type;
+		nextLine[3] = pid;
+		if (nextLine != null) {
+			cw.writeNext(nextLine);
+		}
+	}
+	
+	public List<List<EHICommand>> replayLogs(String projectPath, Analyzer analyzer){
+		List<List<EHICommand>> nestedCommands = analyzer.convertXMLLogToObjects(projectPath+File.separator+"Rest");
+		sortNestedCommands(nestedCommands);
+		return nestedCommands;
+	}
+
+	private void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {
+		long rest = cur.getTimestamp()-last.getTimestamp();
+		if (rest >= 1*ONE_SECOND) {
+			String range = "";
+			if (rest < 2*ONE_SECOND) {
+				range = "1s-2s";
+			} else if (rest < 5*ONE_SECOND) {
+				range = "2s-5s";
+			} else if (rest < 10*ONE_SECOND) {
+				range = "5s-10s";
+			} else if (rest < 20*ONE_SECOND) {
+				range = "10s-20s";
+			} else if (rest < 30*ONE_SECOND) {
+				range = "20s-30s";
+			} else if (rest < ONE_MIN) {
+				range = "30s-1m";
+			} else if (rest < TWO_MIN) {
+				range = "1m-2m";
+			} else if (rest < FIVE_MIN) {
+				range = "2m-5m";
+			} else if (rest < TEN_MIN) {
+				range = "5m-10m";
+			} else if (rest < 3*TEN_MIN) {
+				range = "10m-30m";
+			} else if (rest < 6*TEN_MIN) {
+				range = "30m-60m";
+			} else {
+				range = ">1h";
+			}
+			PauseCommand rCommnad = new PauseCommand(last, cur, rest, range);
+			rCommnad.setStartTimestamp(0);
+			rCommnad.setTimestamp(last.getTimestamp()+1);
+			newCommands.add(rCommnad);
+		} 
+		newCommands.add(cur);
+	}
+	
+	private boolean maybeAddWebCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur, EHICommand webCommand, long startTimestamp) {
+		long timestamp = webCommand.getStartTimestamp() - startTimestamp;
+		if (webCommand == null || timestamp < last.getTimestamp() || timestamp > cur.getTimestamp()) {
+			return false;
+		}
+		webCommand.setStartTimestamp(0);
+		webCommand.setTimestamp(timestamp);
+		maybeAddPauseCommand(newCommands, last,	webCommand);
+//		newCommands.add(webCommand);
+		maybeAddPauseCommand(newCommands, webCommand, cur);
+		return true;
+	}
+	
+	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {
+		if (iterator == null) {
+			return null;
+		}
+		EHICommand webCommand = null;
+		long timestamp = 0;
+		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getStartTimestamp() - startTimestamp) < 0) {
+			webCommand.setStartTimestamp(0);
+			webCommand.setTimestamp(timestamp);
+			commands.add(webCommand);
+		}
+		return webCommand;
+	}
+}
+]]></snapshot>
+  </Command>
+  <Command __id="1" _type="MoveCaretCommand" caretOffset="269" date="Fri Feb 05 12:23:24 EST 2021" docOffset="1409" starttimestamp="1612545804246" timestamp="625" />
+  <Command __id="2" _type="MoveCaretCommand" caretOffset="267" date="Fri Feb 05 12:23:25 EST 2021" docOffset="1407" starttimestamp="1612545804246" timestamp="900" />
+  <Command __id="3" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:25 EST 2021" starttimestamp="1612545804246" timestamp="1373" />
+  <Command __id="4" _type="MoveCaretCommand" caretOffset="366" date="Fri Feb 05 12:23:25 EST 2021" docOffset="1506" starttimestamp="1612545804246" timestamp="1501" />
+  <Command __id="5" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2317" />
+  <Command __id="6" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2338" />
+  <Command __id="7" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2532" />
+  <Command __id="8" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2547" />
+  <Command __id="9" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2569" />
+  <Command __id="10" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:26 EST 2021" starttimestamp="1612545804246" timestamp="2589" />
+  <Command __id="11" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:27 EST 2021" starttimestamp="1612545804246" timestamp="3145" />
+  <Command __id="12" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:28 EST 2021" starttimestamp="1612545804246" timestamp="3932" />
+  <Command __id="14" _type="MoveCaretCommand" caretOffset="725" date="Fri Feb 05 12:23:28 EST 2021" docOffset="752" starttimestamp="1612545804246" timestamp="4461" />
+  <Command __id="15" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:28 EST 2021" starttimestamp="1612545804246" timestamp="4485" />
+  <Command __id="16" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:28 EST 2021" starttimestamp="1612545804246" timestamp="4504" />
+  <Command __id="17" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:28 EST 2021" starttimestamp="1612545804246" timestamp="4710" />
+  <Command __id="18" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:29 EST 2021" starttimestamp="1612545804246" timestamp="5289" />
+  <Command __id="19" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:29 EST 2021" starttimestamp="1612545804246" timestamp="5421" />
+  <Command __id="20" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:29 EST 2021" starttimestamp="1612545804246" timestamp="5472" />
+  <Command __id="21" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:29 EST 2021" starttimestamp="1612545804246" timestamp="5609" />
+  <Command __id="22" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:29 EST 2021" starttimestamp="1612545804246" timestamp="5681" />
+  <Command __id="23" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="5844" />
+  <Command __id="24" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="5902" />
+  <Command __id="25" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6049" />
+  <Command __id="26" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6063" />
+  <Command __id="27" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6203" />
+  <Command __id="28" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6431" />
+  <Command __id="29" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6569" />
+  <Command __id="30" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6584" />
+  <Command __id="31" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:30 EST 2021" starttimestamp="1612545804246" timestamp="6714" />
+  <Command __id="32" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:31 EST 2021" starttimestamp="1612545804246" timestamp="6777" />
+  <Command __id="33" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:31 EST 2021" starttimestamp="1612545804246" timestamp="6921" />
+  <Command __id="34" _type="MoveCaretCommand" caretOffset="364" date="Fri Feb 05 12:23:31 EST 2021" docOffset="391" starttimestamp="1612545804246" timestamp="7625" />
+  <Command __id="36" _type="PauseCommand" date="Fri Feb 05 12:23:34 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="10310">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[2683]]></rest>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <next><![CDATA[Delete]]></next>
+  </Command>
+  <Command __id="37" _type="EclipseCommand" commandID="org.eclipse.ui.edit.text.delete.line" date="Fri Feb 05 12:23:34 EST 2021" starttimestamp="1612545804246" timestamp="10327" />
+  <Command __id="38" _type="EclipseCommand" commandID="org.eclipse.ui.file.save" date="Fri Feb 05 12:23:34 EST 2021" starttimestamp="1612545804246" timestamp="10656" />
+  <Command __id="39" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:35 EST 2021" starttimestamp="1612545804246" timestamp="11394" />
+  <Command __id="40" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:35 EST 2021" starttimestamp="1612545804246" timestamp="11481" />
+  <Command __id="42" _type="PauseCommand" date="Fri Feb 05 12:23:37 EST 2021" range="1s-2s" starttimestamp="1612545804246" timestamp="13308">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[1827]]></rest>
+    <prev><![CDATA[EclipseCommand]]></prev>
+    <next><![CDATA[MoveCaretCommand]]></next>
+  </Command>
+  <Command __id="41" _type="MoveCaretCommand" caretOffset="756" date="Fri Feb 05 12:23:37 EST 2021" docOffset="783" starttimestamp="1612545804246" timestamp="13308" />
+  <Command __id="43" _type="SelectTextCommand" caretOffset="767" date="Fri Feb 05 12:23:37 EST 2021" end="767" start="754" starttimestamp="1612545804246" timestamp="13491" />
+  <Command __id="44" _type="SelectTextCommand" caretOffset="799" date="Fri Feb 05 12:23:38 EST 2021" end="799" start="743" starttimestamp="1612545804246" timestamp="13778" />
+  <Command __id="46" _type="PauseCommand" date="Fri Feb 05 12:23:41 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="16825">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[3047]]></rest>
+    <prev><![CDATA[SelectTextCommand]]></prev>
+    <next><![CDATA[Insert]]></next>
+  </Command>
+  <Command __id="48" _type="MoveCaretCommand" caretOffset="813" date="Fri Feb 05 12:23:41 EST 2021" docOffset="840" starttimestamp="1612545804246" timestamp="17640" />
+  <Command __id="50" _type="EclipseCommand" commandID="eventLogger.styledTextCommand.DELETE_PREVIOUS" date="Fri Feb 05 12:23:42 EST 2021" starttimestamp="1612545804246" timestamp="18438" />
+  <Command __id="52" _type="PauseCommand" date="Fri Feb 05 12:23:45 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="21064">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[2626]]></rest>
+    <prev><![CDATA[EclipseCommand]]></prev>
+    <next><![CDATA[MoveCaretCommand]]></next>
+  </Command>
+  <Command __id="51" _type="MoveCaretCommand" caretOffset="563" date="Fri Feb 05 12:23:45 EST 2021" docOffset="590" starttimestamp="1612545804246" timestamp="21064" />
+  <Command __id="53" _type="SelectTextCommand" caretOffset="573" date="Fri Feb 05 12:23:45 EST 2021" end="573" start="560" starttimestamp="1612545804246" timestamp="21236" />
+  <Command __id="54" _type="SelectTextCommand" caretOffset="593" date="Fri Feb 05 12:23:45 EST 2021" end="593" start="547" starttimestamp="1612545804246" timestamp="21398" />
+  <Command __id="56" _type="PauseCommand" date="Fri Feb 05 12:23:47 EST 2021" range="1s-2s" starttimestamp="1612545804246" timestamp="23119">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[1721]]></rest>
+    <prev><![CDATA[SelectTextCommand]]></prev>
+    <next><![CDATA[Insert]]></next>
+  </Command>
+  <Command __id="59" _type="PauseCommand" date="Fri Feb 05 12:23:48 EST 2021" range="1s-2s" starttimestamp="1612545804246" timestamp="24496">
+    <type><![CDATA[Edit]]></type>
+    <rest><![CDATA[1372]]></rest>
+    <prev><![CDATA[Delete]]></prev>
+    <next><![CDATA[MoveCaretCommand]]></next>
+  </Command>
+  <Command __id="58" _type="MoveCaretCommand" caretOffset="618" date="Fri Feb 05 12:23:48 EST 2021" docOffset="645" starttimestamp="1612545804246" timestamp="24496" />
+  <Command __id="61" _type="PauseCommand" date="Fri Feb 05 12:23:50 EST 2021" range="1s-2s" starttimestamp="1612545804246" timestamp="25776">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[1280]]></rest>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <next><![CDATA[EclipseCommand]]></next>
+  </Command>
+  <Command __id="60" _type="EclipseCommand" commandID="org.eclipse.ui.file.save" date="Fri Feb 05 12:23:50 EST 2021" starttimestamp="1612545804246" timestamp="25776" />
+  <Command __id="62" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:50 EST 2021" starttimestamp="1612545804246" timestamp="25864" />
+  <Command __id="63" _type="EclipseCommand" commandID="" date="Fri Feb 05 12:23:50 EST 2021" starttimestamp="1612545804246" timestamp="25945" />
+  <Command __id="64" _type="MoveCaretCommand" caretOffset="457" date="Fri Feb 05 12:23:50 EST 2021" docOffset="484" starttimestamp="1612545804246" timestamp="26495" />
+  <Command __id="66" _type="PauseCommand" date="Fri Feb 05 12:23:54 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="30426">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[3931]]></rest>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="65" _type="ShellCommand" date="Fri Feb 05 12:23:54 EST 2021" starttimestamp="1612545804246" timestamp="30426" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="67" _type="ShellCommand" date="Fri Feb 05 12:23:55 EST 2021" starttimestamp="1612545804246" timestamp="31052" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="69" _type="PauseCommand" date="Fri Feb 05 12:23:57 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="33477">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[2425]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="68" _type="ShellCommand" date="Fri Feb 05 12:23:57 EST 2021" starttimestamp="1612545804246" timestamp="33477" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="70" _type="ShellCommand" date="Fri Feb 05 12:23:58 EST 2021" starttimestamp="1612545804246" timestamp="34310" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="71" _type="EclipseCommand" commandID="org.eclipse.debug.ui.commands.Terminate" date="Fri Feb 05 12:23:58 EST 2021" starttimestamp="1612545804246" timestamp="34370" />
+  <Command __id="72" _type="ShellCommand" date="Fri Feb 05 12:23:59 EST 2021" starttimestamp="1612545804246" timestamp="34786" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="74" _type="PauseCommand" date="Fri Feb 05 12:24:12 EST 2021" range="10s-20s" starttimestamp="1612545804246" timestamp="48534">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[13748]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="73" _type="ShellCommand" date="Fri Feb 05 12:24:12 EST 2021" starttimestamp="1612545804246" timestamp="48534" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="76" _type="PauseCommand" date="Fri Feb 05 12:24:18 EST 2021" range="5s-10s" starttimestamp="1612545804246" timestamp="54026">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[5492]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[DiffBasedFileOpenCommand]]></next>
+  </Command>
+  <Command __id="77" _type="MoveCaretCommand" caretOffset="366" date="Fri Feb 05 12:24:18 EST 2021" docOffset="1506" starttimestamp="1612545804246" timestamp="54171" />
+  <Command __id="79" _type="MoveCaretCommand" caretOffset="457" date="Fri Feb 05 12:24:19 EST 2021" docOffset="484" starttimestamp="1612545804246" timestamp="55260" />
+  <Command __id="81" _type="MoveCaretCommand" caretOffset="1509" date="Fri Feb 05 12:24:20 EST 2021" docOffset="3201" starttimestamp="1612545804246" timestamp="56016" />
+  <Command __id="83" _type="PauseCommand" date="Fri Feb 05 12:24:25 EST 2021" range="5s-10s" starttimestamp="1612545804246" timestamp="61027">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[5011]]></rest>
+    <prev><![CDATA[MoveCaretCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="82" _type="ShellCommand" date="Fri Feb 05 12:24:25 EST 2021" starttimestamp="1612545804246" timestamp="61027" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="85" _type="PauseCommand" date="Fri Feb 05 12:24:29 EST 2021" range="2s-5s" starttimestamp="1612545804246" timestamp="65607">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[4580]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="84" _type="ShellCommand" date="Fri Feb 05 12:24:29 EST 2021" starttimestamp="1612545804246" timestamp="65607" type="ECLIPSE_GAINED_FOCUS" />
+  <Command __id="87" _type="PauseCommand" date="Fri Feb 05 12:24:37 EST 2021" range="5s-10s" starttimestamp="1612545804246" timestamp="72987">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[7380]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[ShellCommand]]></next>
+  </Command>
+  <Command __id="86" _type="ShellCommand" date="Fri Feb 05 12:24:37 EST 2021" starttimestamp="1612545804246" timestamp="72987" type="ECLIPSE_LOST_FOCUS" />
+  <Command __id="89" _type="PauseCommand" date="Fri Feb 05 12:24:38 EST 2021" range="1s-2s" starttimestamp="1612545804246" timestamp="74040">
+    <type><![CDATA[Other]]></type>
+    <rest><![CDATA[1053]]></rest>
+    <prev><![CDATA[ShellCommand]]></prev>
+    <next><![CDATA[EclipseCommand]]></next>
+  </Command>
+  <Command __id="88" _type="EclipseCommand" commandID="org.eclipse.ui.ide.showInSystemExplorer" date="Fri Feb 05 12:24:38 EST 2021" starttimestamp="1612545804246" timestamp="74040" />
