@@ -26,7 +26,7 @@ public class Driver {
 		analyzer = new AnAnalyzer();
 		replayer = new AReplayer(analyzer);
 		analyzer.addAnalyzerListener(replayer);	
-		replayer.createPauseCommandLogs(classFolderPath);
+		replayer.createExtraCommand(classFolderPath, "", AReplayer.LOCALCHECK);
 //		replayer.createLocalCheckCommands(classFolderPath);
 //		replayer.analyzeFolder(classFolderPath);
 //		replayer = new AExperimentalReplayer(analyzer);

@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -18,9 +20,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import analyzer.Analyzer;
 import analyzer.MainConsoleUI;
@@ -40,7 +42,6 @@ import fluorite.commands.EHICommand;
 import fluorite.commands.ExceptionCommand;
 import fluorite.commands.GetHelpCommand;
 import fluorite.commands.InsertStringCommand;
-import fluorite.commands.LocalCheckCommand;
 import fluorite.commands.PasteCommand;
 import fluorite.commands.Replace;
 import fluorite.commands.RequestHelpCommand;
@@ -49,31 +50,36 @@ import fluorite.commands.RunCommand;
 import fluorite.commands.ShellCommand;
 import fluorite.commands.WebCommand;
 import fluorite.util.EHLogReader;
+import generators.CommandGenerator;
+import generators.LocalCheckCommandGenerator;
+import generators.PauseCommandGenerator;
 
 public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
-	protected static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\Desktop\\events_524_f19";
-	protected static final String REST_INSESSION = "Rest(In Session)";
-	protected static final String REST_ENDSESSION = "Rest(End Session)";
-	protected static final String REST_LOSEFOCUS = "Rest(Lose Focus)";
-	protected static final String ECLIPSE_LOST_FOCUS = "ECLIPSE_LOST_FOCUS";
-	protected static final String ECLIPSE_CLOSED = "ECLIPSE_CLOSED";
-	protected static final String XML_START1 = "<Events startTimestamp=\"";
-	protected static final String XML_START2 = "\" logVersion=\"";
-	protected static final String XML_VERSION = "1.0.0.202008151525";
-	protected static final String XML_START3 = "\">\r\n";
-	protected static final String XML_FILE_ENDING = "\r\n</Events>"; 
-	protected static final long ONE_SECOND = 1000;
-	protected static final long ONE_MIN = 60*1000;
-	protected static final long TEN_MIN = 10*ONE_MIN;
-	protected static final long FIVE_MIN = 5*ONE_MIN;
-	protected static final long HALF_MIN = ONE_MIN/2;
-	protected static final long TWO_MIN = 2*ONE_MIN;
-	protected static final long DAY = 24*60*ONE_MIN;
-	protected static final long[] REST = {ONE_SECOND, 2*ONE_SECOND, 5*ONE_SECOND, 10*ONE_SECOND, 15*ONE_SECOND, HALF_MIN, ONE_MIN, TWO_MIN, FIVE_MIN, TEN_MIN, 2*TEN_MIN, 3*TEN_MIN, 9*FIVE_MIN, 6*TEN_MIN};
+	public static final int PAUSE = 0;
+	public static final int LOCALCHECK = 1;
+	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\Desktop\\events_524_f19";
+	public static final String REST_INSESSION = "Rest(In Session)";
+	public static final String REST_ENDSESSION = "Rest(End Session)";
+	public static final String REST_LOSEFOCUS = "Rest(Lose Focus)";
+	public static final String ECLIPSE_LOST_FOCUS = "ECLIPSE_LOST_FOCUS";
+	public static final String ECLIPSE_CLOSED = "ECLIPSE_CLOSED";
+	public static final String XML_START1 = "<Events startTimestamp=\"";
+	public static final String XML_START2 = "\" logVersion=\"";
+	public static final String XML_VERSION = "1.0.0.202008151525";
+	public static final String XML_START3 = "\">\r\n";
+	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
+	public static final long ONE_SECOND = 1000;
+	public static final long ONE_MIN = 60*1000;
+	public static final long TEN_MIN = 10*ONE_MIN;
+	public static final long FIVE_MIN = 5*ONE_MIN;
+	public static final long HALF_MIN = ONE_MIN/2;
+	public static final long TWO_MIN = 2*ONE_MIN;
+	public static final long DAY = 24*60*ONE_MIN;
+	public static final int THREAD_LIM = 5;
+	public static final long[] REST = {ONE_SECOND, 2*ONE_SECOND, 5*ONE_SECOND, 10*ONE_SECOND, 15*ONE_SECOND, HALF_MIN, ONE_MIN, TWO_MIN, FIVE_MIN, TEN_MIN, 2*TEN_MIN, 3*TEN_MIN, 9*FIVE_MIN, 6*TEN_MIN};
 	protected int threadCount = 0;
 	protected CountDownLatch latch;
 	protected Analyzer analyzer;
-	private static final int THREAD_LIM = 3;
 	private int count = 0;
 	private int currentExceptions = 0; 
 	private int totalExceptions = 0;
@@ -81,11 +87,107 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 	private Map<String, Map<String, List<List<EHICommand>>>> data;
 	private ExceptionMatcher[] ems = {JavaExceptionMatcher.getInstance(), PrologExceptionMatcher.getInstance(), SMLExceptionMatcher.getInstance()};
 
-
 	public AReplayer(Analyzer anAnalyzer) {
 		super(anAnalyzer);
-		analyzer = anAnalyzer;
 		data = new HashMap<>();
+	}
+	
+	public void createExtraCommand(String classFolderPath, String surfix, int mode) {
+		File folder = new File(classFolderPath);
+		if (!folder.exists()) {
+			System.out.println("Class Folder does not exist");
+			System.exit(0);
+		}
+		File[] assigns = folder.listFiles(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.isDirectory();
+			}
+		});
+		int numThread = 0;
+		for (int i = 0; i < assigns.length; i++) {
+			File assignFolder = assigns[i];
+			File[] students = assignFolder.listFiles(new FileFilter() {
+				public boolean accept(File pathname) {
+					return pathname.isDirectory();
+				}
+			});
+			numThread += students.length;
+		}
+		
+		latch = new CountDownLatch(numThread);
+		for (int i = 0; i < assigns.length; i++) {
+			File assignFolder = assigns[i];
+			File[] students = assignFolder.listFiles(new FileFilter() {
+				public boolean accept(File pathname) {
+					return pathname.isDirectory();
+				}
+			});
+			Map<String, List<String[]>> localCheckEvents = null;
+			if (mode == LOCALCHECK) {
+				localCheckEvents = readLocalCheckEvents(assignFolder.getName());
+			}
+			for (int j = 0; j < students.length; j++) {
+				File studentFolder  = students[j];
+				File submissionFolder = new File(studentFolder,"Submission attachment(s)");
+				if (!submissionFolder.exists()) {
+					latch.countDown();
+					continue;
+				}
+				File projectFolder = getProjectFolder(submissionFolder);
+				System.out.println("Reading " + assignFolder.getName() + " student " + studentFolder.getName());
+//				File rest = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse" + File.separator+"Rest");
+//				if (rest.exists()) {
+//					synchronized (this) {
+//						threadCount--;
+//					}
+//					latch.countDown();
+//					continue;
+//				}
+				File[] logs = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse").listFiles(new FileFilter() {
+					public boolean accept(File pathname) {
+						return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");
+					}
+				});
+				if (logs == null) {
+					synchronized (this) {
+						threadCount--;
+					}
+					latch.countDown();
+					continue;
+				}
+				CommandGenerator cg;
+				if (mode == LOCALCHECK) {
+					cg = new LocalCheckCommandGenerator(analyzer, latch, logs, threadCount, localCheckEvents.get(studentFolder.getName()), surfix);
+				} else {
+					cg = new PauseCommandGenerator(analyzer, latch, logs, threadCount, surfix);
+				}
+				Thread thread = new Thread(cg);
+				while(true) {
+					if (threadCount > THREAD_LIM) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+
+					if (threadCount <= THREAD_LIM) {
+						synchronized (this) {
+							threadCount++;
+							thread.start();
+							break;
+						}
+					}
+				}
+			}
+		}
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			System.exit(0);
+		}
 	}
 	
 	public void analyzeFolder(String classFolderPath) {
@@ -127,9 +229,9 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-//					createAssignData(assign, folder);
-//					createDistributionData(assign, folder);
-					createPrevPauseDistribution(assign, folder);
+					createAssignData(assign, folder, data.get(assign));
+					createDistributionData(assign, folder, data.get(assign));
+					createPauseDistribution(assign, folder, data.get(assign));
 					count++;
 					if (count == data.size()) {
 						System.out.println("finished");
@@ -140,7 +242,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		}
 	}
 	
-	private void createAssignData(String assign, File folder) {
+	public void createAssignData(String assign, File folder, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(folder,assign+".csv");
 		FileWriter fw;
 		File csv2 = new File(folder,assign+"Event.csv");
@@ -165,9 +267,9 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			String[] header2 = {"case_id", "timestamp", "activity", "user"};
 			cw2.writeNext(header2);
 			
-			for (String student : data.get(assign).keySet()) {
+			for (String student : data.keySet()) {
 				System.out.println("Writing " + assign + " student " + student + "to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(assign).get(student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
 				List<String> retVal = new ArrayList<>();
 				retVal.add(student);
 				long totalTime = totalTimeSpent(nestedCommands);
@@ -323,6 +425,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 				String[] nextLine = retVal.toArray(new String[1]);
 				cw.writeNext(nextLine);
 				
+				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
 			}
 			List<String> retVal = new ArrayList<>();
 			retVal.add("Sum");
@@ -345,7 +448,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		}
 	}
 	
-	private void writeOneLine(CSVWriter cw, String assign, long time, String type, String pid) {
+	public void writeOneLine(CSVWriter cw, String assign, long time, String type, String pid) {
 		String[] nextLine = new String[4]; 
 		nextLine[0] = assign + " " + pid;
 		Date date = new Date(time);
@@ -377,7 +480,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		return null;
 	}
 	
-	private void createDistributionData(String assign, File folder) {
+	public void createDistributionData(String assign, File folder, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(folder,assign+"Distribution.csv");
 		FileWriter fw;
 		try {
@@ -392,14 +495,14 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			
 			String[] sum = new String[header.length];
 			sum[0] = "Sum";
+			int[] restSum = new int[REST.length];
+			long[] restTimeSum = new long[REST.length];
 			for (int i = 1; i < sum.length; i++) {
 				sum[i] = "";
 			}
-			int[] restSum = new int[REST.length];
-			long[] restTimeSum = new long[REST.length];
-			for (String student : data.get(assign).keySet()) {
+			for (String student : data.keySet()) {
 				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(assign).get(student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
 				List<String> retVal = new ArrayList<>();
 				retVal.add(student);
 				long totalTime = totalTimeSpent(nestedCommands);
@@ -451,190 +554,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		} 
 	}
 	
-	public void createPauseCommandLogs(String classFolderPath) {
-		File folder = new File(classFolderPath);
-		if (!folder.exists()) {
-			System.out.println("Class Folder does not exist");
-			System.exit(0);
-		}
-		File[] assigns = folder.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		});
-		int numThread = 0;
-		for (int i = 0; i < assigns.length; i++) {
-			File assignFolder = assigns[i];
-			File[] students = assignFolder.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
-			numThread += students.length;
-		}
-		latch = new CountDownLatch(numThread);
-		for (int i = 0; i < assigns.length; i++) {
-			File assignFolder = assigns[i];
-			File[] students = assignFolder.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
-			for (int j = 0; j < students.length; j++) {
-				File studentFolder  = students[j];
-				File submissionFolder = new File(studentFolder,"Submission attachment(s)");
-				if (!submissionFolder.exists()) {
-					latch.countDown();
-					continue;
-				}
-				File projectFolder = getProjectFolder(submissionFolder);
-//				for (File projectFolder : submissionFolder.listFiles(new FileFilter() {
-//					public boolean accept(File pathname) {
-//						return pathname.isDirectory() && !pathname.getName().contains("MACOS");
-//					}
-//				})) {
-					System.out.println("Reading " + assignFolder.getName() + " student " + studentFolder.getName());
-					File rest = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse" + File.separator+"Rest");
-					if (rest.exists()) {
-						synchronized (this) {
-							threadCount--;
-						}
-						latch.countDown();
-						continue;
-					}
-					File[] logs = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse").listFiles(new FileFilter() {
-						public boolean accept(File pathname) {
-							return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");
-						}
-					});
-					if (logs == null) {
-						synchronized (this) {
-							threadCount--;
-						}
-						latch.countDown();
-						continue;
-					}
-					Thread thread = new Thread(new Runnable() {
-						public void run() {
-							try {
-								for (File file : logs) {
-									List<EHICommand> commands = readOneLogFile(file.getPath(), analyzer);
-									if (commands.size() < 2) {
-										continue;
-									}
-									List<EHICommand> newCommands = new ArrayList<>();
-									EHICommand last = null;
-									EHICommand cur = null;
-									for (EHICommand command : commands) {
-										if (cur == null) {
-											cur = command;
-											newCommands.add(command);
-										} else {
-											last = cur;
-											cur = command;
-											maybeAddPauseCommand(newCommands, last, cur);
-										}
-									}
-									String logContent = XML_START1 + getLogFileCreationTime(file) + XML_START2 + XML_VERSION + XML_START3;
-									for (EHICommand c : newCommands) {
-										logContent += c.persist();
-									}
-									logContent += XML_FILE_ENDING;
-									try {
-										File newLog = new File(file.getParent()+File.separator+"Rest"+File.separator+file.getName());
-										if (newLog.exists()) {
-											newLog.delete();
-										}
-										newLog.getParentFile().mkdirs();
-										newLog.createNewFile();
-										BufferedWriter writer = new BufferedWriter(new FileWriter(newLog, true));
-										System.out.println("Writing to file " + newLog.getPath());
-										writer.write(logContent);
-										writer.close();
-										System.out.println("Finished writing to file " + newLog.getPath());
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-								}
-							} catch (Exception e) {
-								// TODO: handle exception
-								e.printStackTrace();
-							}finally {
-								// TODO: handle finally clause
-								synchronized (this) {
-									threadCount--;
-								}
-								latch.countDown();
-							}
-						}							
-					});
-					while(true) {
-						if (threadCount > THREAD_LIM) {
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-						
-						if (threadCount <= THREAD_LIM) {
-							synchronized (this) {
-								threadCount++;
-								thread.start();
-								break;
-							}
-						}
-					}
-				}
-			}
-//		}
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			System.exit(0);
-		}
-	}
-	
-	private void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {
-		long rest = cur.getTimestamp()-last.getTimestamp();
-		if (rest >= 1*ONE_SECOND) {
-			String range = "";
-			if (rest < 2*ONE_SECOND) {
-				range = "1s-2s";
-			} else if (rest < 5*ONE_SECOND) {
-				range = "2s-5s";
-			} else if (rest < 10*ONE_SECOND) {
-				range = "5s-10s";
-			} else if (rest < 20*ONE_SECOND) {
-				range = "10s-20s";
-			} else if (rest < 30*ONE_SECOND) {
-				range = "20s-30s";
-			} else if (rest < ONE_MIN) {
-				range = "30s-1m";
-			} else if (rest < TWO_MIN) {
-				range = "1m-2m";
-			} else if (rest < FIVE_MIN) {
-				range = "2m-5m";
-			} else if (rest < TEN_MIN) {
-				range = "5m-10m";
-			} else if (rest < 3*TEN_MIN) {
-				range = "10m-30m";
-			} else if (rest < 6*TEN_MIN) {
-				range = "30m-60m";
-			} else {
-				range = ">1h";
-			}
-			PauseCommand command = new PauseCommand(last, cur, rest, range);
-			command.setStartTimestamp(last.getStartTimestamp());
-			command.setTimestamp(last.getTimestamp()+1);
-			newCommands.add(command);
-		} 
-		newCommands.add(cur);
-	}
-	
-	private void createPrevPauseDistribution(String assign, File folder) {
+	public void createPauseDistribution(String assign, File folder, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(folder,assign+"PauseDistribution.csv");
 		FileWriter fw;
 		try {
@@ -653,9 +573,9 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			int[] sum = new int[PauseCommand.TYPES.length];
 			long[] sumPause = new long[sum.length];
 			
-			for (String student : data.get(assign).keySet()) {
+			for (String student : data.keySet()) {
 				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(assign).get(student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
 				long[] pauseTimes = new long[sum.length];
@@ -663,7 +583,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 				long[] min = new long[sum.length];
 				double[] mean = new double[sum.length];
 				List<List<Long>> pauses = new ArrayList<>();
-				for (String s : PauseCommand.TYPES) {
+				for (int i = 0; i < PauseCommand.TYPES.length; i++) {
 					pauses.add(new ArrayList<>());
 				}
 				retVal.add(student);
@@ -698,10 +618,10 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 					}
 					retVal.add(min[i]+"");
 					retVal.add(max[i]+"");
-					double std = std(pauses.get(i),mean[i]);
-					if (std > 10773 && std < 10774) {
-						int a = 0;
-					}
+//					double std = std(pauses.get(i),mean[i]);
+//					if (std > 10773 && std < 10774) {
+//						int a = 0;
+//					}
 					retVal.add(std(pauses.get(i),mean[i])+"");
 					
 					sum[i] += numCommmands[i];
@@ -735,7 +655,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			
 			for (String student : data.keySet()) {
 				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(assign).get(student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
 				long[] pauseTimes = new long[sum.length];
@@ -743,7 +663,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 				long[] min = new long[sum.length];
 				double[] mean = new double[sum.length];
 				List<List<Long>> pauses = new ArrayList<>();
-				for (String s : PauseCommand.TYPES) {
+				for (int i = 0; i < PauseCommand.TYPES.length; i++) {
 					pauses.add(new ArrayList<>());
 				}
 				retVal.add(student);
@@ -779,9 +699,6 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 					}
 					retVal.add(min[i]+"");
 					retVal.add(max[i]+"");
-					if (mean[i] == 0) {
-						int a = 0;
-					}
 					retVal.add(std(pauses.get(i),mean[i])+"");
 					sum[i] += numCommmands[i];
 					sumPause[i] += pauseTimes[i];
@@ -817,7 +734,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		return Math.sqrt(sum/pauses.size());
 	}
 	
-	private String[] getPauseHeader() {
+	public String[] getPauseHeader() {
 		List<String> retVal = new ArrayList<>();
 		retVal.add("ID");
 		for (String s : PauseCommand.TYPES) {
@@ -894,7 +811,9 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 	}
 	
 	public List<List<EHICommand>> replayLogs(String projectPath, Analyzer analyzer){
-		refineLogFiles(projectPath);
+		if (!(this instanceof AExperimentalReplayer)) {
+			refineLogFiles(projectPath);
+		}
 //		List<List<EHICommand>> nestedCommands = analyzer.convertXMLLogToObjects(projectPath+File.separator+"Logs"+File.separator+"Eclipse"+File.separator+"Rest");
 		List<List<EHICommand>> nestedCommands = analyzer.convertXMLLogToObjects(projectPath+File.separator+"Logs"+File.separator+"Eclipse");
 		sortNestedCommands(nestedCommands);
@@ -1202,56 +1121,6 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 	public int getTotalExceptions() {
 		return totalExceptions;
 	}
-
-	protected List<EHICommand> readWebCommands(File file){
-		if (!file.exists()) {
-			return null;
-		}
-		List<EHICommand> retVal = new ArrayList<>();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(file));
-			String nextLine;
-			SimpleDateFormat format = new SimpleDateFormat("M/d/yyyy hh:mm:ss");
-			Date date;
-			String keyword;
-			String url;
-			WebCommand webCommand;
-			while ((nextLine = br.readLine()) != null) {
-				try {
-					String[] tokens = nextLine.split("\t");
-					if (tokens.length >= 3) {
-						date = format.parse(tokens[0]);
-						keyword = tokens[1];
-						url = tokens[2];
-						if (keyword.contains("google.com/url?") || keyword.equals(url)) {
-							continue;
-						}
-						webCommand = new WebCommand(keyword, url);
-						webCommand.setTimestamp(date.getTime());
-						retVal.add(0, webCommand);
-					} else {
-						System.out.println("Failed to parse WebCommand");
-					}
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return retVal;
-	}
 	
 	public List<List<List<String>>> getMetrics() {
 		List<List<List<String>>> retval = new ArrayList<>();
@@ -1320,165 +1189,6 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		return localCheckEvents;
 	}
 	
-	public void createLocalCheckCommands(String classFolderPath) {
-		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		File folder = new File(classFolderPath);
-		if (!folder.exists()) {
-			System.out.println("Class Folder does not exist");
-			System.exit(0);
-		}
-		File[] assigns = folder.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		});
-		int numThread = 0;
-		for (int i = 0; i < assigns.length; i++) {
-			File assignFolder = assigns[i];
-			File[] students = assignFolder.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
-			numThread += students.length;
-		}
-		latch = new CountDownLatch(numThread);
-		for (int i = 0; i < assigns.length; i++) {
-			File assignFolder = assigns[i];
-			Map<String, List<String[]>> localCheckEvents = readLocalCheckEvents(assignFolder.getName());
-			File[] students = assignFolder.listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.isDirectory();
-				}
-			});
-			for (int j = 0; j < students.length; j++) {
-				File studentFolder  = students[j];
-				File submissionFolder = new File(studentFolder,"Submission attachment(s)");
-				if (!submissionFolder.exists()) {
-					latch.countDown();
-					continue;
-				}
-//				for (File projectFolder : submissionFolder.listFiles(new FileFilter() {
-//					public boolean accept(File pathname) {
-//						return pathname.isDirectory() && !pathname.getName().contains("MACOS");
-//					}
-//				})) {
-				File projectFolder = getProjectFolder(submissionFolder);
-					System.out.println("Reading " + assignFolder.getName() + " student " + studentFolder.getName());
-					if (studentFolder.getName().contains("1c8e2c2ba9636343795f1aeee358e19f43e94a85a7fdfb93f2e8cb93a5069f4, 2bce409e9ada340221698a5b7a74544dafe6d55b5e045ec973daad6ebc43(145e83d368d49a58760e051541aa7434c833b771c9db6b319ab038ce25cf)")) {
-						int a = 0;
-					}
-					File[] logs = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse"+File.separator+"Rest").listFiles(new FileFilter() {
-						public boolean accept(File pathname) {
-							return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");
-						}
-					});
-					if (logs == null || !localCheckEvents.containsKey(studentFolder.getName())) {
-						synchronized (this) {
-							threadCount--;
-						}
-						latch.countDown();
-						continue;
-					}
-					Thread thread = new Thread(new Runnable() {
-						public void run() {
-
-							try {
-								List<String[]> studentLC = localCheckEvents.get(studentFolder.getName());
-								for (File file : logs) {
-									List<EHICommand> commands = readOneLogFile(file.getPath(), analyzer);
-									if (commands.size() < 2) {
-										continue;
-									}
-									List<EHICommand> newCommands = new ArrayList<>();
-									EHICommand last = null;
-									EHICommand cur = null;
-									int i = 0;
-									String[] event = studentLC.get(i);
-									long timestamp = df.parse(event[1]).getTime();
-									for (EHICommand command : commands) {
-										if (cur == null) {
-											cur = command;
-											newCommands.add(command);
-										} else {
-											last = cur;
-											cur = command;
-											if (timestamp >= last.getStartTimestamp()+last.getTimestamp() && timestamp < cur.getStartTimestamp() + cur.getTimestamp()) {
-												List<String> events = new ArrayList<>();
-												while (timestamp < cur.getStartTimestamp() + cur.getTimestamp() && i+1 < studentLC.size()) {
-													events.add(event[2]);
-													i++;
-													event = studentLC.get(i);
-													timestamp = df.parse(event[1]).getTime();
-												}
-												LocalCheckCommand command2 = new LocalCheckCommand(events);
-												command2.setStartTimestamp(last.getStartTimestamp());
-												command2.setTimestamp(timestamp-last.getStartTimestamp());
-												newCommands.add(command2);
-											}
-										}
-									}
-									String logContent = XML_START1 + getLogFileCreationTime(file) + XML_START2 + XML_VERSION + XML_START3;
-									for (EHICommand c : newCommands) {
-										logContent += c.persist();
-									}
-									logContent += XML_FILE_ENDING;
-									try {
-										File newLog = new File(file.getParent()+File.separator+"LocalCheck"+File.separator+file.getName());
-										if (newLog.exists()) {
-											newLog.delete();
-										}
-										newLog.getParentFile().mkdirs();
-										newLog.createNewFile();
-										BufferedWriter writer = new BufferedWriter(new FileWriter(newLog, true));
-										System.out.println("Writing to file " + newLog.getPath());
-										writer.write(logContent);
-										writer.close();
-										System.out.println("Finished writing to file " + newLog.getPath());
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-								}
-							} catch (Exception e) {
-								e.printStackTrace();
-							}finally {
-								synchronized (this) {
-									threadCount--;
-								}
-								latch.countDown();
-							}
-						}							
-					});
-					while(true) {
-						if (threadCount > THREAD_LIM) {
-							try {
-								Thread.sleep(1000);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-						
-						if (threadCount <= THREAD_LIM) {
-							synchronized (this) {
-								threadCount++;
-								thread.start();
-								break;
-							}
-						}
-					}
-				}
-			}
-//		}
-		try {
-			latch.await();
-			System.out.println(latch.getCount());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			System.exit(0);
-		}
-	}
-	
 	public File getProjectFolder(File folder) {
 		for (File file : folder.listFiles((file)->{
 			return file.isDirectory();
@@ -1493,5 +1203,199 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			return getProjectFolder(file);
 		}
 		return folder;
+	}
+
+	public String readWebContent(String aURL) {
+		String content = "";
+		Scanner sc = null;
+		try {
+			URL url = new URL(aURL);
+			URLConnection con = url.openConnection();
+			con.setReadTimeout(5000);
+			sc = new Scanner(con.getInputStream());
+			StringBuffer sb = new StringBuffer();
+			while (sc.hasNext()) {
+				sb.append(sc.next());
+			}
+			content = sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (sc != null) {
+				sc.close();
+			}
+		}
+		if (content.equals("") && !aURL.substring(0,5).equals("https")) {
+			aURL = aURL.replaceFirst("http", "https");
+			return readWebContent(aURL);
+		}
+		
+		return content;
+	}
+	
+	public void createWebStats(String assign, File folder, Map<String, List<List<EHICommand>>> data) {
+		File csv = new File(folder,assign+"WebStats.csv");
+		FileWriter fw;
+		File csv2 = new File(folder,assign+"WebSearches.csv");
+		FileWriter fw2;
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			if (csv2.exists()) {
+				csv2.delete();
+			}
+			csv.createNewFile();
+			csv2.createNewFile();
+			fw = new FileWriter(csv);
+			fw2 = new FileWriter(csv2);
+			CSVWriter cw = new CSVWriter(fw);
+			CSVWriter cw2 = new CSVWriter(fw2);
+			String[] header = {"Title", "URL", "# of Visits", "Provided?"};
+//			String[] header2 = {"ID", "Search Word", "Title", "URL", "Sequence", "Last Page of the Search?", "Pasted Text"};
+			String[] header2 = {"Search Word"};
+			cw.writeNext(header);
+			cw2.writeNext(header2);
+
+			Map<String, Integer> urls = new HashMap<>();
+			Map<String, String> titles = new HashMap<>();
+			Map<String, List<String>> searches = new LinkedHashMap<>();
+			Map<String, List<String>> contents = new HashMap<>();
+			for (String student : data.keySet()) {
+				EHICommand lastSearch = null;
+				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				for (List<EHICommand> commands : nestedCommands) {
+					for (int i = 0; i < commands.size(); i++) {
+						EHICommand command = commands.get(i);
+						if (command instanceof WebCommand) {
+							String url = command.getDataMap().get("URL");
+							if (command.getAttributesMap().get("type").equals("Search")) {
+								lastSearch = command;
+								if (!searches.containsKey(lastSearch.getDataMap().get("keyword"))) {
+									searches.put(lastSearch.getDataMap().get("keyword"), new ArrayList<>());
+								}
+							} 
+							if (command.getAttributesMap().get("type").equals("Search Result") || command.getAttributesMap().get("type").equals("Stack Overflow")) {
+								String searchWord = "null";
+								if (lastSearch != null) {
+									searchWord = lastSearch.getDataMap().get("keyword");
+								}
+								if (!searches.containsKey(searchWord)) {
+									searches.put(searchWord, new ArrayList<>());
+								}
+								searches.get(searchWord).add(url);
+//								if (!contents.containsKey(url)) {
+//									List<String> list = new ArrayList<>();
+//									if (!url.contains("google.com")) {
+//										list.add(readWebContent(url));
+////										list.add(readWebContent2(url));
+//										contents.put(url, list);
+//									}
+//								}
+							}
+							if (command.getAttributesMap().get("type").contains("Provided")) {
+//								if (!searches.containsKey("Provided")) {
+//									searches.put("Provided", new ArrayList<>());
+//								}
+//								searches.get("Provided").add(url);
+//								if (!contents.containsKey(url)) {
+//									List<String> list = new ArrayList<>();
+//									list.add(readWebContent(url));
+////									list.add(readWebContent2(url));
+//									contents.put(url, list);
+//								}
+							}
+							urls.merge(url, 1, Integer::sum);
+							titles.put(url, command.getDataMap().get("keyword"));
+						}
+						if (command instanceof PasteCommand) {
+							outer:
+							for (int j = i-1; j >= 0 && j > i-20; j--) {
+								EHICommand command2 = commands.get(j);
+								String pastedText = "";
+								if (command2 instanceof InsertStringCommand || command2 instanceof Replace) {
+									if (command2 instanceof InsertStringCommand) {
+										pastedText = command2.getDataMap().get(InsertStringCommand.XML_Data_Tag);
+									} else {
+										pastedText = command2.getDataMap().get("insertedText");
+									}
+									if (pastedText.length() > 10) {
+										for (String url : contents.keySet()) {
+											List<String> list = contents.get(url);
+											String pastedText2 = pastedText.replaceAll("\\s", "");
+											if (list.get(0).contains(pastedText2)) {
+												for (int k = 1; k < list.size(); k++) {
+													if (list.get(k).replaceAll("\\s",  "").equals(pastedText2)) {
+														break outer;
+													}
+												}
+												list.add(pastedText);
+												break outer;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				for (String s : searches.keySet()) {
+					List<String> nextLine = new ArrayList<>();
+//					nextLine.add(student);
+					if (s.contains(" - Google Search")) {
+						s = s.substring(0,s.indexOf(" - Google Search"));
+					} 
+					nextLine.add(s);
+					cw2.writeNext(nextLine.toArray(new String[1]));
+
+//					if (searches.get(s).size() == 0) {
+//						nextLine.add("No Result");
+//						cw2.writeNext(nextLine.toArray(new String[1]));
+//						continue;
+//					}
+//					for (int i = 0; i < searches.get(s).size(); i++) {
+//						String url = searches.get(s).get(i);
+//						nextLine.add(titles.get(url));
+//						nextLine.add(url);
+//						nextLine.add(i+1+"");
+//						nextLine.add(i == searches.get(s).size()-1 ? "Last" : "");
+//						if (contents.containsKey(url)) {
+//							List<String> list = contents.get(url);
+//							for (int j = 1; j < list.size(); j++) {
+//								nextLine.add(list.get(j));
+//							}
+//						}
+//						cw2.writeNext(nextLine.toArray(new String[1]));
+//						nextLine = new ArrayList<>();
+//						nextLine.add(student);
+//						nextLine.add("");
+//					}
+				}
+				searches.clear();
+			}
+			Map<String, Integer> sortedMap = new LinkedHashMap<>();
+			urls.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
+			for (String s : sortedMap.keySet()) {
+				String[] nextLine = {titles.get(s), s, sortedMap.get(s)+"", isProvided(s)? "Provided":""};
+				cw.writeNext(nextLine);
+			}
+			fw.close();
+			cw.close();
+			
+			fw2.close();
+			cw2.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	private boolean isProvided(String s) {
+		for (String url : WebCommand.PROVIDED_URL) {
+			if (s.equals(url)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
