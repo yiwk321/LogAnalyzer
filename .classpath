@@ -123,10 +123,5 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/HelpView"/>
 	<classpathentry kind="lib" path="/Hermes/lib/json-20170516.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-10.0.2">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

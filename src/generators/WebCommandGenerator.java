@@ -1,11 +1,9 @@
 package generators;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,18 +11,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import analyzer.Analyzer;
 import fluorite.commands.EHICommand;
 import fluorite.commands.WebCommand;
+import logAnalyzer.Replayer;
 
 public class WebCommandGenerator extends PauseCommandGenerator{
 	EHICommand webCommand = null;
 	List<EHICommand> webCommands = null;
 	Iterator<EHICommand> webCommandIterator = null;
 	
-	public WebCommandGenerator(Analyzer anAnalyzer, CountDownLatch aLatch, File[] logs, Integer aThreadCount, File studentFolder, String aSurfix) {
-		super(anAnalyzer, aLatch, logs, aThreadCount, aSurfix);
+	public WebCommandGenerator(Replayer replayer, CountDownLatch aLatch, Map<String, List<EHICommand>> commandMap, File studentFolder) {
+		super(replayer, aLatch, commandMap);
 		File browser = new File(studentFolder, "Browser");
 		if (browser.exists() && browser.listFiles().length != 0) {
 			webCommands = readWebCommands(browser.listFiles()[0]);
@@ -73,19 +72,19 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 		}
 	}
 	
-	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {
-		if (iterator == null) {
-			return null;
-		}
-		EHICommand webCommand = null;
-		long timestamp = 0;
-		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getTimestamp() - startTimestamp) < 0) {
-			webCommand.setStartTimestamp(0);
-			webCommand.setTimestamp(timestamp);
-			commands.add(webCommand);
-		}
-		return webCommand;
-	}
+//	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {
+//		if (iterator == null) {
+//			return null;
+//		}
+//		EHICommand webCommand = null;
+//		long timestamp = 0;
+//		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getTimestamp() - startTimestamp) < 0) {
+//			webCommand.setStartTimestamp(0);
+//			webCommand.setTimestamp(timestamp);
+//			commands.add(webCommand);
+//		}
+//		return webCommand;
+//	}
 	
 	protected List<EHICommand> readWebCommands(File file){
 		if (!file.exists()) {

@@ -1,52 +1,44 @@
 package generators;
 
-import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import analyzer.Analyzer;
 import fluorite.commands.EHICommand;
 import fluorite.commands.PauseCommand;
-import logAnalyzer.AReplayer;
+import logAnalyzer.Replayer;
 
 public class PauseCommandGenerator extends CommandGenerator{
-	Analyzer analyzer;
-	CountDownLatch latch;
-	File[] logs;
-	Integer threadCount;
-	
-	public PauseCommandGenerator(Analyzer anAnalyzer, CountDownLatch aLatch, File[] logs, Integer aThreadCount, String aSurfix) {
-		analyzer = anAnalyzer;
+	public PauseCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, Map<String, List<EHICommand>> aMap) {
 		latch = aLatch;
-		this.logs = logs;
-		threadCount = aThreadCount;
-		surfix = aSurfix;
+		commandMap = aMap;
+		replayer = aReplayer;
 	}
 
 	public void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {
 		long rest = cur.getTimestamp()-last.getTimestamp();
-		if (rest >= 1*AReplayer.ONE_SECOND) {
+		if (rest >= 1*Replayer.ONE_SECOND) {
 			String range = "";
-			if (rest < 2*AReplayer.ONE_SECOND) {
+			if (rest < 2*Replayer.ONE_SECOND) {
 				range = "1s-2s";
-			} else if (rest < 5*AReplayer.ONE_SECOND) {
+			} else if (rest < 5*Replayer.ONE_SECOND) {
 				range = "2s-5s";
-			} else if (rest < 10*AReplayer.ONE_SECOND) {
+			} else if (rest < 10*Replayer.ONE_SECOND) {
 				range = "5s-10s";
-			} else if (rest < 20*AReplayer.ONE_SECOND) {
+			} else if (rest < 20*Replayer.ONE_SECOND) {
 				range = "10s-20s";
-			} else if (rest < 30*AReplayer.ONE_SECOND) {
+			} else if (rest < 30*Replayer.ONE_SECOND) {
 				range = "20s-30s";
-			} else if (rest < AReplayer.ONE_MIN) {
+			} else if (rest < Replayer.ONE_MIN) {
 				range = "30s-1m";
-			} else if (rest < AReplayer.TWO_MIN) {
+			} else if (rest < Replayer.TWO_MIN) {
 				range = "1m-2m";
-			} else if (rest < AReplayer.FIVE_MIN) {
+			} else if (rest < Replayer.FIVE_MIN) {
 				range = "2m-5m";
-			} else if (rest < AReplayer.TEN_MIN) {
+			} else if (rest < Replayer.TEN_MIN) {
 				range = "5m-10m";
-			} else if (rest < 3*AReplayer.TEN_MIN) {
+			} else if (rest < 3*Replayer.TEN_MIN) {
 				range = "10m-30m";
-			} else if (rest < 6*AReplayer.TEN_MIN) {
+			} else if (rest < 6*Replayer.TEN_MIN) {
 				range = "30m-60m";
 			} else {
 				range = ">1h";
