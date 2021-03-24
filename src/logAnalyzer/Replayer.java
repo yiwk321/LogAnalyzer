@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import dayton.ellwanger.helpbutton.exceptionMatcher.ExceptionMatcher;
@@ -53,7 +56,7 @@ import generators.PauseCommandGenerator;
 public abstract class Replayer{
 	public static final int PAUSE = 0;
 	public static final int LOCALCHECK = 1;
-	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\git\\Hermes_Log_Parser\\NewVersionTest\\assignment1_events.csv";
+	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\git\\Hermes_Log_Parser\\NewVersionTest\\";
 	public static final String REST_INSESSION = "Rest(In Session)";
 	public static final String REST_ENDSESSION = "Rest(End Session)";
 	public static final String REST_LOSEFOCUS = "Rest(Lose Focus)";
@@ -90,20 +93,22 @@ public abstract class Replayer{
 			System.out.println("Folder " + student + " does not exist");
 			return null;
 		}
+		File logFolder = null;
 		File submission = new File(student,"Submission attachment(s)");
-		if (!submission.exists()) {
-			System.out.println("Folder " + submission + " does not exist");
+		if (submission.exists()) {
+			logFolder = new File(getProjectFolder(submission), "Logs"+File.separator+"Eclipse");
+		} else {
+			logFolder = new File(student, "Eclipse");
+		}
+		if (!logFolder.exists()) {
+			System.out.println("No logs found for student " + student.getName());
 			return null;
 		}
-		File projectFolder = getProjectFolder(submission);
-		File logFolder = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse");
 		File[] logFiles = logFolder.listFiles(File::isDirectory);
 		if (logFiles != null && logFiles.length > 0) {
-			
 			logFiles = logFiles[0].listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
 		} else {
-			logFiles = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse").listFiles((file)
-				->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
+			logFiles = logFolder.listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
 		}
 		if (logFiles == null) {
 			System.out.println("No logs found for student " + student.getName());
@@ -126,12 +131,10 @@ public abstract class Replayer{
 			System.out.println("log does not exist:" + path);
 			return null;
 		}
-
 		if (!path.endsWith(".xml")) {
 			System.out.println("log is not in xml format:" + path);
 			return null;
 		}
-
 		try {
 			List<EHICommand> commands = reader.readAll(path);
 			sortCommands(commands, 0, commands.size()-1);
@@ -144,19 +147,22 @@ public abstract class Replayer{
 	
 	protected Map<String, List<String[]>> readLocalCheckEvents(String assign) {
 		Map<String, List<String[]>> localCheckEvents = new HashMap<>();
-//		for (File file : new File(LOCALCHECK_EVENTS).listFiles()) {
-//			if (!assign.substring(assign.indexOf(" ")+1).equals(file.getName().substring("assignment".length(),file.getName().indexOf("_")))) {
-//				continue;
-//			}
-			try {
-				File file = new File(LOCALCHECK_EVENTS);
+		Pattern pattern = Pattern.compile("(\\d)+");
+		Matcher logMatcher = null;
+		Matcher eventsMatcher = null;
+		try {
+			File folder = new File(LOCALCHECK_EVENTS);
+			File[] files = folder.listFiles((f)->{return f.getName().endsWith(".csv");});
+			for (File file : files) {
+				logMatcher = pattern.matcher(assign.substring(assign.lastIndexOf(File.separator)));
+				eventsMatcher = pattern.matcher(file.getName());
+				if (!(logMatcher.find() && eventsMatcher.find() && logMatcher.group(0).equals(eventsMatcher.group(0)))) {
+					continue;
+				}
 				CSVReader cr = new CSVReader(new FileReader(file));
 				String[] nextLine = cr.readNext();
 				List<String[]> studentLC = null;
 				while ((nextLine = cr.readNext()) != null) {
-//					if ((nextLine[3]+","+nextLine[4]).equals("13ed2397140edcfe071c453b9990e31af758f26e76d1c6b4a26299b3f6, 86a8112cd14986dbeee69b6c3787724bb86e52f221fce5070f87de1a1cf3(237fa787eb14c996eabaaebcabfd94fd9931aab3b9cde4b6a5a6c66e54b9ee)")) {
-//						int a = 0;
-//					}
 					if (!localCheckEvents.containsKey(assign+File.separator+nextLine[3]+","+nextLine[4])) {
 						studentLC = new ArrayList<>();
 						localCheckEvents.put(assign+File.separator+nextLine[3]+","+nextLine[4], studentLC);
@@ -164,14 +170,15 @@ public abstract class Replayer{
 					studentLC.add(nextLine);
 				}
 				cr.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			} 
-//		}
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} 
 		return localCheckEvents;
 	}
 	
@@ -213,7 +220,6 @@ public abstract class Replayer{
 			e.printStackTrace();
 		} finally {
 			System.out.println("Done!");
-//			System.exit(0);
 		}
 	}
 	
@@ -241,10 +247,9 @@ public abstract class Replayer{
 		for (String fileName : logToWrite.keySet()) {
 			try {
 				File file = new File(fileName);
-				if (file.getParent().contains("Eclipse")) {
+				if (file.getParentFile().getName().contains("Eclipse")) {
 					file = new File(file.getParent()+File.separator+surfix+File.separator+file.getName());
 				}
-//				File newLog = new File(file.getParent()+File.separator+surfix+File.separator+file.getName());
 				System.out.println("Writing to file " + file.getPath());
 				if (file.exists()) {
 					file.delete();
@@ -269,7 +274,6 @@ public abstract class Replayer{
 			e.printStackTrace();
 		} finally {
 			System.out.println("Done!");
-//			System.exit(0);
 		}
 	}
 	
@@ -289,9 +293,9 @@ public abstract class Replayer{
 			fw = new FileWriter(csv);
 			CSVWriter cw = new CSVWriter(fw);
 			String[] header = {"Student", "Total Time Spent", "Active Time", 
-							   "Rest Time", "Wall Clock Time", "Insert", "Delete", 
-							   "Replace", "Copy", "Paste", "Run", "Exception", 
-							   "LocalChecks", "Exception Breakdown"};
+							   "Rest Time", "Wall Clock Time", "Pause", "Web", 
+							   "Insert", "Delete", "Replace", "Copy", "Paste", 
+							   "Run", "Exception", "LocalChecks", "Exception Breakdown"};
 			cw.writeNext(header);
 			
 			if (csv2.exists()) {
@@ -336,7 +340,7 @@ public abstract class Replayer{
 						if (command != null) {
 							curTime = command.getTimestamp() + command.getStartTimestamp();
 						}
-						if (lastTime - curTime > 5*60*1000) {
+						if (lastTime - curTime > FIVE_MIN) {
 							addOneLine(output, assign, lastTime, REST_INSESSION, student);
 						}
 						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
@@ -412,7 +416,7 @@ public abstract class Replayer{
 											lastTime = curTime;
 										}
 										curTime = command.getTimestamp() + command.getStartTimestamp();
-										if (lastTime - curTime > 5*60*1000) {
+										if (lastTime - curTime > FIVE_MIN) {
 											addOneLine(output, assign, lastTime, REST_INSESSION, student);
 										}
 										if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
@@ -432,7 +436,7 @@ public abstract class Replayer{
 												lastTime = curTime;
 											}
 											curTime = command.getTimestamp() + command.getStartTimestamp();
-											if (lastTime - curTime > 5*60*1000) {
+											if (lastTime - curTime > FIVE_MIN) {
 												addOneLine(output, assign, lastTime, REST_INSESSION, student);
 											}
 											addOneLine(output, assign, curTime, getEventType(ex), student);
@@ -459,9 +463,7 @@ public abstract class Replayer{
 				for(int i = 0; i < numCommands.length; i++) {
 					retVal.add(i+5, numCommands[i]+"");
 					sum[i] += numCommands[i];
-					if (i > 1) {
-						sum[numCommands.length] += numCommands[i];
-					}
+					sum[numCommands.length] += numCommands[i];
 				}
 				for(int i = 0; i < breakdownList.size(); i++) {
 					retVal.add(i+5+numCommands.length, breakdownList.get(i));
@@ -475,7 +477,7 @@ public abstract class Replayer{
 			retVal.add("");
 			retVal.add("");
 			retVal.add("");
-			for (int i = 1; i < sum.length; i++) {
+			for (int i = 0; i < sum.length; i++) {
 				retVal.add(sum[i]+"");
 			}
 			String[] nextLine = retVal.toArray(new String[1]);
@@ -586,8 +588,8 @@ public abstract class Replayer{
 			long[] sumPause = new long[sum.length];
 			assign = assign.substring(assign.lastIndexOf(File.separator)+1);
 			for (String student : data.keySet()) {
-				System.out.println("Generating PauseDistribution for student " + student);
 				List<List<EHICommand>> nestedCommands = data.get(student);
+				if (nestedCommands.size() == 0) continue;
 				student = student.substring(student.lastIndexOf(File.separator)+1);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
@@ -661,6 +663,8 @@ public abstract class Replayer{
 			
 			for (String student : data.keySet()) {
 				List<List<EHICommand>> nestedCommands = data.get(student);
+				if (nestedCommands.size() == 0) continue;
+				student = student.substring(student.lastIndexOf(File.separator)+1);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
 				long[] pauseTimes = new long[sum.length];
@@ -1092,28 +1096,18 @@ public abstract class Replayer{
 	
 	protected long[] restTime(List<List<EHICommand>> nestedCommands, long time, long time2) {
 		long[] restTime = {0,0,0};
-		for (int i = 0; i < nestedCommands.size(); i++) {
-			List<EHICommand> commands = nestedCommands.get(i);
-			EHICommand last = null;
-			EHICommand cur = null;
-			int k = 0;
-			for(; k < commands.size(); k++) {
-				if (commands.get(k).getStartTimestamp() > 0 || commands.get(k).getTimestamp() > 0) {
-					break;
-				}
-			}
-			for(; k < commands.size(); k++) {
-				if (cur != null) {
-					last = cur;
-				}
-				cur = commands.get(k);
-				if (last != null) {
-					long diff = cur.getStartTimestamp() + cur.getTimestamp() - last.getTimestamp() - last.getStartTimestamp();
-					if (diff > time) {
-						restTime[0] += diff;
-						if (diff < time2) {
+		for (List<EHICommand> commands : nestedCommands) {
+			for (EHICommand command : commands) {
+				if (command instanceof PauseCommand) {
+					long pause = Long.parseLong(command.getDataMap().get("pause"));
+					if (pause == 1819257) {
+						int a = 0;
+					}
+					if (pause > time) {
+						restTime[0] += pause;
+						if (pause < time2) {
 							restTime[1]++;
-							restTime[2] += diff;
+							restTime[2] += pause;
 						}
 					}
 				}
@@ -1237,16 +1231,20 @@ public abstract class Replayer{
 			System.out.println("Folder " + student + " does not exist");
 			return;
 		}
+		File logFolder = null;
 		File submission = new File(student,"Submission attachment(s)");
-		if (!submission.exists()) {
-			System.out.println("Folder " + submission + " does not exist");
-			return ;
+		if (submission.exists()) {
+			logFolder = new File(getProjectFolder(submission), "Logs"+File.separator+"Eclipse");
+		} else {
+			logFolder = new File(student, "Eclipse");
 		}
-		File projectFolder = getProjectFolder(submission);
-		File logFolder = new File(projectFolder.getPath(), "Logs"+File.separator+"Eclipse");
-		File[] logFiles = logFolder.listFiles(File::isDirectory);
-		if (logFiles != null && logFiles.length > 0) {
-			for (File file : logFiles) {
+		if (!logFolder.exists()) {
+			System.out.println("No logs found for student " + student.getName());
+			return;
+		}
+		File[] generatedLogs = logFolder.listFiles(File::isDirectory);
+		if (generatedLogs != null && generatedLogs.length > 0) {
+			for (File file : generatedLogs) {
 				deleteFolder(file);
 			}
 		}

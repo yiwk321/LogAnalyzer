@@ -20,8 +20,9 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 		studentLC = events;
 	}
 	
-	public void addCommands(List<EHICommand> commands, List<EHICommand> newCommands) {
+	public List<EHICommand> addCommands(List<EHICommand> commands) {
 		if (i < studentLC.size()) {
+			List<EHICommand> newCommands = new ArrayList<>();
 			EHICommand last = null;
 			EHICommand cur = null;
 			String[] event = null;
@@ -44,6 +45,9 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 							LocalCheckCommand command2 = new LocalCheckCommand(event[2]);
 							command2.setStartTimestamp(last.getStartTimestamp());
 							command2.setTimestamp(timestamp-last.getStartTimestamp());
+							if (command2.getStartTimestamp() == 0) {
+								int a = 0;
+							}
 							newCommands.add(command2);
 							i++;
 							if (i >= studentLC.size()) {
@@ -60,9 +64,9 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 					newCommands.add(command);
 				}
 			}
-			commands = newCommands;
-			newCommands = new ArrayList<>();
+			return super.addCommands(newCommands);
+		} else {
+			return super.addCommands(commands);
 		}
-		super.addCommands(commands, newCommands);
 	}
 }

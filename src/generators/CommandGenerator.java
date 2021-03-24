@@ -34,19 +34,19 @@ public abstract class CommandGenerator implements Runnable {
 		try {
 			System.out.println(Thread.currentThread().getName() + " started");
 			for (String fileName : commandMap.keySet()) {
-				List<EHICommand> commands = commandMap.get(fileName);
+				List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
 				File file = new File(fileName);
 				if (commands.size() < 2) {
 					continue;
 				}
-				List<EHICommand> newCommands = new ArrayList<>();
+				
 				long startTimestamp = getLogFileCreationTime(file);
 				if (commands.get(commands.size()-1).getStartTimestamp() == 0) {
 					for (EHICommand command : commands) {
 						command.setStartTimestamp(startTimestamp);
 					}
 				}
-				addCommands(commands, newCommands);
+				List<EHICommand> newCommands = addCommands(commands);
 				StringBuffer buf = new StringBuffer();
 				buf.append(Replayer.XML_START1 + getLogFileCreationTime(file) + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
 				int i = 0;
@@ -71,5 +71,16 @@ public abstract class CommandGenerator implements Runnable {
 		}
 	}
 	
-	public abstract void addCommands(List<EHICommand> commands, List<EHICommand> newCommands);
+	public List<EHICommand> removePauseCommands(List<EHICommand> commands) {
+		List<EHICommand> newCommands = new ArrayList<>();
+		for (int i = 0; i < commands.size(); i++) {
+			EHICommand command = commands.get(i);
+			if (!(command instanceof PauseCommand)) {
+				newCommands.add(command);
+			}
+		}
+		return newCommands;
+	}
+	
+	public abstract List<EHICommand> addCommands(List<EHICommand> commands);
 }

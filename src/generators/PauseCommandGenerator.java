@@ -1,5 +1,6 @@
 package generators;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -51,7 +52,8 @@ public class PauseCommandGenerator extends CommandGenerator{
 		newCommands.add(cur);
 	}
 
-	public void addCommands(List<EHICommand> commands, List<EHICommand> newCommands) {
+	public List<EHICommand> addCommands(List<EHICommand> commands) {
+		List<EHICommand> newCommands = new ArrayList<>();
 		EHICommand last = null;
 		EHICommand cur = null;
 		for (EHICommand command : commands) {
@@ -64,5 +66,6 @@ public class PauseCommandGenerator extends CommandGenerator{
 				maybeAddPauseCommand(newCommands, last, cur);
 			}
 		}
+		return newCommands;
 	}
 }

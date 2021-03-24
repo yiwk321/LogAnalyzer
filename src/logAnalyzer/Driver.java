@@ -10,6 +10,7 @@ public class Driver {
 //	private static String experimentalClassFolderPath = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData";
 	private static Replayer replayer;
 	static String path = "";
+	static boolean isRead = false;
 	
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -17,7 +18,7 @@ public class Driver {
 		enterPath(scanner);
 		out:
 		while(true) {
-			System.out.println("Enter Command: generate/analyze/change/delete/quit");
+			System.out.println("Enter Command: read/generate/analyze/change/delete/quit");
 			switch (scanner.nextLine().toLowerCase()) {
 			case "generate":
 				generate();
@@ -31,6 +32,9 @@ public class Driver {
 			case "delete":
 				delete();
 				break;
+			case "read":
+				read();
+				break;
 			case "quit":
 				break out;
 			default:
@@ -43,15 +47,25 @@ public class Driver {
 	}
 	
 	public static void generate() {
+		if (!isRead) read();
 		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
+		isRead = false;
 	}
 	
 	public static void analyze() {
+		if (!isRead) read();
 		replayer.analyze();
 	}
 	
 	public static void delete() {
 		replayer.delete(path);
+	}
+	
+	public static void read() {
+		if (new File(path).exists()) {
+			replayer.readLogs(path);
+			isRead = true;
+		} 
 	}
 	
 	public static void chooseMode(Scanner scanner) {
@@ -70,11 +84,11 @@ public class Driver {
 	}
 	
 	public static void enterPath(Scanner scanner) {
+		isRead = false;
 		while (true) {
 			System.out.println("Enter Folder Path:");
 			path = scanner.nextLine();
 			if (new File(path).exists()) {
-				replayer.readLogs(path);
 				return;
 			} 
 			System.out.println("Path Does Not Exist, Enter Again");
