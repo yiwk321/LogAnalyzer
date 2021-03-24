@@ -1100,9 +1100,6 @@ public abstract class Replayer{
 			for (EHICommand command : commands) {
 				if (command instanceof PauseCommand) {
 					long pause = Long.parseLong(command.getDataMap().get("pause"));
-					if (pause == 1819257) {
-						int a = 0;
-					}
 					if (pause > time) {
 						restTime[0] += pause;
 						if (pause < time2) {
