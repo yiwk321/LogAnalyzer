@@ -1,5 +1,6 @@
 package logAnalyzer;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +57,8 @@ import generators.PauseCommandGenerator;
 public abstract class Replayer{
 	public static final int PAUSE = 0;
 	public static final int LOCALCHECK = 1;
-	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\git\\Hermes_Log_Parser\\NewVersionTest\\";
+//	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\git\\Hermes_Log_Parser\\NewVersionTest\\";
+	public static final String LOCALCHECK_EVENTS = "LocalChecks Logs";
 	public static final String REST_INSESSION = "Rest(In Session)";
 	public static final String REST_ENDSESSION = "Rest(End Session)";
 	public static final String REST_LOSEFOCUS = "Rest(Lose Focus)";
@@ -96,14 +98,24 @@ public abstract class Replayer{
 		File logFolder = null;
 		File submission = new File(student,"Submission attachment(s)");
 		if (submission.exists()) {
-			logFolder = new File(getProjectFolder(submission), "Logs"+File.separator+"Eclipse");
+			logFolder = getProjectFolder(submission);
+			if (logFolder != null) {
+				logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+			}
 		} else {
 			logFolder = new File(student, "Eclipse");
+			if (!logFolder.exists()) {
+				logFolder = getProjectFolder(student);
+				if (logFolder != null) {
+					logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+				}
+			}
 		}
-		if (!logFolder.exists()) {
+		if (logFolder == null || !logFolder.exists()) {
 			System.out.println("No logs found for student " + student.getName());
 			return null;
 		}
+		refineLogFiles(logFolder);
 		File[] logFiles = logFolder.listFiles(File::isDirectory);
 		if (logFiles != null && logFiles.length > 0) {
 			logFiles = logFiles[0].listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
@@ -116,6 +128,9 @@ public abstract class Replayer{
 		}
 		Map<String, List<EHICommand>> logs = new TreeMap<>();
 		for (File logFile : logFiles) {
+			if (logFile.getName().equals("Log2021-01-26-15-37-27-356.xml")) {
+				int a = 0;
+			}
 			List<EHICommand> ret = readOneLogFile(logFile);
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
@@ -145,8 +160,31 @@ public abstract class Replayer{
 		return null;
 	}
 	
+	public void refineLogFiles(File logFolder){
+		try {
+			for (File file : logFolder.listFiles((filename)->{return filename.getName().endsWith(".lck");})) {
+				File logFile = new File(file.getParent(), file.getName().substring(0, file.getName().indexOf(".lck")));
+				BufferedReader reader = new BufferedReader(new FileReader(logFile));
+				String lastLine = null;
+				String currentLine = null;
+				while((currentLine = reader.readLine()) != null) {
+					lastLine = currentLine;
+				}
+				if (lastLine != null && !lastLine.endsWith("</Events>")) {
+					BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
+					writer.write(XML_FILE_ENDING);
+					writer.close();
+				}	
+				reader.close();
+				file.delete();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+	}
+	
 	protected Map<String, List<String[]>> readLocalCheckEvents(String assign) {
-		Map<String, List<String[]>> localCheckEvents = new HashMap<>();
+		Map<String, List<String[]>> localCheckEvents = new TreeMap<>();
 		Pattern pattern = Pattern.compile("(\\d)+");
 		Matcher logMatcher = null;
 		Matcher eventsMatcher = null;
@@ -159,13 +197,28 @@ public abstract class Replayer{
 				if (!(logMatcher.find() && eventsMatcher.find() && logMatcher.group(0).equals(eventsMatcher.group(0)))) {
 					continue;
 				}
+				System.out.println("Reading LocalChecks file " + file.getPath());
 				CSVReader cr = new CSVReader(new FileReader(file));
 				String[] nextLine = cr.readNext();
 				List<String[]> studentLC = null;
 				while ((nextLine = cr.readNext()) != null) {
-					if (!localCheckEvents.containsKey(assign+File.separator+nextLine[3]+","+nextLine[4])) {
+//					if (!localCheckEvents.containsKey(assign+File.separator+nextLine[3]+","+nextLine[4])) {
+//						studentLC = new ArrayList<>();
+//						localCheckEvents.put(assign+File.separator+nextLine[3]+","+nextLine[4], studentLC);
+//					}
+					String studentFolder = assign + File.separator;
+					for (int i = 0; i < nextLine.length-3; i++) {
+						if (nextLine[i+3].isEmpty()) {
+							continue;
+						}
+						if (i > 0) {
+							studentFolder += ",";
+						}
+						studentFolder += nextLine[i+3];
+					}
+					if (!localCheckEvents.containsKey(studentFolder)) {
 						studentLC = new ArrayList<>();
-						localCheckEvents.put(assign+File.separator+nextLine[3]+","+nextLine[4], studentLC);
+						localCheckEvents.put(studentFolder, studentLC);
 					}
 					studentLC.add(nextLine);
 				}
@@ -211,6 +264,7 @@ public abstract class Replayer{
 	}
 	
 	public void createExtraCommand(String surfix, int mode) {
+		logToWrite.clear();
 		CountDownLatch latch = new CountDownLatch(countStudents());
 		createExtraCommand(latch, surfix, mode);
 		try {
@@ -263,6 +317,7 @@ public abstract class Replayer{
 				e.printStackTrace();
 			}
 		}
+		logToWrite.clear();
 	}
 	
 	public void analyze() {
@@ -933,7 +988,7 @@ public abstract class Replayer{
 		return retVal.toString();
 	}
 	
-	protected void sortNestedCommands(List<List<EHICommand>> nestedCommands){
+	public void sortNestedCommands(List<List<EHICommand>> nestedCommands){
 		for (int i = 0; i < nestedCommands.size(); i++) {
 			List<EHICommand> commands = nestedCommands.get(i);
 			if (commands == null || commands.size() < 2) {
@@ -945,7 +1000,7 @@ public abstract class Replayer{
 		}
 	}
 	
-	private void sortCommands(List<EHICommand> commands, int start, int end){
+	public void sortCommands(List<EHICommand> commands, int start, int end){
 		for(int i = 0; i < commands.size(); i++) {
 			if (commands.get(i) == null) {
 				commands.remove(i);
@@ -954,11 +1009,11 @@ public abstract class Replayer{
 		}
 		EHICommand command = null;
 		long cur = 0;
-		for(int i = 2; i < commands.size(); i++) {
+		for(int i = 0; i < commands.size(); i++) {
 			command = commands.get(i);
 			cur = command.getStartTimestamp()+command.getTimestamp();
 			int j = i-1;
-			while (j > 1){
+			while (j >= 0){
 				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
 					j--;
 				} else {
@@ -1024,9 +1079,11 @@ public abstract class Replayer{
 			} 
 		}
 		for (File file : folder.listFiles(File::isDirectory)) {
-			return getProjectFolder(file);
+			if ((file = getProjectFolder(file)) != null) {
+				return file;
+			}
 		}
-		return folder;
+		return null;
 	}
 	
 	protected String[] getHeader() {
@@ -1234,6 +1291,9 @@ public abstract class Replayer{
 			logFolder = new File(getProjectFolder(submission), "Logs"+File.separator+"Eclipse");
 		} else {
 			logFolder = new File(student, "Eclipse");
+			if (!logFolder.exists()) {
+				logFolder = new File(getProjectFolder(student), "Logs"+File.separator+"Eclipse");
+			}
 		}
 		if (!logFolder.exists()) {
 			System.out.println("No logs found for student " + student.getName());

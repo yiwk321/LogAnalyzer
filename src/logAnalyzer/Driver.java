@@ -2,15 +2,19 @@ package logAnalyzer;
 
 import java.io.File;
 import java.util.Scanner;
+import mains.Main;
 
 public class Driver {
 //	E:\testdata\Fall2020
 //	C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData
 //	private static String classFolderPath = "E:\\testdata\\Fall2020";
 //	private static String experimentalClassFolderPath = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData";
-	private static Replayer replayer;
+//	E:\submissions_2\assignment_954981_export
+	public static Replayer replayer;
 	static String path = "";
 	static boolean isRead = false;
+	public static double multiplier = 1;
+	public static int defaultPauseTime = -1;
 	
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -21,21 +25,27 @@ public class Driver {
 			System.out.println("Enter Command: read/generate/analyze/change/delete/quit");
 			switch (scanner.nextLine().toLowerCase()) {
 			case "generate":
+			case "g":
 				generate();
 				break;
 			case "analyze":
+			case "a":
 				analyze();
 				break;
 			case "change":
+			case "c":
 				enterPath(scanner);
 				break;
 			case "delete":
+			case "d":
 				delete();
 				break;
 			case "read":
+			case "r":
 				read();
 				break;
 			case "quit":
+			case "q":
 				break out;
 			default:
 				System.out.println("Command Not Recognized, Enter Again");
@@ -47,8 +57,12 @@ public class Driver {
 	}
 	
 	public static void generate() {
+		System.out.println("Generating LocalChecks log");
+		String[] args = {path};
+		Main.main(args);
 		if (!isRead) read();
 		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
+//		replayer.createExtraCommand("Generated", Replayer.PAUSE);
 		isRead = false;
 	}
 	
@@ -70,16 +84,53 @@ public class Driver {
 	
 	public static void chooseMode(Scanner scanner) {
 		while (true){
-			System.out.println("Choose mode: semester/assign");
+			System.out.println("Choose mode: semester/assign/intell");
 			String input = scanner.nextLine();
-			if (input.contains("assign")) {
+			switch (input.toLowerCase()) {
+			case "assign":
+			case "a":
 				replayer = new AnAssignmentReplayer();
 				return;
-			} else if (input.contains("semester")){
+			case "semester":
+			case "s":
 				replayer = new ASemesterReplayer();
 				return;
+			case "intell":
+			case "i":
+				System.out.println("Enter pause time multiplier (default is 1):");
+//				double multiplier = 1;
+				while (true) {
+					try {
+						String string = scanner.nextLine();
+						if (string.isEmpty()) {
+							break;
+						}
+						multiplier = Double.parseDouble(string);
+						break;
+					} catch (Exception e) {
+						System.out.println("Multiplier must be double or empty line");
+					}
+				}
+				System.out.println("Enter default pause time (default is 5 min):");
+//				int defaultPauseTime = -1;
+				while (true) {
+					try {
+						String string = scanner.nextLine();
+						if (string.isEmpty()) {
+							break;
+						}
+						defaultPauseTime = Integer.parseInt(string);
+						break;
+					} catch (Exception e) {
+						System.out.println("Default pause time must be int or empty line");
+					}
+				}
+				replayer = new AnIntellAssignReplayer(multiplier, defaultPauseTime);
+				return;
+			default:
+				System.out.println("Command Not Recognized, Enter Again");
+				break;
 			}
-			System.out.println("Command Not Recognized, Enter Again");
 		}
 	}
 	

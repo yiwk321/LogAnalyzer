@@ -33,20 +33,38 @@ public abstract class CommandGenerator implements Runnable {
 	public void run() {
 		try {
 			System.out.println(Thread.currentThread().getName() + " started");
-			for (String fileName : commandMap.keySet()) {
+//			for (String fileName : commandMap.keySet()) {
+			String[] keyset = commandMap.keySet().toArray(new String[0]);
+			for (int j = 0; j < commandMap.size(); j++) {
+				String fileName = keyset[j];
 				List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
 				File file = new File(fileName);
 				if (commands.size() < 2) {
 					continue;
 				}
-				
+				if (fileName.contains("Log2021-02-18-15-39-50-636.xml")) {
+					int a = 0;
+				}
 				long startTimestamp = getLogFileCreationTime(file);
 				if (commands.get(commands.size()-1).getStartTimestamp() == 0) {
 					for (EHICommand command : commands) {
 						command.setStartTimestamp(startTimestamp);
 					}
 				}
-				List<EHICommand> newCommands = addCommands(commands);
+				List<EHICommand> newCommands = null;
+				if (j == commandMap.size()-1) {
+					newCommands = addCommands(commands, Long.MAX_VALUE);
+				} else {
+					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
+					long nextStartTime = -1;
+					for(int k = 0; k < nextCommands.size(); k++) {
+						if (nextCommands.get(k).getStartTimestamp() > 0 || nextCommands.get(k).getTimestamp() > 0) {
+							nextStartTime = nextCommands.get(k).getStartTimestamp();
+							break;
+						}
+					}
+					newCommands = addCommands(commands, nextStartTime);
+				}
 				StringBuffer buf = new StringBuffer();
 				buf.append(Replayer.XML_START1 + getLogFileCreationTime(file) + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
 				int i = 0;
@@ -82,5 +100,5 @@ public abstract class CommandGenerator implements Runnable {
 		return newCommands;
 	}
 	
-	public abstract List<EHICommand> addCommands(List<EHICommand> commands);
+	public abstract List<EHICommand> addCommands(List<EHICommand> commands, long nextStartTime);
 }
