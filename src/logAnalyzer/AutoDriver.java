@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Scanner;
 
 public class AutoDriver extends Driver{
-//	public static String folderPath = "E:\\submissions\\524";
 	public static String[] folderPath = {
 										"E:\\submissions\\533",
 										"E:\\submissions\\524"};

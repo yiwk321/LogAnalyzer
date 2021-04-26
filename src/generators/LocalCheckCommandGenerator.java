@@ -42,9 +42,6 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 				} else {
 					last = cur;
 					cur = command;
-					if (j == commands.size()-1) {
-						int a = 0;
-					}
 					if (j == commands.size()-1 && timestamp < nextStartTime) {
 						LocalCheckCommand command2 = new LocalCheckCommand(event[2]);
 						while (timestamp < nextStartTime && i < studentLC.size()) {
@@ -55,9 +52,6 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 							} else {
 								command2.setStartTimestamp(last.getStartTimestamp());
 								command2.setTimestamp(timestamp-last.getStartTimestamp());
-							}
-							if (command2.getTimestamp() == 565353) {
-								int a = 0;
 							}
 							newCommands.add(command2);
 							i++;
@@ -81,9 +75,6 @@ public class LocalCheckCommandGenerator extends PauseCommandGenerator {
 							} else {
 								command2.setStartTimestamp(last.getStartTimestamp());
 								command2.setTimestamp(timestamp-last.getStartTimestamp());
-							}
-							if (command2.getTimestamp() == 565353) {
-								int a = 0;
 							}
 							newCommands.add(command2);
 							i++;

@@ -57,7 +57,6 @@ import generators.PauseCommandGenerator;
 public abstract class Replayer{
 	public static final int PAUSE = 0;
 	public static final int LOCALCHECK = 1;
-//	public static final String LOCALCHECK_EVENTS = "C:\\Users\\Zhizhou\\git\\Hermes_Log_Parser\\NewVersionTest\\";
 	public static final String LOCALCHECK_EVENTS = "LocalChecks Logs";
 	public static final String REST_INSESSION = "Rest(In Session)";
 	public static final String REST_ENDSESSION = "Rest(End Session)";
@@ -128,9 +127,6 @@ public abstract class Replayer{
 		}
 		Map<String, List<EHICommand>> logs = new TreeMap<>();
 		for (File logFile : logFiles) {
-			if (logFile.getName().equals("Log2021-01-26-15-37-27-356.xml")) {
-				int a = 0;
-			}
 			List<EHICommand> ret = readOneLogFile(logFile);
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
@@ -202,10 +198,6 @@ public abstract class Replayer{
 				String[] nextLine = cr.readNext();
 				List<String[]> studentLC = null;
 				while ((nextLine = cr.readNext()) != null) {
-//					if (!localCheckEvents.containsKey(assign+File.separator+nextLine[3]+","+nextLine[4])) {
-//						studentLC = new ArrayList<>();
-//						localCheckEvents.put(assign+File.separator+nextLine[3]+","+nextLine[4], studentLC);
-//					}
 					String studentFolder = assign + File.separator;
 					for (int i = 0; i < nextLine.length-3; i++) {
 						if (nextLine[i+3].isEmpty()) {
@@ -949,7 +941,7 @@ public abstract class Replayer{
 	public double std(List<Long> pauses, double mean) {
 		double sum = 0;
 		for (Long l : pauses) {
-			sum += Math.pow((1.0 * l) - mean,2);
+			sum += Math.pow((double)l - mean,2);
 		}
 		return Math.sqrt(sum/pauses.size());
 	}

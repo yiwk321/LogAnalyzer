@@ -37,7 +37,6 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 		EHICommand last = null;
 		EHICommand cur = null;
 		if (webCommand == null) {
-//			webCommand = maybeAddWebCommandBeforeLogs(webCommandIterator, startTimestamp, newCommands);
 			webCommand = webCommandIterator.next();
 		}
 		long timestamp = 0;
@@ -45,9 +44,6 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 			timestamp = webCommand.getTimestamp() - commands.get(commands.size()-1).getStartTimestamp();
 		}
 		for (EHICommand command : commands) {
-//			if (command.getTimestamp() + logStartTimestamp < startTimestamp || command.getTimestamp() + logStartTimestamp > endTimestamp) {
-//				continue;
-//			}
 			if (cur == null) {
 				cur = command;
 				newCommands.add(command);
@@ -71,20 +67,6 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 			}
 		}
 	}
-	
-//	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {
-//		if (iterator == null) {
-//			return null;
-//		}
-//		EHICommand webCommand = null;
-//		long timestamp = 0;
-//		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getTimestamp() - startTimestamp) < 0) {
-//			webCommand.setStartTimestamp(0);
-//			webCommand.setTimestamp(timestamp);
-//			commands.add(webCommand);
-//		}
-//		return webCommand;
-//	}
 	
 	protected List<EHICommand> readWebCommands(File file){
 		if (!file.exists()) {

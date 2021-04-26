@@ -13,9 +13,6 @@ public class AnAssignmentReplayer extends Replayer {
 	protected Map<String, Map<String, List<EHICommand>>> allLogs;
 	
 	public void readLogs(String path) {
-//		if (root != null && root.getPath().equals(path)) {
-//			return;
-//		}
 		root = new File(path);
 		allLogs = readAssignment(root);
 	}

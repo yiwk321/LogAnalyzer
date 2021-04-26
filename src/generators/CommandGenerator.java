@@ -42,9 +42,6 @@ public abstract class CommandGenerator implements Runnable {
 				if (commands.size() < 2) {
 					continue;
 				}
-				if (fileName.contains("Log2021-02-18-15-39-50-636.xml")) {
-					int a = 0;
-				}
 				long startTimestamp = getLogFileCreationTime(file);
 				if (commands.get(commands.size()-1).getStartTimestamp() == 0) {
 					for (EHICommand command : commands) {

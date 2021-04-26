@@ -18,32 +18,6 @@ public class PauseCommandGenerator extends CommandGenerator{
 	public void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {
 		long rest = cur.getTimestamp()-last.getTimestamp();
 		if (rest >= 1*Replayer.ONE_SECOND) {
-//			String range = "";
-//			if (rest < 2*Replayer.ONE_SECOND) {
-//				range = "1s-2s";
-//			} else if (rest < 5*Replayer.ONE_SECOND) {
-//				range = "2s-5s";
-//			} else if (rest < 10*Replayer.ONE_SECOND) {
-//				range = "5s-10s";
-//			} else if (rest < 20*Replayer.ONE_SECOND) {
-//				range = "10s-20s";
-//			} else if (rest < 30*Replayer.ONE_SECOND) {
-//				range = "20s-30s";
-//			} else if (rest < Replayer.ONE_MIN) {
-//				range = "30s-1m";
-//			} else if (rest < Replayer.TWO_MIN) {
-//				range = "1m-2m";
-//			} else if (rest < Replayer.FIVE_MIN) {
-//				range = "2m-5m";
-//			} else if (rest < Replayer.TEN_MIN) {
-//				range = "5m-10m";
-//			} else if (rest < 3*Replayer.TEN_MIN) {
-//				range = "10m-30m";
-//			} else if (rest < 6*Replayer.TEN_MIN) {
-//				range = "30m-60m";
-//			} else {
-//				range = ">1h";
-//			}
 			PauseCommand command = new PauseCommand(last, cur, rest);
 			command.setStartTimestamp(last.getStartTimestamp());
 			command.setTimestamp(last.getTimestamp()+1);

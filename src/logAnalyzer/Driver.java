@@ -5,11 +5,8 @@ import java.util.Scanner;
 import mains.Main;
 
 public class Driver {
-//	E:\testdata\Fall2020
-//	C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData
 //	private static String classFolderPath = "E:\\testdata\\Fall2020";
 //	private static String experimentalClassFolderPath = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData";
-//	E:\submissions_2\assignment_954981_export
 	public static Replayer replayer;
 	static String path = "";
 	static boolean isRead = false;
@@ -98,7 +95,6 @@ public class Driver {
 			case "intell":
 			case "i":
 				System.out.println("Enter pause time multiplier (default is 1):");
-//				double multiplier = 1;
 				while (true) {
 					try {
 						String string = scanner.nextLine();
@@ -112,7 +108,6 @@ public class Driver {
 					}
 				}
 				System.out.println("Enter default pause time (default is 5 min):");
-//				int defaultPauseTime = -1;
 				while (true) {
 					try {
 						String string = scanner.nextLine();
