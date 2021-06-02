@@ -10,7 +10,7 @@ import logAnalyzer.AnIntervalReplayer;
 
 public class IntervalDriver {
 	public static final File STUDENT_FOLDER = new File("C:\\Users\\Zhizhou\\eclipse2021-workspace\\A1");
-	//Parse string to long if the date if a string
+	//Parse time stamps to long if they are strings
 	public static final DateFormat DF = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 	//For context based work time, a pause is considered a rest if pauseTime > MULTIPLIER * context-based-threshold
 	public static final double MULTIPLIER = 1;
