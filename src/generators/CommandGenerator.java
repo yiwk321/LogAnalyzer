@@ -32,7 +32,9 @@ public abstract class CommandGenerator implements Runnable {
 
 	public void run() {
 		try {
-			System.out.println(Thread.currentThread().getName() + " started");
+			if (latch != null) {
+				System.out.println(Thread.currentThread().getName() + " started");
+			}
 //			for (String fileName : commandMap.keySet()) {
 			String[] keyset = commandMap.keySet().toArray(new String[0]);
 			for (int j = 0; j < commandMap.size(); j++) {
@@ -81,8 +83,10 @@ public abstract class CommandGenerator implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
-			latch.countDown();
-			System.out.println(Thread.currentThread().getName() + " finished, " + latch.getCount() + " threads remaining");
+			if (latch != null) {
+				latch.countDown();
+				System.out.println(Thread.currentThread().getName() + " finished, " + latch.getCount() + " threads remaining");
+			}
 		}
 	}
 	

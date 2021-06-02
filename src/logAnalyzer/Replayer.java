@@ -14,9 +14,11 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,8 @@ import fluorite.util.EHLogReader;
 import generators.CommandGenerator;
 import generators.LocalCheckCommandGenerator;
 import generators.PauseCommandGenerator;
+import tests.Assignment;
+import tests.Suite;
 
 public abstract class Replayer{
 	public static final int PAUSE = 0;
@@ -80,6 +84,12 @@ public abstract class Replayer{
 	private Map<String, String> logToWrite;
 	private EHLogReader reader;
 	protected File root;
+	protected Map<String, Assignment> assignMap;
+	static Pattern suitePattern = Pattern.compile("^(\\w*) - \\[(.*)\\]");
+	static Pattern assignPattern = Pattern.compile("Assignment \\d");
+	static Pattern ecPattern = Pattern.compile("Assignment \\d Extra Credit.*");
+	static Pattern assignSuitePattern = Pattern.compile("[FS]\\d*Assignment\\d*Suite.*");
+	public static final String suite = "E:\\submissions\\524\\Suite Test Mapping.txt";
 	
 	public Replayer() {
 		logToWrite = new TreeMap<>();
@@ -139,11 +149,11 @@ public abstract class Replayer{
 		String path = log.getPath();
 		System.out.println("Reading file " + path);
 		if (!log.exists()) {
-			System.out.println("log does not exist:" + path);
+			System.err.println("log does not exist:" + path);
 			return null;
 		}
 		if (!path.endsWith(".xml")) {
-			System.out.println("log is not in xml format:" + path);
+			System.err.println("log is not in xml format:" + path);
 			return null;
 		}
 		try {
@@ -151,7 +161,7 @@ public abstract class Replayer{
 			sortCommands(commands, 0, commands.size()-1);
 			return commands;
 		} catch (Exception e) {
-			System.out.println("Could not read file" + path + e);
+			System.err.println("Could not read file" + path + "\n"+ e);
 		}
 		return null;
 	}
@@ -368,10 +378,10 @@ public abstract class Replayer{
 				}
 				long[] restTime = restTime(nestedCommands, FIVE_MIN, Long.MAX_VALUE);
 				long wallClockTime = wallClockTime(nestedCommands);
-				retVal.add(convertToHourMinuteSecond(totalTime));
-				retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
-				retVal.add(convertToHourMinuteSecond(restTime[0]));
-				retVal.add(convertToHourMinuteSecond(wallClockTime));
+				retVal.add(format(totalTime));
+				retVal.add(format(totalTime - restTime[0]));
+				retVal.add(format(restTime[0]));
+				retVal.add(format(wallClockTime));
 				int[] numCommands = new int[10];
 				List<String> breakdownList = new ArrayList<>();
 				StringBuffer list = new StringBuffer();
@@ -572,8 +582,8 @@ public abstract class Replayer{
 					continue;
 				}
 				long wallClockTime = wallClockTime(nestedCommands);
-				retVal.add(convertToHourMinuteSecond(totalTime));
-				retVal.add(convertToHourMinuteSecond(wallClockTime));
+				retVal.add(format(totalTime));
+				retVal.add(format(wallClockTime));
 
 				long[] restTime = {0,0};
 				for (int i = 0; i < REST.length; i++) {
@@ -582,8 +592,8 @@ public abstract class Replayer{
 					} else {
 						restTime = restTime(nestedCommands, REST[i], Long.MAX_VALUE);
 					}
-					retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
-					retVal.add(convertToHourMinuteSecond(restTime[0]));
+					retVal.add(format(totalTime - restTime[0]));
+					retVal.add(format(restTime[0]));
 					retVal.add(restTime[1]+"");
 					retVal.add(getTime(restTime[1] == 0? 0:1.0*restTime[2]/restTime[1]));
 					restSum[i] += restTime[1];
@@ -617,6 +627,7 @@ public abstract class Replayer{
 	
 	public void createPauseDistribution(String assign, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(assign+"PauseDistribution.csv");
+		System.out.println("Generating Pause Distribution for Assignment " + assign);
 		FileWriter fw;
 		try {
 			if (csv.exists()) {
@@ -1061,7 +1072,7 @@ public abstract class Replayer{
 		if (command instanceof LocalCheckCommand) {
 			return "LocalCheck";
 		}
-		return null;
+		return "Other";
 	}
 	
 	public File getProjectFolder(File folder) {
@@ -1220,7 +1231,7 @@ public abstract class Replayer{
 					days++;
 					startTime = timeStamp - timeStamp % DAY;
 					if (nestedCommands2.size() > 0 && nestedCommands2.get(0).size() > 0) {
-						retVal.add(convertToHourMinuteSecond(totalTimeSpent(nestedCommands2)));
+						retVal.add(format(totalTimeSpent(nestedCommands2)));
 					}
 					nestedCommands2 = new ArrayList<>();
 					commands2 = new ArrayList<>();
@@ -1230,17 +1241,22 @@ public abstract class Replayer{
 			}
 		}
 		if (nestedCommands2.size() > 0 && nestedCommands2.get(0).size() > 0) {
-			retVal.add(convertToHourMinuteSecond(totalTimeSpent(nestedCommands2)));
+			retVal.add(format(totalTimeSpent(nestedCommands2)));
 		}
 		retVal.add(0,days+"");
 		return retVal.toArray(new String[1]);
 	}
 
-	protected String convertToHourMinuteSecond(long timeSpent){
-		int hour = (int) (timeSpent / 3600000);
-		int minute = (int) (timeSpent % 3600000 / 60000);
-		int second = (int) (timeSpent % 60000 / 1000);
-		return hour + ":" + minute + ":" + second;
+	protected String format(long timeSpent){
+		boolean negative = false;
+		if (timeSpent < 0) {
+			negative = true;
+			timeSpent = -1 * timeSpent;
+		}
+		long hour = timeSpent / 3600000;
+		long minute = timeSpent % 3600000 / 60000;
+		long second = timeSpent % 60000 / 1000;
+		return negative?"-":"" + String.format("%d:%02d:%02d", hour, minute, second);
 	}
 
 	protected boolean isException(EHICommand command) {
@@ -1310,5 +1326,45 @@ public abstract class Replayer{
 			}
 		}
 		folder.delete();
+	}
+	
+	public void mapTestToSuite() {
+		assignMap = new HashMap<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(suite)));
+			String line = "";
+			Assignment assign = null;
+			Matcher matcher = null;
+			while ((line = br.readLine()) != null) {
+				if (ecPattern.matcher(line).matches()){
+					if ((line = br.readLine()) != null) {
+						for (String test : line.split(", ")) {
+							if (assign != null) {
+								assign.addEC(test);
+							}
+						};
+					}
+				} else if (assignPattern.matcher(line).matches()) {
+					if (!assignMap.containsKey(line)) {
+						assign = new Assignment(line);
+						assignMap.put(line, assign);
+					}
+				} else if (assignSuitePattern.matcher(line).matches()) {
+					continue;
+				} else if ((matcher = suitePattern.matcher(line)).matches()) {
+//					Matcher matcher = suitePattern.matcher(line);
+//					matcher.matches();
+					Suite suite = new Suite(matcher.group(1), new HashSet<String>(Arrays.asList(matcher.group(2).split(", "))));
+					if (assign != null) {
+						assign.addSuite(suite);
+					}
+				}
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

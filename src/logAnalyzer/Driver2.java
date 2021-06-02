@@ -3,7 +3,7 @@ package logAnalyzer;
 import java.io.File;
 import java.util.Scanner;
 
-public class AutoDriver extends Driver{
+public class Driver2 extends Driver{
 	public static String[] folderPath = {
 										"E:\\submissions\\533",
 										"E:\\submissions\\524"};
@@ -41,8 +41,8 @@ public class AutoDriver extends Driver{
 				break;
 		}
 		s.close();
-		if (replayer.getClass() == AnIntellAssignReplayer.class) {
-			replayer = new AnIntellAssignReplayer(multiplier, defaultPauseTime);
+		if (replayer.getClass() == AContextBasedReplayer.class) {
+			replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
 		} else if (replayer.getClass() == AnAssignmentReplayer.class) {
 			replayer = new AnAssignmentReplayer();
 		} else if (replayer.getClass() == ASemesterReplayer.class) {
