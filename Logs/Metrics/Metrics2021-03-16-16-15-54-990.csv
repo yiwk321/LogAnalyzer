@@ -1,3 +1,0 @@
-Id,Prediction,Date,File,StartTime,ElapsedTime,BusyTime,Commands,editOrInsertPercentage,debugPercentage,navigationPercentage,focusPercentage,removePercentage,editPercentage,COMMAND_RATE,NAVIGATION_RATE,DEBUG_RATE,FOCUS_RATE,EDIT_RATE,REMOVE_RATE,INSERT_RATE,webLinkTimes,Web Page Visits
-1,,Tue Mar 16 16:19:10 EDT 2021,LocalCheckCommand.java,1615925950378,119442,0,(I)6(F)9,0.4,0.0,0.0,60.0,0.0,0.0,0.12605042016806722,0.0,0.0,0.07563025210084033,0.0,0.0,0.05042016806722689,0.0,[]
-,/modelData/A0UserStudy2010.arff,Tue Mar 16 16:19:10 EDT 2021,LocalCheckCommand.java, 1615925950378

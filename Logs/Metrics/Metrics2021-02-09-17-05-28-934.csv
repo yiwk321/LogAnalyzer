@@ -1,3 +1,0 @@
-Id,Prediction,Date,File,StartTime,ElapsedTime,BusyTime,Commands,editOrInsertPercentage,debugPercentage,navigationPercentage,focusPercentage,removePercentage,editPercentage,COMMAND_RATE,NAVIGATION_RATE,DEBUG_RATE,FOCUS_RATE,EDIT_RATE,REMOVE_RATE,INSERT_RATE,webLinkTimes,Web Page Visits
-1,,Tue Feb 09 17:05:40 EST 2021,AExperimentalReplayer.java,1612908340614,90430,0,(D)7,0.0,100.0,0.0,0.0,0.0,0.0,0.07777777777777778,0.0,0.07777777777777778,0.0,0.0,0.0,0.0,0.0,[]
-,/modelData/A0UserStudy2010.arff,Tue Feb 09 17:05:40 EST 2021,AExperimentalReplayer.java, 1612908340614

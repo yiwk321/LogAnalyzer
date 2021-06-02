@@ -1,2148 +1,0 @@
-<Events startTimestamp="1615397223589" logVersion="1.0.0.202101171653">
-  <Command __id="107" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 13:44:55 EST 2021" docASTNodeCount="2624" docActiveCodeLength="18463" docExpressionCount="1710" docLength="24538" projectName="HelpView" starttimestamp="1615397223589" timestamp="4672278">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\HelpView\src\dayton\ellwanger\helpbutton\HelpViewController.java]]></filePath>
-    <diff><![CDATA[null]]></diff>
-    <snapshot><![CDATA[package dayton.ellwanger.helpbutton;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import dayton.ellwanger.helpbutton.exceptionMatcher.ExceptionMatcher;
-import dayton.ellwanger.helpbutton.exceptionMatcher.JavaExceptionMatcher;
-import dayton.ellwanger.helpbutton.exceptionMatcher.PrologExceptionMatcher;
-import dayton.ellwanger.helpbutton.exceptionMatcher.SMLExceptionMatcher;
-import dayton.ellwanger.helpbutton.preferences.HelpPreferences;
-import fluorite.commands.EHICommand;
-import fluorite.commands.FileOpenCommand;
-import fluorite.commands.GetHelpCommand;
-import fluorite.commands.RequestHelpCommand;
-import fluorite.commands.ShellCommand;
-import fluorite.model.EHEventRecorder;
-import fluorite.model.EclipseEventListener;
-import fluorite.util.EHLogReader;
-import fluorite.util.EHUtilities;
-
-public class HelpViewController implements HelpListener, EclipseEventListener {
-	//	private static final String testURL = "http://localhost:12345";
-	private static final String getHelpURL = "https://us-south.functions.appdomain.cloud/api/v1/web/ORG-UNC-dist-seed-james_dev/V2/get-available-help";
-	private static final String requestHelpURL = "https://us-south.functions.appdomain.cloud/api/v1/web/ORG-UNC-dist-seed-james_dev/V2/request-help";
-//	private static final String reportURL = "https://us-south.functions.appdomain.cloud/api/v1/web/ORG-UNC-dist-seed-james_dev/cyverse/add-cyverse-log";
-//	private final Pattern exceptionPattern = Pattern.compile(".+Exception[^\\n]++(\\s+at .++)+");
-//	private List<ExceptionMatcher> exceptionMatchers = new ArrayList<>();
-	private HelpView view;
-	private int numCommand = 0;
-	private static final int COMMAND_LIM = 100;
-	private ExceptionMatcher em;
-//	private static final String LOG_FILE_PATH = "LogProjPath";
-//	private static final String NUM_COMMANDS_SENT = "numCommandsSent";
-//	private ArrayBlockingQueue<EHICommand> commandsToSend;
-//	private List<EHICommand> commandsToSend2;
-	
-	public HelpViewController(HelpView view) {
-		this.view = view;
-//		addExceptionMatcher(JavaExceptoinMatcher.getInstance());
-		view.setHelpListener(this);
-		setExceptionMatcher(EditorsUI.getPreferenceStore().getString(HelpPreferences.LANGUAGE));
-		ConsoleListener.getInstance().addListener(this);
-		EHEventRecorder.getInstance().addEclipseEventListener(this);
-//		commandsToSend = EHEventRecorder.getInstance().getCommandsToSend();
-//		commandsToSend2 = new ArrayList<>();
-//		new Thread(new Runnable() {
-//			public void run() {
-//				sendLogToServer();
-//			}
-//		}).start();
-	}
-
-	public void exceptionEvent(String output){
-		List<String> exceptions = new ArrayList<>();
-//		Matcher matcher = exceptionPattern.matcher(output);
-//		while (matcher.find()) {
-//			String ex = matcher.group();
-//			if (!exceptions.contains(ex)) {
-//				exceptions.add(matcher.group());
-//			}
-//		}
-//		for (ExceptionMatcher em : exceptionMatchers) {
-			exceptions = em.match(output);
-//			if (exceptions.size() != 0) {
-//				break;
-//			}
-//		}
-		view.populateErrorCombo(exceptions);
-	}
-	
-//	public void addExceptionMatcher(ExceptionMatcher em) {
-//		exceptionMatchers.add(em);
-//	}
-//	
-//	public void removeExcetionMatcher(ExceptionMatcher em) {
-//		exceptionMatchers.remove(em);
-//	}
-	
-	public void setExceptionMatcher(String language) {
-		switch (language) {
-		case "java":
-			em = JavaExceptionMatcher.getInstance();
-			break;
-		case "prolog":
-			em = PrologExceptionMatcher.getInstance();
-			break;
-		case "python":
-			em = JavaExceptionMatcher.getInstance();
-			break;
-		case "SML":
-			em = SMLExceptionMatcher.getInstance();
-			break;
-		default:
-			em = JavaExceptionMatcher.getInstance();
-			break;
-		}
-	}
-
-	public void consoleOutput(String output) {
-		view.updateConsoleOutput(output);
-		exceptionEvent(output);
-	}
-
-	@Override
-	public JSONObject requestHelp(String email, String course, String assign, String errorType, String errorMessage, String problem, String term, int difficulty, String helpText, String requestID, String output, String language) throws IOException {
-		try {
-//			MessageConsoleStream out = view.findConsole("debugRequestHelp").newMessageStream();
-//			out.println("requesting help");
-			JSONObject helpRequest = new JSONObject();
-			JSONObject code = new JSONObject();
-			helpRequest.put("code", code);
-			if (language == null || language.equals("")) {
-				language = "java";
-			}
-			helpRequest.put("language", language);
-			helpRequest.put("environment", "ecipse");
-			helpRequest.put("error-message", errorMessage);
-			helpRequest.put("error-type", errorType);
-			helpRequest.put("course", course);
-			helpRequest.put("assignment", assign);
-			helpRequest.put("comment", helpText);
-			helpRequest.put("problem", problem);
-			helpRequest.put("term", term);
-			helpRequest.put("email", email);
-			helpRequest.put("request-id", "");
-			helpRequest.put("output", output);
-//			out.println("project path = " + getCurrentProjectPath());
-			File src = new File(getCurrentProjectPath() + File.separator + "Logs" + File.separator + "srcOld");
-			if (!src.exists() || numCommand > 50) {
-				src = new File(getCurrentProjectPath() + File.separator + "Logs" + File.separator + "src");
-			}
-			if (!src.exists()) {
-				src = findSourceFolder(new File(getCurrentProjectPath()), EditorsUI.getPreferenceStore().getString(HelpPreferences.LANGUAGE));
-			}
-//			out.println("src = " + src);
-			if (src != null) {
-				List<String> filePaths = new ArrayList<>();
-				List<String> relevantFilePaths = new ArrayList<>();
-				findSourceFiles(src, filePaths, language);
-//				out.println("source files found");
-				if (calculateSize(src) < 900*1024) {
-					for (String filePath : filePaths) {
-						File file = new File(filePath);
-						code.put(file.getName(), readFile(file));
-					}
-					addHistory(code, calculateSize(src));
-				} else if (errorMessage.indexOf("\r\n\t") >= 0) {
-					String stackTrace = errorMessage.substring(errorMessage.indexOf("\r\n\t"));
-					while (stackTrace.indexOf(".java") >= 0) {
-						String fileName = stackTrace.substring(stackTrace.lastIndexOf('(')+1, stackTrace.lastIndexOf(".java")+5);
-						for (String file : filePaths) {
-							if (file.contains(fileName)) {
-								relevantFilePaths.add(file);
-								filePaths.remove(file);
-								break;
-							}
-						}
-						stackTrace = stackTrace.substring(0, stackTrace.lastIndexOf('('));
-					}
-					long size = 0;
-					for (String filePath : relevantFilePaths) {
-						File file = new File(filePath);
-						size += file.length();
-						if (size > 900) {
-							break;
-						}
-						code.put(file.getName(), readFile(file));
-					}
-					addHistory(code, size);
-				} else {
-					long size = addHistory(code, 0);
-					for (String filePath : filePaths) {
-						File file = new File(filePath);
-						if (code.has(file.getName())) {
-							continue;
-						}
-						size += file.length();
-						if (size > 900) {
-							break;
-						}
-						code.put(file.getName(), readFile(file));
-					}
-				}
-			}
-//			out.println("source files add to json object, sending request");
-			JSONObject response = HTTPRequest.post(helpRequest, requestHelpURL);
-			if (response == null) {
-//				out.println("response is null");
-				recordRequestHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, "", false, difficulty);
-				throw new IOException();
-			}
-//			out.println("received response from server: " + response.toString(4));
-			helpRequest.put("request-id", response.get("request-id"));
-			recordRequestHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, "", true, difficulty);
-			view.addPendingRequest(helpRequest);
-			view.removeRepliedRequest(response.getString("request-id"));
-
-			new Thread(()->{
-				try {
-//					String requestId = response.getJSONObject("input").getJSONObject("body").getString("request-id");
-					String requestId = response.getString("request-id");
-					String id = requestId.substring(requestId.lastIndexOf('.')+1);
-					File[] files = view.getRepliedFolder().listFiles(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
-							return name.equals(id+".JSON");
-						}
-					});
-					File file = new File(view.getPendingFolder().getPath()+ File.separator + id +".JSON");
-					if (file.exists()) {
-						file.delete();
-					}
-					file.createNewFile();
-					FileOutputStream os = new FileOutputStream(file);
-					if (files.length == 1) {
-						os.write(readJSON(files[0]).toString(4).getBytes());
-						files[0].delete();
-					} else {
-						os.write(helpRequest.toString(4).getBytes());
-					}
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}).start();
-			return helpRequest;
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public JSONObject getHelp(String email, String course, String assign, String errorType, String errorMessage, String problem, String term, String requestID, String output, String language) throws IOException {
-		try {
-			JSONObject helpRequest = new JSONObject();
-			JSONObject code = new JSONObject();
-			helpRequest.put("code", code);
-			helpRequest.put("language", language);
-			helpRequest.put("environment", "eclipse");
-			helpRequest.put("error-message", errorMessage);
-			helpRequest.put("error-type", errorType);
-			helpRequest.put("course", course);
-			helpRequest.put("assignment", assign);
-			helpRequest.put("problem", problem);
-			helpRequest.put("term", term);
-			helpRequest.put("email", email);
-			if (requestID == null) {
-				helpRequest.put("request-id", "");
-			} else {
-				helpRequest.put("request-id", requestID);
-			}
-			helpRequest.put("output", output);
-//			System.out.println(helpRequest.toString(4));
-			JSONObject response = HTTPRequest.post(helpRequest, getHelpURL);
-			if (response == null) {
-				recordGetHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, "", false);
-				throw new IOException();
-			}
-//			System.out.println(response.toString(4));
-			List<String> replies = new ArrayList<>();
-			JSONArray help = new JSONArray();
-			try {
-				help = response.getJSONArray("help");
-				for (int i = 0; i < help.length(); i++) {
-					replies.add(help.getString(i));
-				}
-			}catch (JSONException e) {
-			}
-			String id = response.getString("request-id");
-			helpRequest.put("request-id", id);
-			helpRequest.put("help", help);
-			recordGetHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, help.toString(4), true);
-			view.updateReplies(replies);
-			if (replies.size() == 0) {
-				return helpRequest;
-			}
-			
-			view.addRepliedRequest(helpRequest);
-			view.removePendingRequest(id);
-			new Thread(()->{
-				try {
-					String requestId = response.getString("request-id");
-					String rid = requestId.substring(requestId.lastIndexOf('.')+1);
-					File[] files = view.getPendingFolder().listFiles(new FilenameFilter() {
-						public boolean accept(File dir, String name) {
-							return name.equals(rid+".JSON");
-						}
-					});
-					if (files.length == 1) {
-						files[0].delete();
-					}
-//					helpRequest.put("help", help);
-					File file = new File(view.getRepliedFolder().getPath()+ File.separator + rid +".JSON");
-					if (file.exists()) {
-						file.delete();
-					}
-					file.createNewFile();
-					FileOutputStream os = new FileOutputStream(file);
-					os.write(helpRequest.toString(4).getBytes());
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}).start();
-			return helpRequest;
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null; 
-	}
-
-	private void findSourceFiles(File file, List<String> files, String language){
-//		view.findConsole("debugRequestHelp").newMessageStream().println("finding " + language + " files from " + file);
-		if (file.isDirectory()) {
-			for (File file2 : file.listFiles()) {
-//				view.findConsole("debugRequestHelp").newMessageStream().println("finding " + language + " files from " + file2);
-				findSourceFiles(file2, files, language);
-			}
-		} else {
-			switch (language) {
-			case "java":
-				if (file.getName().toLowerCase().endsWith(".java")) {
-					files.add(file.getAbsolutePath());
-				}
-				break;
-			case "python":
-				if (file.getName().toLowerCase().endsWith(".py")) {
-					files.add(file.getAbsolutePath());
-				}
-				break;
-			case "prolog":
-				if (file.getName().toLowerCase().endsWith(".pl")) {
-					files.add(file.getAbsolutePath());
-				}
-				break;
-			case "SML":
-				if (file.getName().toLowerCase().endsWith(".sml")) {
-					files.add(file.getAbsolutePath());
-				}
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	private long calculateSize(File file) {
-		long size = 0;
-		if (file.isDirectory()) {
-			for (File file2 : file.listFiles()) {
-				size += calculateSize(file2);
-			}
-			return size;
-		} else {
-			return file.length();
-		}
-	}
-
-	public void copyFiles(File source, File dest) throws IOException{
-		InputStream is = null;
-		OutputStream os = null;
-		try {
-			if (!dest.exists()) {
-				dest.getParentFile().mkdirs();
-				dest.createNewFile();
-			} else {
-				dest.delete();
-				dest.createNewFile();
-			}
-			is = new FileInputStream(source);
-			os = new FileOutputStream(dest);
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = is.read(buffer)) > 0) {
-				os.write(buffer, 0, length);
-			}
-			buffer = "</Events>".getBytes();
-			os.write(buffer, 0, buffer.length);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (is != null) {
-				is.close();
-			}
-			if (os != null) {
-				os.close();
-			}
-		} 
-	}
-
-	private JSONObject readJSON(File file) {
-		try {
-			StringBuilder sb = new StringBuilder();
-			String line;
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-
-			while ((line = reader.readLine()) != null) {
-				sb.append(line);
-			}
-
-			reader.close();
-			return new JSONObject(sb.toString());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private void recordGetHelpCommand(String email, String course, String assign, String errorType, String errorMessage, String problem, String term, String requestID, String output, String help, boolean success) {
-		new Thread(()->{
-			EHEventRecorder.getInstance().recordCommand(new GetHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, help, success));
-		}).start();
-	}
-
-	private void recordRequestHelpCommand(String email, String course, String assign, String errorType, String errorMessage, String problem, String term, String requestID, String output, String help, boolean success, int difficulty) {
-		new Thread(()->{
-			EHEventRecorder.getInstance().recordCommand(new RequestHelpCommand(email, course, assign, errorType, errorMessage, problem, term, requestID, output, help, success, difficulty));
-		}).start();
-	}
-	//	@Override
-	//	public void difficultyUpdate(int difficulty) {
-	//		if(ConnectionManager.getInstance() != null) {
-	//			JSONObject helpRequest = new JSONObject();
-	//			try {
-	//				helpRequest.put("difficulty", difficulty);
-	//			} catch (JSONException ex) {
-	//				ex.printStackTrace();
-	//			}
-	//			DifficultyUpdateForwardedToConnectionManager.newCase(this, helpRequest.toString());
-	////			JSONObjectForwardedToConnectionManager.newCase(this, helpRequest.toString());
-	//
-	//			ConnectionManager.getInstance().sendMessage(helpRequest);
-	//		}		
-	//	}
-	
-	private long addHistory(JSONObject code, long size) {
-		File log = new File(getCurrentProjectPath()+File.separator+"Logs"+File.separator+"Eclipse");
-		if (!log.exists()) {
-			return size;
-		}
-		File[] logs = log.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".xml");
-			}
-		});
-		if (logs.length == 0) {
-			return size;
-		}
-		File currentLog = logs[0];
-		for (File file : logs) {
-			if (file.lastModified() > currentLog.lastModified()) {
-				currentLog = file;
-			}
-		}
-		try {
-//			List<EHICommand> commands = EHEventRecorder.getInstance().getAllCommands();
-			File temp = new File(log, "temp.xml");
-			copyFiles(currentLog, temp);
-			List<EHICommand> commands;
-			try {
-				commands = new EHLogReader().readAll(temp.getPath());
-//				commands = new EHLogReader().readAll("C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\test\\Logs\\Eclipse\\Log2020-09-02-11-07-58-675.xml");
-			} catch (NullPointerException e) {
-				temp.delete();
-				return size;
-			}
-			int num = numCommand > COMMAND_LIM/2? numCommand : numCommand + COMMAND_LIM;
-			temp.delete();
-			List<File> modifiedFiles = new ArrayList<>(); 
-			JSONArray history = new JSONArray();
-			List<EHICommand> filteredCommand = new ArrayList<>();
-			code.put("log", history);
-			for (int i = commands.size()-1; i >= 0; i--) {
-				EHICommand command = commands.get(i);
-				if (command instanceof FileOpenCommand) {
-					File f = new File(command.getDataMap().get("filePath"));
-					if (f.exists() && !modifiedFiles.contains(f)) {
-						modifiedFiles.add(f);
-					}
-				}
-//				if (command instanceof ShellCommand || command instanceof GetHelpCommand || command instanceof RequestHelpCommand) {
-//					continue;
-//				}
-				if (command instanceof ShellCommand) {
-					continue;
-				}
-				size += command.persist().length();
-				if (size > 900 * 1024) {
-					break;
-				}
-				filteredCommand.add(command);
-				if (filteredCommand.size() == num) {
-					break;
-				}
-			}
-			for (int i = filteredCommand.size() - 1; i >= 0; i--) {
-				history.put(filteredCommand.get(i).persist());
-			}
-			for (File file : modifiedFiles) {
-				if (!code.has(file.getName())) {
-					size += file.length();
-					if (size > 900*1024) {
-						break;
-					}
-					code.put(file.getName(), readFile(file));
-				}
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return size;
-	}
-	
-	private String getCurrentProjectPath(){
-		return EHUtilities.getCurrentProject().getLocation().toOSString();
-	}
-	
-	private String readFile(File file) {
-		try {
-			BufferedReader br;
-			br = new BufferedReader(new FileReader(file));
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line).append("\r\n");
-			}
-			br.close();
-			return sb.toString();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
-	@Override
-	public void eventRecordingStarted(long aStartTimestamp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void eventRecordingEnded() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void timestampReset(long aStartTimestamp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void commandExecuted(String aCommandName, long aTimestamp) {
-		// TODO Auto-generated method stub
-//		if (aCommandName.equals("ShellCommand")) {
-//			return;
-//		}
-		createSnapshot();
-	}
-
-	@Override
-	public void documentChanged(String aCommandName, long aTimestamp) {
-		// TODO Auto-generated method stub
-		createSnapshot();
-	}
-
-	@Override
-	public void documentChangeFinalized(long aTimestamp) {
-		// TODO Auto-generated method stub
-		createSnapshot();
-	}
-	
-	private synchronized void createSnapshot() {
-		numCommand++;
-		if (numCommand == COMMAND_LIM) {
-			numCommand = 0;
-			new Thread(()->{
-				File src = findSourceFolder(new File(getCurrentProjectPath()), EditorsUI.getPreferenceStore().getString(HelpPreferences.LANGUAGE));
-				File snapshot = new File(getCurrentProjectPath()+File.separator+"Logs"+File.separator+"src");
-				File snapshotOld = new File(getCurrentProjectPath()+File.separator+"Logs"+File.separator+"srcOld");
-				if (snapshot.exists()) {
-					if (snapshotOld.exists()) {
-						deleteFolder(snapshot);
-					}
-					cloneFolder(snapshot, snapshot.getPath(), snapshotOld.getPath());
-				}
-				cloneFolder(src, src.getPath(), snapshot.getPath());
-//				sendLogToServer();
-			}).start();
-		}
-	}
-
-	private File findSourceFolder(File folder, String language) {
-		if (language.equals("java")) {
-			return new File(folder + File.separator + "src");
-		}
-		if(folder.listFiles((File dir, String name)->{
-			switch (language) {
-			case "prolog":
-				return name.endsWith(".pl");
-			case "python":
-				return name.endsWith(".py");
-			case "SML":
-				return name.endsWith(".sml");
-			default:
-				return false;
-			}
-		}).length > 0) {
-			return folder;
-		}
-		File src = null;
-		for (File dir : folder.listFiles((File pathname)-> {return pathname.isDirectory() && !pathname.getPath().contains(getCurrentProjectPath()+File.separator+"Logs");})) {
-			src = findSourceFolder(dir, language);
-			if (src != null) {
-				if (folder.getPath().equals(getCurrentProjectPath())) {
-					return dir;
-				}
-				return src;
-			}
-		}
-		return null;
-	}
-	
-//	private void sendLogToServer() {
-//		String storedLogFilePath = EditorsUI.getPreferenceStore().getString(LOG_FILE_PATH);
-//		int numCommandsSent = EditorsUI.getPreferenceStore().getInt(NUM_COMMANDS_SENT);
-//		if (new File(storedLogFilePath).exists()) {
-//			sendLog(new EHLogReader().readAll(storedLogFilePath), numCommandsSent, storedLogFilePath);
-//		}
-//		
-//		File log = new File(getCurrentProjectPath()+File.separator+"Logs"+File.separator+"Eclipse");
-//		if (!log.exists()) {
-//			log.mkdirs();
-//		}
-//		
-//		File[] logs = log.listFiles(new FilenameFilter() {
-//			public boolean accept(File dir, String name) {
-//				return name.endsWith(".xml");
-//			}
-//		});
-//		
-//		File currentLog = null;
-//		String logFilePath = "";
-//
-//		if (logs.length != 0) {
-//			currentLog = logs[0];
-//			for (File file : logs) {
-//				if (file.lastModified() > currentLog.lastModified()) {
-//					currentLog = file;
-//				}
-//			}
-//			logFilePath = currentLog.getPath();
-//		}
-//		EditorsUI.getPreferenceStore().putValue(LOG_FILE_PATH, logFilePath);
-//		EditorsUI.getPreferenceStore().putValue(NUM_COMMANDS_SENT, "0");
-//
-//		while (true) {
-//			try {
-//				commandsToSend2.add(commandsToSend.take());
-//			} catch (InterruptedException e1) {
-//				e1.printStackTrace();
-//			}
-//			if (commandsToSend2.size() >= 100) {
-//				sendLog(commandsToSend2, numCommand, logFilePath);
-//			}
-//		}
-//	}
-	
-	private void cloneFolder(File source, String sourcePath, String destPath){
-		try {
-			for (File file : source.listFiles()) {
-				if (file.isDirectory()) {
-					new File(file.getPath().replace(sourcePath, destPath)).mkdirs();
-					cloneFolder(file, file.getPath(), file.getPath().replace(sourcePath, destPath));
-				} else {
-					copyFiles(file, new File(file.getPath().replace(sourcePath, destPath)));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private static void deleteFolder(File folder) {
-		for (File file : folder.listFiles()) {
-			if (file.isDirectory()) {
-				deleteFolder(file);
-			} else {
-				file.delete();
-			}
-		}
-		folder.delete();
-	}
-	
-//	private List<JSONObject> sendLog(List<EHICommand> commands, int numCommandsSent, String logFileName) {
-//		try {
-//			while(numCommandsSent < commands.size()) {
-//				JSONObject log = new JSONObject();
-//				JSONObject report = new JSONObject();
-//				report.put("log_id", logFileName);
-//				try {
-//					report.put("machine_id", NetworkInterface.getNetworkInterfaces().nextElement().getHardwareAddress());
-//				}catch (NoSuchElementException | SocketException e) {
-//					report.put("machine_id", "No Network Card Found");
-//				}
-//				report.put("log_type", "eclipse");
-//				report.put("course_id", EditorsUI.getPreferenceStore().getString(HelpPreferences.COURSE));
-//				report.put("log", log);
-//				int size = report.length();
-//				String commandText = "";
-//				for (int i = numCommandsSent; i < commands.size(); i++, numCommandsSent++) {
-//					EHICommand command = commands.get(i);
-//					String s = command.persist();
-//					size += s.length();
-//					commandText += s;
-//					if (size > 900 * 1024) {
-//						break;
-//					}
-//				}
-//				log.put("json", commandText);
-//				HTTPRequest.post(report, reportURL);
-//			}
-//		} catch (JSONException e) {
-//			// TODO: handle exception
-//		}
-//		return null;
-//	}
-}
-
-
-]]></snapshot>
-  </Command>
-  <Command __id="108" _type="MoveCaretCommand" caretOffset="0" date="Wed Mar 10 13:44:56 EST 2021" docOffset="0" starttimestamp="1615397223589" timestamp="4672532" />
-  <Command __id="110" _type="MoveCaretCommand" caretOffset="26578" date="Wed Mar 10 13:45:08 EST 2021" docOffset="28059" starttimestamp="1615397223589" timestamp="4685314" />
-  <Command __id="112" _type="ShellCommand" date="Wed Mar 10 13:45:15 EST 2021" starttimestamp="1615397223589" timestamp="4692255" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="113" _type="FindCommand" caseSensitive="false" date="Wed Mar 10 13:45:17 EST 2021" forward="true" matchWord="false" offset="28059" regexp="false" replaceAll="false" selection="Find" selectionScope="false" starttimestamp="1615397223589" timestamp="4694289" wrapSearch="true">
-    <searchString><![CDATA[replaylog]]></searchString>
-    <replaceString><![CDATA[]]></replaceString>
-  </Command>
-  <Command __id="114" _type="ShellCommand" date="Wed Mar 10 13:45:20 EST 2021" starttimestamp="1615397223589" timestamp="4696515" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="115" _type="MoveCaretCommand" caretOffset="32868" date="Wed Mar 10 13:45:22 EST 2021" docOffset="34349" starttimestamp="1615397223589" timestamp="4698908" />
-  <Command __id="116" _type="SelectTextCommand" caretOffset="32854" date="Wed Mar 10 13:45:24 EST 2021" end="32889" start="32854" starttimestamp="1615397223589" timestamp="4700844" />
-  <Command __id="117" _type="CopyCommand" date="Wed Mar 10 13:45:25 EST 2021" starttimestamp="1615397223589" timestamp="4701496" />
-  <Command __id="118" _type="MoveCaretCommand" caretOffset="32865" date="Wed Mar 10 13:45:28 EST 2021" docOffset="34346" starttimestamp="1615397223589" timestamp="4705132" />
-  <Command __id="119" _type="SelectTextCommand" caretOffset="32872" date="Wed Mar 10 13:45:29 EST 2021" end="32872" start="32854" starttimestamp="1615397223589" timestamp="4705566" />
-  <Command __id="120" _type="SelectTextCommand" caretOffset="32891" date="Wed Mar 10 13:45:29 EST 2021" end="32891" start="32852" starttimestamp="1615397223589" timestamp="4705724" />
-  <Command __id="121" _type="SelectTextCommand" caretOffset="32872" date="Wed Mar 10 13:45:29 EST 2021" end="32872" start="32852" starttimestamp="1615397223589" timestamp="4706142" />
-  <Command __id="122" _type="SelectTextCommand" caretOffset="32891" date="Wed Mar 10 13:45:29 EST 2021" end="32891" start="32852" starttimestamp="1615397223589" timestamp="4706314" />
-  <Command __id="123" _type="SelectTextCommand" caretOffset="32872" date="Wed Mar 10 13:45:30 EST 2021" end="32872" start="32852" starttimestamp="1615397223589" timestamp="4706684" />
-  <Command __id="124" _type="CopyCommand" date="Wed Mar 10 13:45:30 EST 2021" starttimestamp="1615397223589" timestamp="4707128" />
-  <Command __id="126" _type="ShellCommand" date="Wed Mar 10 13:45:31 EST 2021" starttimestamp="1615397223589" timestamp="4707871" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="127" _type="CopyCommand" date="Wed Mar 10 13:45:32 EST 2021" starttimestamp="1615397223589" timestamp="4708544" />
-  <Command __id="128" _type="PasteCommand" date="Wed Mar 10 13:45:33 EST 2021" starttimestamp="1615397223589" timestamp="4709643" />
-  <Command __id="109" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 13:45:08 EST 2021" docASTNodeCount="5848" docActiveCodeLength="33454" docExpressionCount="4027" docLength="38060" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="4685032">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\LogAnalyzer\src\logAnalyzer\AExperimentalReplayer.java]]></filePath>
-    <diff><![CDATA[null]]></diff>
-    <snapshot><![CDATA[package logAnalyzer;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
-import analyzer.Analyzer;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import fluorite.commands.ConsoleInput;
-import fluorite.commands.ConsoleOutputCommand;
-import fluorite.commands.CopyCommand;
-import fluorite.commands.Delete;
-import fluorite.commands.EHExceptionCommand;
-import fluorite.commands.EHICommand;
-import fluorite.commands.ExceptionCommand;
-import fluorite.commands.GetHelpCommand;
-import fluorite.commands.InsertStringCommand;
-import fluorite.commands.PasteCommand;
-import fluorite.commands.PauseCommand;
-import fluorite.commands.Replace;
-import fluorite.commands.RequestHelpCommand;
-import fluorite.commands.RunCommand;
-import fluorite.commands.ShellCommand;
-import fluorite.commands.WebCommand;
-import jdk.internal.jline.internal.InputStreamReader;
-
-public class AExperimentalReplayer extends AReplayer{
-	private Map<String, List<List<EHICommand>>> data;
-	private static final int THREAD_LIM = 6;
-	private static final String TIMESTAMP = "C:\\Users\\Zhizhou\\Desktop\\timestamp for each participant.csv";
-	private Map<String, Long[]> timestamps = new HashMap<>();
-	
-	public AExperimentalReplayer(Analyzer anAnalyzer) {
-		super(anAnalyzer);
-		analyzer = anAnalyzer;
-		data = new HashMap<>();
-		System.setProperty("http.agent", "Chrome");
-	}
-	
-	public void readTimestamp() {
-		try {
-			SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-			File timestampFile = new File(TIMESTAMP);
-			CSVReader cr = new CSVReader(new FileReader(timestampFile));
-			cr.readNext();
-			String[] token = null;
-			while ((token = cr.readNext()) != null) {
-				long startTime = df.parse(token[4]).getTime();
-				if (startTime < 15*3600*1000) {
-					startTime += 12*3600*1000;
-				}
-				long endTime = df.parse(token[5]).getTime();
-				if (endTime < 15*3600*1000) {
-					endTime += 12*3600*1000;
-				}
-				Long[] times = {startTime, endTime};
-				timestamps.put(token[0], times);
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public void createPauseCommandLogs(String classFolderPath) {
-		File folder = new File(classFolderPath);
-		if (!folder.exists()) {
-			System.out.println("Class Folder does not exist");
-			System.exit(0);
-		}
-		File[] students = folder.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		});
-		latch = new CountDownLatch(students.length);
-		for (int j = 0; j < students.length; j++) {
-			File studentFolder  = students[j];
-			File logFolder = new File(studentFolder,"Eclipse");
-			if (!logFolder.exists()) {
-				latch.countDown();
-				continue;
-			}
-			System.out.println("Reading " + studentFolder.getName());
-			File[] logs = new File(logFolder.getPath()).listFiles(new FileFilter() {
-				public boolean accept(File pathname) {
-					return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");
-				}
-			});
-			Thread thread = new Thread(new Runnable() {
-				public void run() {
-					if (logs == null) {
-						synchronized (this) {
-							threadCount--;
-						}
-						latch.countDown();
-						return;
-					}
-//					if (!studentFolder.getName().equals("16")) {
-//						synchronized (this) {
-//							threadCount--;
-//						}
-//						latch.countDown();
-//						return;
-//					}
-					try {
-						File browser = new File(studentFolder, "Browser");
-						List<EHICommand> webCommands = null;
-						Iterator<EHICommand> webCommandIterator = null;
-						if (browser.exists() && browser.listFiles().length != 0) {
-							webCommands = readWebCommands(browser.listFiles()[0]);
-							if (webCommands != null) {
-								webCommandIterator = webCommands.iterator();
-							}
-						}
-						EHICommand webCommand = null;
-						for (File file : logs) {
-							
-							long startTimestamp = getLogFileCreationTime(file);
-							long logStartTimestamp = startTimestamp;
-//							long endTimestamp = Long.MAX_VALUE;
-//							if (timestamps.containsKey(studentFolder.getName())) {
-//								startTimestamp = startTimestamp / DAY * DAY + timestamps.get(studentFolder.getName())[0] - 60*ONE_MIN;
-//								endTimestamp = startTimestamp / DAY * DAY + timestamps.get(studentFolder.getName())[1] - 59*ONE_MIN;
-//							}
-							List<EHICommand> commands = readOneLogFile(file.getPath(), analyzer);
-							if (commands.size() < 2) {
-								continue;
-							}
-							List<EHICommand> newCommands = new ArrayList<>();
-							EHICommand last = null;
-							EHICommand cur = null;
-							if (webCommand == null) {
-//								webCommand = maybeAddWebCommandBeforeLogs(webCommandIterator, startTimestamp, newCommands);
-								webCommand = webCommandIterator.next();
-							}
-							long timestamp = 0;
-							if (webCommand != null) {
-								timestamp = webCommand.getTimestamp() - logStartTimestamp;
-							}
-							for (EHICommand command : commands) {
-//								if (command.getTimestamp() + logStartTimestamp < startTimestamp || command.getTimestamp() + logStartTimestamp > endTimestamp) {
-//									continue;
-//								}
-								command.setStartTimestamp(logStartTimestamp);
-								if (cur == null) {
-									cur = command;
-									newCommands.add(command);
-								} else {
-									last = cur;
-									cur = command;
-//									boolean webCommandAdded = false;
-//									while(webCommand != null && maybeAddWebCommand(newCommands, last, cur, webCommand, webCommandIterator, startTimestamp)) {
-//										webCommandAdded = true;
-//										last = webCommand;
-//										try {
-//											webCommand = webCommandIterator.next();
-//										} catch (NoSuchElementException e) {
-//											webCommand = null;
-//										}
-//									} 
-//									if (!webCommandAdded) {
-//										maybeAddPauseCommand(newCommands, last, cur);
-//									}
-									
-//									boolean added = false;
-									while (webCommand != null && timestamp >= last.getTimestamp() && timestamp <= cur.getTimestamp()) {
-										webCommand.setStartTimestamp(logStartTimestamp);
-										webCommand.setTimestamp(timestamp);
-										maybeAddPauseCommand(newCommands, last,	webCommand);
-//										webCommandAdded = true;
-										if (webCommandIterator.hasNext()) {
-											last = webCommand;
-											webCommand = webCommandIterator.next();
-											timestamp = webCommand.getTimestamp() - logStartTimestamp;
-										} else {
-											webCommand = null;
-											break;
-										}
-									}
-//									if (webCommandAdded) {
-//										maybeAddPauseCommand(newCommands, last, cur);
-////										return webCommand;
-//									} else {
-										maybeAddPauseCommand(newCommands, last, cur);
-//									}
-								}
-							}
-							
-							String logContent = XML_START1 + getLogFileCreationTime(file) + XML_START2 + XML_VERSION + XML_START3;
-							for (EHICommand c : newCommands) {
-								logContent += c.persist();
-							}
-							logContent += XML_FILE_ENDING;
-							try {
-								File newLog = new File(file.getParent()+File.separator+"RestOld"+File.separator+file.getName());
-								if (newLog.exists()) {
-									newLog.delete();
-								}
-								if (newCommands.size() == 0) {
-									continue;
-								}
-								newLog.getParentFile().mkdirs();
-								newLog.createNewFile();
-								BufferedWriter writer = new BufferedWriter(new FileWriter(newLog, true));
-								System.out.println("Writing to file " + newLog.getPath());
-								writer.write(logContent);
-								writer.close();
-								System.out.println("Finished writing to file " + newLog.getPath());
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						synchronized (this) {
-							threadCount--;
-						}
-						latch.countDown();
-					}
-				}							
-			});
-			while(true) {
-				if (threadCount > THREAD_LIM) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				
-				if (threadCount <= THREAD_LIM) {
-					synchronized (this) {
-						threadCount++;
-						thread.start();
-						break;
-					}
-				}
-			}
-		}
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			System.exit(0);
-		}
-	}
-
-	public void analyzeFolder(String classFolderPath) {
-		File folder = new File(classFolderPath);
-		if (!folder.exists()) {
-			System.exit(0);
-		}
-		File[] participants = folder.listFiles(new FileFilter() {
-			public boolean accept(File pathname) {
-				return pathname.isDirectory();
-			}
-		});
-		for (int i = 0; i < participants.length; i++) {
-			File participantFolder = new File(participants[i],"Eclipse");
-			if (!participantFolder.exists()) {
-				continue;
-			}
-			System.out.println("Reading student " + participantFolder.getName());
-			data.put(participants[i].getName(), replayLogs(participantFolder.getPath(), analyzer));
-		}
-		List<List<EHICommand>> nestedCommands = data.get("26");
-		for (int i = 0; i < nestedCommands.size(); i++) {
-			for (EHICommand command:nestedCommands.get(i)) {
-				if (command instanceof ExceptionCommand) {
-					System.out.println(command);
-				}
-			}
-		}
-//		createAssignData("Experiment", folder);
-//		createDistributionData("Experiment", folder);
-//		createPrevPauseDistribution("Experiment", folder);
-//		createNextPauseDistribution("Experiment", folder);
-		createWebStats("Experiment", folder);
-		System.exit(0);
-	}
-
-	private void createAssignData(String assign, File folder) {
-		File csv = new File(folder,assign+"Old.csv");
-		FileWriter fw;
-		File csv2 = new File(folder,assign+"EventOld.csv");
-		FileWriter fw2;
-		int[] sum = new int[10];
-		try {
-			if (csv.exists()) {
-				csv.delete();
-			}
-			csv.createNewFile();
-			fw = new FileWriter(csv);
-			CSVWriter cw = new CSVWriter(fw);
-			String[] header = {"Student", "Total Time Spent", "Active Time", "Rest Time", "Wall Clock Time", "Pause", "Web Visit", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Exception", "Exception Breakdown"};
-			cw.writeNext(header);
-
-			if (csv2.exists()) {
-				csv2.delete();
-			}
-			csv2.createNewFile();
-			fw2 = new FileWriter(csv2);
-			CSVWriter cw2 = new CSVWriter(fw2);
-			String[] header2 = {"case_id", "timestamp", "activity", "user"};
-			cw2.writeNext(header2);
-
-			for (String student : data.keySet()) {
-				System.out.println("Writing " + assign + " student " + student + "to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				List<String> retVal = new ArrayList<>();
-				retVal.add(student);
-				long totalTime = totalTimeSpent(nestedCommands);
-				long[] restTime = restTime(nestedCommands, FIVE_MIN, Long.MAX_VALUE);
-				long wallClockTime = wallClockTime(nestedCommands);
-				retVal.add(convertToHourMinuteSecond(totalTime));
-				retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
-				retVal.add(convertToHourMinuteSecond(restTime[0]));
-				retVal.add(convertToHourMinuteSecond(wallClockTime));
-				int[] numCommands = new int[9];
-				List<String> breakdownList = new ArrayList<>();
-				String list = "";
-				for (List<EHICommand> commands : nestedCommands) {
-					long lastTime = -1;
-					long curTime = -1;
-					for (int i = 0; i < commands.size(); i++) {
-						EHICommand command = commands.get(i);
-
-						if (i > 0) {
-							lastTime = curTime;
-						}
-						if (command != null) {
-							curTime = command.getTimestamp() + command.getStartTimestamp();
-						}
-						if (lastTime - curTime > 5*60*1000) {
-							writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
-						}
-						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
-							writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);
-						} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
-							writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);
-						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand ||
-								command instanceof Delete ||
-								command instanceof Replace || command instanceof PasteCommand || command instanceof ExceptionCommand ||
-								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
-								command instanceof RequestHelpCommand || command instanceof GetHelpCommand) {
-							writeOneLine(cw2, assign, curTime, getEventType(command), student);
-						}
-						if (command instanceof PauseCommand) {
-							numCommands[0]++;
-							list += "A";
-						}
-						if (command instanceof WebCommand) {
-							numCommands[1]++;
-							list += "W";
-						}
-						if (command instanceof InsertStringCommand) {
-							numCommands[2]++;
-							list += "I";
-						}
-						if (command instanceof Delete) {
-							numCommands[3]++;
-							list += "D";
-						}
-						if (command instanceof Replace) {
-							numCommands[4]++;
-							list += "R";
-						}
-						if (command instanceof CopyCommand) {
-							numCommands[5]++;
-							list += "C";
-						}
-						if (command instanceof PasteCommand) {
-							numCommands[6]++;
-							list += "P";
-						}
-						if (command instanceof RunCommand) {
-							numCommands[7]++;
-							list += "U";
-						}
-						if (command instanceof ExceptionCommand || command instanceof EHExceptionCommand) {
-							if(isException(command)) {
-								if (command instanceof EHExceptionCommand) {
-									ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
-									ex.setTimestamp(command.getTimestamp());
-									ex.setStartTimestamp(command.getStartTimestamp());
-								}
-								numCommands[8]++;
-								list += "E";
-								if (i < commands.size()-1) {
-									command = commands.get(i+1);
-								} else {
-									continue;
-								}
-								while(!(command instanceof InsertStringCommand || command instanceof Replace 
-										|| command instanceof Delete 
-										|| command instanceof CopyCommand || command instanceof PasteCommand)) {
-									if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
-											command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof ExceptionCommand ||
-											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_LOST_FOCUS")) ||
-											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_CLOSED"))) {
-										if (i > 0) {
-											lastTime = curTime;
-										}
-										curTime = command.getTimestamp() + command.getStartTimestamp();
-										if (lastTime - curTime > 5*60*1000) {
-											writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
-										}
-										if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
-											writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);
-										} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
-											writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);
-										} else {
-											writeOneLine(cw2, assign, curTime, getEventType(command), student);
-										}
-									}
-									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand) && isException(command)) {
-										if (command instanceof EHExceptionCommand) {
-											ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
-											ex.setTimestamp(command.getTimestamp());
-											ex.setStartTimestamp(command.getStartTimestamp());
-											if (i > 0) {
-												lastTime = curTime;
-											}
-											curTime = command.getTimestamp() + command.getStartTimestamp();
-											if (lastTime - curTime > 5*60*1000) {
-												writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);
-											}
-											writeOneLine(cw2, assign, curTime, getEventType(ex), student);
-										}
-										numCommands[8]++;
-										list += "E";
-									}
-									i++;
-									if (i+1 < commands.size()) {
-										command = commands.get(i+1);
-									} else {
-										break;
-									}
-								}
-								breakdownList.add(countConsecutiveCommands(list));
-								list = "";
-							}
-						}
-					}
-				}
-				if (!list.equals("")) {
-					breakdownList.add(countConsecutiveCommands(list));
-				}
-				for(int i = 0; i < numCommands.length; i++) {
-					retVal.add(i+5, numCommands[i]+"");
-					sum[i] += numCommands[i];
-					if (i > 1) {
-						sum[9] += numCommands[i];
-					}
-				}
-				for(int i = 0; i < breakdownList.size(); i++) {
-					retVal.add(i+14, breakdownList.get(i));
-				}
-				String[] nextLine = retVal.toArray(new String[1]);
-				cw.writeNext(nextLine);
-				
-				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
-			}
-			List<String> retVal = new ArrayList<>();
-			retVal.add("Sum");
-			retVal.add("");
-			retVal.add("");
-			retVal.add("");
-			retVal.add("");
-			for (int i = 0; i < sum.length; i++) {
-				retVal.add(sum[i]+"");
-			}
-			String[] nextLine = retVal.toArray(new String[1]);
-			cw.writeNext(nextLine);
-			fw.close();
-			cw.close();
-
-			fw2.close();
-			cw2.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void createDistributionData(String assign, File folder) {
-		File csv = new File(folder,assign+"DistributionOld.csv");
-		FileWriter fw;
-		try {
-			if (csv.exists()) {
-				csv.delete();
-			}
-			csv.createNewFile();
-			fw = new FileWriter(csv);
-			CSVWriter cw = new CSVWriter(fw);
-			String[] header = getHeader();
-			cw.writeNext(header);
-			
-			String[] sum = new String[header.length];
-			long[] restTimeSum = new long[REST.length];
-			sum[0] = "Sum";
-			for (int i = 1; i < sum.length; i++) {
-				sum[i] = "";
-			}
-			int[] restSum = new int[REST.length];
-			for (String student : data.keySet()) {
-				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				List<String> retVal = new ArrayList<>();
-				retVal.add(student);
-				long totalTime = totalTimeSpent(nestedCommands);
-				if (totalTime == 0) {
-					continue;
-				}
-				long wallClockTime = wallClockTime(nestedCommands);
-				retVal.add(convertToHourMinuteSecond(totalTime));
-				retVal.add(convertToHourMinuteSecond(wallClockTime));
-
-				long[] restTime = {0,0};
-				for (int i = 0; i < REST.length; i++) {
-					if (i < REST.length-1) {
-						restTime = restTime(nestedCommands, REST[i], REST[i+1]);
-					} else {
-						restTime = restTime(nestedCommands, REST[i], Long.MAX_VALUE);
-					}
-					retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));
-					retVal.add(convertToHourMinuteSecond(restTime[0]));
-					retVal.add(restTime[1]+"");
-					retVal.add(getTime(restTime[1] == 0? 0:1.0*restTime[2]/restTime[1]));
-					restSum[i] += restTime[1];
-					restTimeSum[i] += restTime[2];
-				}
-				
-				String[] days = daysSpent(nestedCommands);
-				if (days != null) {
-					for (int i = 0; i < days.length; i++) {
-						retVal.add(days[i]);
-					}
-				}
-				
-				String[] nextLine = retVal.toArray(new String[1]);
-				cw.writeNext(nextLine);
-				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
-			}
-			int sum2 = 0;
-			for (int i = 0; i < restSum.length; i++) {
-				sum[4*i+5] = restSum[i]+"";
-				sum2 += restSum[i];
-				sum[4*i+6] = getTime(restSum[i] == 0? 0:1.0*restTimeSum[i]/restSum[i]);
-			}
-			sum[1] = sum2+"";
-			cw.writeNext(sum);
-			fw.close();
-			cw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	}
-	
-	private void createPrevPauseDistribution(String assign, File folder) {
-		File csv = new File(folder,assign+"PauseDistributionOld.csv");
-		FileWriter fw;
-		try {
-			if (csv.exists()) {
-				csv.delete();
-			}
-			csv.createNewFile();
-			fw = new FileWriter(csv);
-			CSVWriter cw = new CSVWriter(fw);
-			String[] prev = {"Prev"};
-			cw.writeNext(prev);
-			String[] header = getPauseHeader();
-			cw.writeNext(header);
-
-			String[] nextLine = new String[header.length];
-			int[] sum = new int[PauseCommand.TYPES.length];
-			long[] sumPause = new long[sum.length];
-			for (String student : data.keySet()) {
-				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				List<String> retVal = new ArrayList<>();
-				int[] numCommmands = new int[sum.length];
-				long[] pauseTimes = new long[sum.length];
-				retVal.add(student);
-				for (List<EHICommand> commands : nestedCommands) {
-					for (EHICommand command : commands) {
-						if (command instanceof PauseCommand) {
-							for (int i = 0; i < sum.length; i++) {
-								if (command.getDataMap().get("prevType").equals(PauseCommand.TYPES[i])) {
-									numCommmands[i]++;
-									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); 
-									break;
-								}
-							}
-						}
-					}
-				}
-				for (int i = 0; i < sum.length; i++) {
-					retVal.add(numCommmands[i]+"");
-					if (numCommmands[i] == 0) {
-						retVal.add("0");
-					} else {
-						retVal.add(pauseTimes[i]/numCommmands[i]+"");
-					}
-					sum[i] += numCommmands[i];
-					sumPause[i] += pauseTimes[i];
-				}
-//				String[] nextLine = retVal.toArray(new String[1]);
-				nextLine = retVal.toArray(new String[1]);
-				cw.writeNext(nextLine);
-				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
-			}
-//			String[] nextLine = new String[header.length];
-			nextLine = new String[header.length];
-			nextLine[0] = "Sum";
-			for (int i = 0; i < sum.length; i++) {
-				nextLine[1+i*2] = sum[i]+"";
-				if (sum[i] == 0) {
-					nextLine[2+i*2] = 0+"";
-				} else {
-					nextLine[2+i*2] = sumPause[i]/sum[i]+"";
-				}
-			}
-			cw.writeNext(nextLine);
-			
-			String[] empty = {};
-			cw.writeNext(empty);
-			String[] next = {"next"};
-			cw.writeNext(next);
-			sum = new int[PauseCommand.TYPES.length];
-			sumPause = new long[sum.length];
-			for (String student : data.keySet()) {
-				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				List<String> retVal = new ArrayList<>();
-				int[] numCommmands = new int[sum.length];
-				long[] pauseTimes = new long[sum.length];
-				retVal.add(student);
-				for (List<EHICommand> commands : nestedCommands) {
-					for (EHICommand command : commands) {
-						if (command instanceof PauseCommand) {
-							for (int i = 0; i < sum.length; i++) {
-								if (command.getDataMap().get("nextType").equals(PauseCommand.TYPES[i])) {
-									numCommmands[i]++;
-									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); 
-									break;
-								}
-							}
-						}
-					}
-				}
-				for (int i = 0; i < sum.length; i++) {
-					retVal.add(numCommmands[i]+"");
-					if (numCommmands[i] == 0) {
-						retVal.add("0");
-					} else {
-						retVal.add(pauseTimes[i]/numCommmands[i]+"");
-					}
-					sum[i] += numCommmands[i];
-					sumPause[i] += pauseTimes[i];
-				}
-				nextLine = retVal.toArray(new String[1]);
-				cw.writeNext(nextLine);
-				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
-			}
-			nextLine = new String[header.length];
-			nextLine[0] = "Sum";
-			for (int i = 0; i < sum.length; i++) {
-				nextLine[1+i*2] = sum[i]+"";
-				if (sum[i] == 0) {
-					nextLine[2+i*2] = 0+"";
-				} else {
-					nextLine[2+i*2] = sumPause[i]/sum[i]+"";
-				}
-			}
-			cw.writeNext(nextLine);
-			
-			fw.close();
-			cw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	}
-	
-	private void createWebStats(String assign, File folder) {
-		File csv = new File(folder,assign+"WebStatsBert.csv");
-		FileWriter fw;
-		File csv2 = new File(folder,assign+"WebSearchesBert.csv");
-		FileWriter fw2;
-		try {
-			if (csv.exists()) {
-				csv.delete();
-			}
-			if (csv2.exists()) {
-				csv2.delete();
-			}
-			csv.createNewFile();
-			csv2.createNewFile();
-			fw = new FileWriter(csv);
-			fw2 = new FileWriter(csv2);
-			CSVWriter cw = new CSVWriter(fw);
-			CSVWriter cw2 = new CSVWriter(fw2);
-			String[] header = {"Title", "URL", "# of Visits", "Provided?"};
-//			String[] header2 = {"ID", "Search Word", "Title", "URL", "Sequence", "Last Page of the Search?", "Pasted Text"};
-			String[] header2 = {"Search Word"};
-			cw.writeNext(header);
-			cw2.writeNext(header2);
-
-			Map<String, Integer> urls = new HashMap<>();
-			Map<String, String> titles = new HashMap<>();
-			Map<String, List<String>> searches = new LinkedHashMap<>();
-			Map<String, List<String>> contents = new HashMap<>();
-			for (String student : data.keySet()) {
-				EHICommand lastSearch = null;
-				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				for (List<EHICommand> commands : nestedCommands) {
-					for (int i = 0; i < commands.size(); i++) {
-						EHICommand command = commands.get(i);
-						if (command instanceof WebCommand) {
-							String url = command.getDataMap().get("URL");
-							if (command.getAttributesMap().get("type").equals("Search")) {
-								lastSearch = command;
-								if (!searches.containsKey(lastSearch.getDataMap().get("keyword"))) {
-									searches.put(lastSearch.getDataMap().get("keyword"), new ArrayList<>());
-								}
-							} 
-							if (command.getAttributesMap().get("type").equals("Search Result") || command.getAttributesMap().get("type").equals("Stack Overflow")) {
-								String searchWord = "null";
-								if (lastSearch != null) {
-									searchWord = lastSearch.getDataMap().get("keyword");
-								}
-								if (!searches.containsKey(searchWord)) {
-									searches.put(searchWord, new ArrayList<>());
-								}
-								searches.get(searchWord).add(url);
-//								if (!contents.containsKey(url)) {
-//									List<String> list = new ArrayList<>();
-//									if (!url.contains("google.com")) {
-//										list.add(readWebContent(url));
-////										list.add(readWebContent2(url));
-//										contents.put(url, list);
-//									}
-//								}
-							}
-							if (command.getAttributesMap().get("type").contains("Provided")) {
-//								if (!searches.containsKey("Provided")) {
-//									searches.put("Provided", new ArrayList<>());
-//								}
-//								searches.get("Provided").add(url);
-//								if (!contents.containsKey(url)) {
-//									List<String> list = new ArrayList<>();
-//									list.add(readWebContent(url));
-////									list.add(readWebContent2(url));
-//									contents.put(url, list);
-//								}
-							}
-							urls.merge(url, 1, Integer::sum);
-							titles.put(url, command.getDataMap().get("keyword"));
-						}
-						if (command instanceof PasteCommand) {
-							outer:
-							for (int j = i-1; j >= 0 && j > i-20; j--) {
-								EHICommand command2 = commands.get(j);
-								String pastedText = "";
-								if (command2 instanceof InsertStringCommand || command2 instanceof Replace) {
-									if (command2 instanceof InsertStringCommand) {
-										pastedText = command2.getDataMap().get(InsertStringCommand.XML_Data_Tag);
-									} else {
-										pastedText = command2.getDataMap().get("insertedText");
-									}
-									if (pastedText.length() > 10) {
-										for (String url : contents.keySet()) {
-											List<String> list = contents.get(url);
-											String pastedText2 = pastedText.replaceAll("\\s", "");
-											if (list.get(0).contains(pastedText2)) {
-												for (int k = 1; k < list.size(); k++) {
-													if (list.get(k).replaceAll("\\s",  "").equals(pastedText2)) {
-														break outer;
-													}
-												}
-												list.add(pastedText);
-												break outer;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				for (String s : searches.keySet()) {
-					List<String> nextLine = new ArrayList<>();
-//					nextLine.add(student);
-					if (s.contains(" - Google Search")) {
-						s = s.substring(0,s.indexOf(" - Google Search"));
-					} 
-					nextLine.add(s);
-					cw2.writeNext(nextLine.toArray(new String[1]));
-
-//					if (searches.get(s).size() == 0) {
-//						nextLine.add("No Result");
-//						cw2.writeNext(nextLine.toArray(new String[1]));
-//						continue;
-//					}
-//					for (int i = 0; i < searches.get(s).size(); i++) {
-//						String url = searches.get(s).get(i);
-//						nextLine.add(titles.get(url));
-//						nextLine.add(url);
-//						nextLine.add(i+1+"");
-//						nextLine.add(i == searches.get(s).size()-1 ? "Last" : "");
-//						if (contents.containsKey(url)) {
-//							List<String> list = contents.get(url);
-//							for (int j = 1; j < list.size(); j++) {
-//								nextLine.add(list.get(j));
-//							}
-//						}
-//						cw2.writeNext(nextLine.toArray(new String[1]));
-//						nextLine = new ArrayList<>();
-//						nextLine.add(student);
-//						nextLine.add("");
-//					}
-				}
-				searches.clear();
-			}
-			Map<String, Integer> sortedMap = new LinkedHashMap<>();
-			urls.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
-			for (String s : sortedMap.keySet()) {
-				String[] nextLine = {titles.get(s), s, sortedMap.get(s)+"", isProvided(s)? "Provided":""};
-				cw.writeNext(nextLine);
-			}
-			fw.close();
-			cw.close();
-			
-			fw2.close();
-			cw2.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	}
-	
-	private void createNextPauseDistribution(String assign, File folder) {
-		File csv = new File(folder,assign+"NextPauseDistribution.csv");
-		FileWriter fw;
-		try {
-			if (csv.exists()) {
-				csv.delete();
-			}
-			csv.createNewFile();
-			fw = new FileWriter(csv);
-			CSVWriter cw = new CSVWriter(fw);
-			String[] header = getPauseHeader();
-			cw.writeNext(header);
-			
-			int[] sum = new int[PauseCommand.TYPES.length];
-			long[] sumPause = new long[sum.length];
-			for (String student : data.keySet()) {
-				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());
-				List<List<EHICommand>> nestedCommands = data.get(student);
-				List<String> retVal = new ArrayList<>();
-				int[] numCommmands = new int[sum.length];
-				long[] pauseTimes = new long[sum.length];
-				retVal.add(student);
-				for (List<EHICommand> commands : nestedCommands) {
-					for (EHICommand command : commands) {
-						if (command instanceof PauseCommand) {
-							for (int i = 0; i < sum.length; i++) {
-								if (command.getDataMap().get("nextType").equals(PauseCommand.TYPES[i])) {
-									numCommmands[i]++;
-									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); 
-									break;
-								}
-							}
-						}
-					}
-				}
-				for (int i = 0; i < sum.length; i++) {
-					retVal.add(numCommmands[i]+"");
-					if (numCommmands[i] == 0) {
-						retVal.add("0");
-					} else {
-						retVal.add(pauseTimes[i]/numCommmands[i]+"");
-					}
-					sum[i] += numCommmands[i];
-					sumPause[i] += pauseTimes[i];
-				}
-				String[] nextLine = retVal.toArray(new String[1]);
-				cw.writeNext(nextLine);
-				System.out.println("written " + assign + " student " + student + "to " + csv.getName());
-			}
-			String[] nextLine = new String[header.length];
-			nextLine[0] = "Sum";
-			for (int i = 0; i < sum.length; i++) {
-				nextLine[1+i*2] = sum[i]+"";
-				if (sum[i] == 0) {
-					nextLine[2+i*2] = 0+"";
-				} else {
-					nextLine[2+i*2] = sumPause[i]/sum[i]+"";
-				}
-			}
-			cw.writeNext(nextLine);
-			fw.close();
-			cw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	}
-	
-	private String[] getPauseHeader() {
-		List<String> retVal = new ArrayList<>();
-		retVal.add("ID");
-		for (String s : PauseCommand.TYPES) {
-			retVal.add(s);
-			retVal.add("Avg. Time");
-//			retVal.add("Longest Time");
-//			retVal.add("Shortest Time");
-		}
-		return retVal.toArray(new String[1]);
-	}
-	
-	private void writeOneLine(CSVWriter cw, String assign, long time, String type, String pid) {
-		String[] nextLine = new String[4]; 
-		nextLine[0] = assign + " " + pid;
-		Date date = new Date(time);
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		nextLine[1] = df.format(date);
-		nextLine[2] = type;
-		nextLine[3] = pid;
-		if (nextLine != null) {
-			cw.writeNext(nextLine);
-		}
-	}
-	
-	public List<List<EHICommand>> replayLogs(String projectPath, Analyzer analyzer){
-		List<List<EHICommand>> nestedCommands = analyzer.convertXMLLogToObjects(projectPath+File.separator+"Rest");
-		sortNestedCommands(nestedCommands);
-		return nestedCommands;
-	}
-
-	private void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {
-		long rest = cur.getTimestamp()-last.getTimestamp();
-		if (rest >= 1*ONE_SECOND) {
-			String range = "";
-			if (rest < 2*ONE_SECOND) {
-				range = "1s-2s";
-			} else if (rest < 5*ONE_SECOND) {
-				range = "2s-5s";
-			} else if (rest < 10*ONE_SECOND) {
-				range = "5s-10s";
-			} else if (rest < 20*ONE_SECOND) {
-				range = "10s-20s";
-			} else if (rest < 30*ONE_SECOND) {
-				range = "20s-30s";
-			} else if (rest < ONE_MIN) {
-				range = "30s-1m";
-			} else if (rest < TWO_MIN) {
-				range = "1m-2m";
-			} else if (rest < FIVE_MIN) {
-				range = "2m-5m";
-			} else if (rest < TEN_MIN) {
-				range = "5m-10m";
-			} else if (rest < 3*TEN_MIN) {
-				range = "10m-30m";
-			} else if (rest < 6*TEN_MIN) {
-				range = "30m-60m";
-			} else {
-				range = ">1h";
-			}
-			PauseCommand rCommnad = new PauseCommand(last, cur, rest, range);
-			rCommnad.setStartTimestamp(last.getStartTimestamp());
-			rCommnad.setTimestamp(last.getTimestamp()+1);
-			newCommands.add(rCommnad);
-		} 
-		newCommands.add(cur);
-	}
-	
-	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {
-		if (iterator == null) {
-			return null;
-		}
-		EHICommand webCommand = null;
-		long timestamp = 0;
-		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getTimestamp() - startTimestamp) < 0) {
-			webCommand.setStartTimestamp(0);
-			webCommand.setTimestamp(timestamp);
-			commands.add(webCommand);
-		}
-		return webCommand;
-	}
-
-	public String readWebContent(String aURL) {
-		String content = "";
-		Scanner sc = null;
-		try {
-			URL url = new URL(aURL);
-//			System.out.println("accessing webpage " + aURL);
-			URLConnection con = url.openConnection();
-			con.setReadTimeout(5000);
-			sc = new Scanner(con.getInputStream());
-			StringBuffer sb = new StringBuffer();
-			while (sc.hasNext()) {
-				sb.append(sc.next());
-			}
-			content = sb.toString();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (sc != null) {
-				sc.close();
-			}
-		}
-		if (content.equals("") && !aURL.substring(0,5).equals("https")) {
-			aURL = aURL.replaceFirst("http", "https");
-			return readWebContent(aURL);
-		}
-		
-//		System.out.println("webpage content " + aURL + content);
-//		return content.replaceAll("<[^>]*>", "").replaceAll("\\s", "");
-		return content;
-	}
-	
-	private boolean isProvided(String s) {
-		for (String url : WebCommand.PROVIDED_URL) {
-			if (s.equals(url)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-//	public String readWebContent2(String url){
-//		try {
-//			HttpURLConnection httpClient =(HttpURLConnection) new URL(url).openConnection();
-//			httpClient.setRequestMethod("GET");
-//			httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
-//			int responseCode = httpClient.getResponseCode();
-//			try (BufferedReader in = new BufferedReader(
-//					new InputStreamReader(httpClient.getInputStream()))) {
-//				StringBuilder response = new StringBuilder();
-//				String line;
-//				while ((line = in.readLine()) != null) {
-//					response.append(line);
-//				}
-//				if (response.toString().equals("") && !url.substring(0,5).equals("https")) {
-//					url = url.replaceFirst("http", "https");
-//					return readWebContent2(url);
-//				}	
-//				return response.toString();
-//			}
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			e.printStackTrace();
-//		}
-//		return "";
-//	}
-}
-]]></snapshot>
-  </Command>
-  <Command __id="129" _type="ShellCommand" date="Wed Mar 10 13:45:37 EST 2021" starttimestamp="1615397223589" timestamp="4713649" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="131" _type="SelectTextCommand" caretOffset="23088" date="Wed Mar 10 13:45:38 EST 2021" end="23088" start="23070" starttimestamp="1615397223589" timestamp="4715066" />
-  <Command __id="132" _type="MoveCaretCommand" caretOffset="23432" date="Wed Mar 10 13:45:40 EST 2021" docOffset="25124" starttimestamp="1615397223589" timestamp="4716885" />
-  <Command __id="586" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 14:50:54 EST 2021" docASTNodeCount="180" docActiveCodeLength="1078" docExpressionCount="118" docLength="1078" projectName="A0" starttimestamp="1615397223589" timestamp="8630970">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Sophomore 2st Sem\COMP533\A0\src\launcher\ServerIntegerSummer.java]]></filePath>
-    <diff><![CDATA[[Diff(EQUAL,"package launcher;¶¶import java.rmi.RemoteException;¶import java.rmi.registry.LocateRegistry;¶import java.rmi.registry.Registry;¶import java.rmi.server.UnicastRemoteObject;¶¶import MVC.AController;¶import MVC.AModel;¶import MVC.AView;¶import MVC.Controller;¶import MVC.Model;¶import MVC.RemoteModel;¶import MVC.View;¶import mapper.AnIntSummingMapper;¶import mapper.MapperFactory;¶¶public class ServerIntegerSummer {¶   	public static final int EXPORT_PORT = 0;¶¶	public static void main(String[] args) {¶¶		MapperFactory.setMapper(new AnIntSummingMapper());¶		Model model = new AModel();¶		try {¶			Registry rmiRegistry = LocateRegistry.createRegistry(RMIRegistry.RMIPORT);¶			UnicastRemoteObject.exportObject((RemoteModel)model, EXPORT_PORT);¶			rmiRegistry.rebind(RMIRegistry.SERVER_MODEL_NAME, (RemoteModel)model);¶		} catch (RemoteException e) {¶			e.printStackTrace();¶		}¶		Controller controller = new AController(model);¶		View view = new AView();¶		model.addPropertyChangeListener(view);¶		controller.start();¶		System.exit(0);¶	}¶}¶")]]]></diff>
-  </Command>
-  <Command __id="589" _type="ShellCommand" date="Wed Mar 10 14:52:50 EST 2021" starttimestamp="1615397223589" timestamp="8747332" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="592" _type="RunCommand" date="Wed Mar 10 14:53:01 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8757440" type="Run" />
-  <Command __id="593" _type="RunCommand" date="Wed Mar 10 14:53:01 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8757440" type="Run" />
-  <Command __id="594" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758434" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\16\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\16\Eclipse\Rest\Log2013-09-13-14-54-59-878.xml
-]]></outputString>
-    <diff><![CDATA[null]]></diff>
-  </Command>
-  <Command __id="595" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758642" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\17\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\17\Eclipse\Rest\Log2013-09-13-09-53-29-705.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"6"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"6"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-13-"), Diff(DELETE,"14-54-59-878"), Diff(INSERT,"09-53-29-705.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="596" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758743" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\19\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\19\Eclipse\Rest\Log2013-09-12-15-05-47-820.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"7"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"7"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"3-09-53-29-705.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242"), Diff(INSERT,"2-15-05-47-820"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="597" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758802" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\20\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\20\Eclipse\Rest\Log2013-09-12-10-40-05-321.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"19"), Diff(INSERT,"20"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"19"), Diff(INSERT,"20"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-12-1"), Diff(DELETE,"5-05-47-820"), Diff(INSERT,"0-40-05-321"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="598" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758865" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\21\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\21\Eclipse\Rest\Log2013-09-16-10-05-18-718.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\22\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\22\Eclipse\Rest\Log2013-09-15-15-38-06-069.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"0"), Diff(INSERT,"1"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"0"), Diff(INSERT,"1"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"2"), Diff(INSERT,"6"), Diff(EQUAL,"-10-"), Diff(DELETE,"40-05-321"), Diff(INSERT,"05-18-718.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\22\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\22\Eclipse\Rest\Log2013-09-15-15-38-06-069"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="599" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8758994" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013-09-14-09-48-24-508.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013-09-14-10-54-43-267.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-12-59-39-052.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-13-40-09-552.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"1"), Diff(INSERT,"3"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"1"), Diff(INSERT,"2"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"1"), Diff(INSERT,"3"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"6-10"), Diff(INSERT,"4-09-48-24-508.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013"), Diff(EQUAL,"-0"), Diff(DELETE,"5"), Diff(INSERT,"9"), Diff(EQUAL,"-1"), Diff(DELETE,"8-718"), Diff(INSERT,"4-10-54-43-267"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"2"), Diff(INSERT,"4"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"1"), Diff(INSERT,"2"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"2"), Diff(INSERT,"4"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"5"), Diff(INSERT,"4"), Diff(EQUAL,"-1"), Diff(DELETE,"5"), Diff(INSERT,"2-59"), Diff(EQUAL,"-3"), Diff(DELETE,"8"), Diff(INSERT,"9"), Diff(EQUAL,"-0"), Diff(DELETE,"6-069"), Diff(INSERT,"52.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-13-40-09-552"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="600" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759094" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-14-39-04-982.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-15-33-03-226.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest\Log2013-09-20-10-17-49-071.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"6"), Diff(EQUAL,"\Eclipse\Rest has 2 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"6"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(INSERT,"18-"), Diff(EQUAL,"14-"), Diff(DELETE,"0"), Diff(INSERT,"3"), Diff(EQUAL,"9-"), Diff(DELETE,"48-24-508"), Diff(INSERT,"04-982"), Diff(EQUAL,".xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"6"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"4"), Diff(INSERT,"8"), Diff(EQUAL,"-1"), Diff(DELETE,"0-54-4"), Diff(INSERT,"5-33-0"), Diff(EQUAL,"3-2"), Diff(INSERT,"2"), Diff(EQUAL,"6"), Diff(DELETE,"7"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"4"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"4"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"14-12-59-39-052.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-13-40-09-552"), Diff(INSERT,"20-10-17-49-071"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="601" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759200" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\28\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\28\Eclipse\Rest\Log2013-09-20-14-30-38-379.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"6"), Diff(INSERT,"8"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"6"), Diff(INSERT,"8"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"18"), Diff(INSERT,"20"), Diff(EQUAL,"-14-3"), Diff(DELETE,"9-04-982.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-15-33-03-226.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest\Log2013-09-20-10-17-49-071"), Diff(INSERT,"0-38-379"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="602" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759279" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\29\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\29\Eclipse\Rest\Log2013-09-23-12-56-55-221.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest\Log2013-09-11-15-13-48-829.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"8"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"8"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-2"), Diff(DELETE,"0"), Diff(INSERT,"3"), Diff(EQUAL,"-1"), Diff(DELETE,"4-30-38-37"), Diff(INSERT,"2-56-55-221.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest\Log2013-09-11-15-13-48-82"), Diff(EQUAL,"9.xml¶")]]]></diff>
-  </Command>
-  <Command __id="603" _type="ConsoleOutput" date="Wed Mar 10 14:53:02 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759380" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\31\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\31\Eclipse\Rest\Log2013-09-06-16-07-40-790.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\32\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\32\Eclipse\Rest\Log2013-09-13-12-11-53-568.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-35-18-862.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-57-56-864.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"29"), Diff(INSERT,"31"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"29"), Diff(INSERT,"31"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"23-12-56-55-221"), Diff(INSERT,"06-16-07-40-790"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\3"), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\3"), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"1-15-13-48-829"), Diff(INSERT,"3-12-11-53-568.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest has 2 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-35-18-862.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-57-56-864"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="604" _type="ConsoleOutput" date="Wed Mar 10 14:53:03 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759450" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest has 18 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-09-23-822.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-30-44-271.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-53-58-501.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-54-11-604.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-01-19-061.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-11-54-779.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml
-ExceptionCommand EHException  EventLogger utility command
-Writing Experiment student 22 to ExperimentWebStatsBert.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"3"), Diff(INSERT,"pd"), Diff(EQUAL,"1\Eclipse\Rest has 1"), Diff(INSERT,"8"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"3"), Diff(INSERT,"pd1\Eclipse\Rest\Log2014-09-26-10-09-23-822.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd"), Diff(EQUAL,"1\Eclipse\Rest\Log201"), Diff(DELETE,"3"), Diff(INSERT,"4"), Diff(EQUAL,"-09-"), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL,"6-1"), Diff(DELETE,"6-07-40-790"), Diff(INSERT,"0-30-44-271"), Diff(EQUAL,".xml¶Reading "), Diff(DELETE,"student Eclipse¶Particpant"), Diff(INSERT,"C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml¶Reading"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"32"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest"), Diff(DELETE," has 1 file(s)"), Diff(INSERT,"\Log2014-10-02-09-53-58-501.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml"), Diff(EQUAL,"¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"32"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"3-09-13-12-11-53-568.xml¶Reading student Eclipse¶Particpant"), Diff(INSERT,"4-10-04-09-54-11-604.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml¶Reading"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"33"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest"), Diff(DELETE," has 2 file(s)"), Diff(INSERT,"\Log2014-10-04-11-01-19-061.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml"), Diff(EQUAL,"¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"33"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"5-02-12-12-35-18-862.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-57-56-864.xml"), Diff(INSERT,"4-10-04-12-11-54-779.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml¶ExceptionCommand EHException  EventLogger utility command¶Writing Experiment student 22 to ExperimentWebStatsBert.csv"), Diff(EQUAL,"¶")]]]></diff>
-  </Command>
-  <Command __id="605" _type="ConsoleOutput" date="Wed Mar 10 14:53:03 EST 2021" overflow="false" starttimestamp="1615397223589" timestamp="8759538" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 33 to ExperimentWebStatsBert.csv
-Writing Experiment student 23 to ExperimentWebStatsBert.csv
-Writing Experiment student 24 to ExperimentWebStatsBert.csv
-Writing Experiment student 26 to ExperimentWebStatsBert.csv
-Writing Experiment student 16 to ExperimentWebStatsBert.csv
-Writing Experiment student 27 to ExperimentWebStatsBert.csv
-Writing Experiment student 17 to ExperimentWebStatsBert.csv
-Writing Experiment student 28 to ExperimentWebStatsBert.csv
-Writing Experiment student 18 to ExperimentWebStatsBert.csv
-Writing Experiment student 29 to ExperimentWebStatsBert.csv
-Writing Experiment student 19 to ExperimentWebStatsBert.csv
-Writing Experiment student pd1 to ExperimentWebStatsBert.csv
-Writing Experiment student 30 to ExperimentWebStatsBert.csv
-Writing Experiment student 20 to ExperimentWebStatsBert.csv
-Writing Experiment student 31 to ExperimentWebStatsBert.csv
-Writing Experiment student 21 to ExperimentWebStatsBert.csv
-Writing Experiment student 32 to ExperimentWebStatsBert.csv
-Writing Experiment student pd2 to ExperimentWebStatsBert.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest has 18 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-09-23-822.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-30-44-271.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-53-58-501.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-54-11-604.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-01-19-061.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-11-54-779.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml¶ExceptionCommand EHException  EventLogger utility command"), Diff(INSERT,"Writing Experiment student 33 to ExperimentWebStatsBert.csv¶Writing Experiment student 23 to ExperimentWebStatsBert.csv¶Writing Experiment student 24 to ExperimentWebStatsBert.csv¶Writing Experiment student 26 to ExperimentWebStatsBert.csv¶Writing Experiment student 16 to ExperimentWebStatsBert.csv¶Writing Experiment student 27 to ExperimentWebStatsBert.csv¶Writing Experiment student 17 to ExperimentWebStatsBert.csv¶Writing Experiment student 28 to ExperimentWebStatsBert.csv¶Writing Experiment student 18 to ExperimentWebStatsBert.csv¶Writing Experiment student 29 to ExperimentWebStatsBert.csv¶Writing Experiment student 19 to ExperimentWebStatsBert.csv¶Writing Experiment student pd1 to ExperimentWebStatsBert.csv¶Writing Experiment student 30 to ExperimentWebStatsBert.csv¶Writing Experiment student 20 to ExperimentWebStatsBert.csv¶Writing Experiment student 31 to ExperimentWebStatsBert.csv¶Writing Experiment student 21 to ExperimentWebStatsBert.csv¶Writing Experiment student 32 to ExperimentWebStatsBert.csv"), Diff(EQUAL,"¶Writing Experiment student "), Diff(DELETE,"2"), Diff(INSERT,"pd"), Diff(EQUAL,"2 to ExperimentWebStatsBert.csv¶")]]]></diff>
-  </Command>
-  <Command __id="606" _type="RunCommand" date="Wed Mar 10 14:53:03 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8759661" type="Run" />
-  <Command __id="607" _type="RunCommand" date="Wed Mar 10 14:53:03 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8759661" type="Run" />
-  <Command __id="608" _type="MoveCaretCommand" caretOffset="94" date="Wed Mar 10 14:53:11 EST 2021" docOffset="391" starttimestamp="1615397223589" timestamp="8767778" />
-  <Command __id="609" _type="SelectTextCommand" caretOffset="81" date="Wed Mar 10 14:53:16 EST 2021" end="617" start="81" starttimestamp="1615397223589" timestamp="8773139" />
-  <Command __id="610" _type="MoveCaretCommand" caretOffset="658" date="Wed Mar 10 14:53:17 EST 2021" docOffset="955" starttimestamp="1615397223589" timestamp="8773538" />
-  <Command __id="611" _type="SelectTextCommand" caretOffset="807" date="Wed Mar 10 14:53:20 EST 2021" end="910" start="807" starttimestamp="1615397223589" timestamp="8776563" />
-  <Command __id="612" _type="MoveCaretCommand" caretOffset="1141" date="Wed Mar 10 14:53:20 EST 2021" docOffset="1438" starttimestamp="1615397223589" timestamp="8777075" />
-  <Command __id="613" _type="SelectTextCommand" caretOffset="1210" date="Wed Mar 10 14:53:22 EST 2021" end="1264" start="1210" starttimestamp="1615397223589" timestamp="8778419" />
-  <Command __id="614" _type="MoveCaretCommand" caretOffset="1234" date="Wed Mar 10 14:53:22 EST 2021" docOffset="1531" starttimestamp="1615397223589" timestamp="8778739" />
-  <Command __id="615" _type="MoveCaretCommand" caretOffset="658" date="Wed Mar 10 14:53:26 EST 2021" docOffset="955" starttimestamp="1615397223589" timestamp="8782664" />
-  <Command __id="616" _type="ShellCommand" date="Wed Mar 10 14:53:49 EST 2021" starttimestamp="1615397223589" timestamp="8806019" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="617" _type="ShellCommand" date="Wed Mar 10 14:54:10 EST 2021" starttimestamp="1615397223589" timestamp="8827221" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="618" _type="ShellCommand" date="Wed Mar 10 14:54:13 EST 2021" starttimestamp="1615397223589" timestamp="8829557" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="619" _type="ShellCommand" date="Wed Mar 10 14:54:14 EST 2021" starttimestamp="1615397223589" timestamp="8831064" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="590" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 14:52:52 EST 2021" docASTNodeCount="150" docActiveCodeLength="1197" docExpressionCount="90" docLength="2822" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8748665">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\LogAnalyzer\src\logAnalyzer\Driver.java]]></filePath>
-    <diff><![CDATA[null]]></diff>
-    <snapshot><![CDATA[package logAnalyzer;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Date;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import analyzer.AnAnalyzer;
-import analyzer.Analyzer;
-
-public class Driver {
-	private static String classFolderPath = "E:\\testdata\\Fall2020";
-	private static String experimentalClassFolderPath = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData";
-	private static Analyzer analyzer;
-	private static AReplayer replayer;
-	private static int timeout = 5000;
-	private static String url = "http://stackoverflow.com/questions/4186835/how-to-add-multiple-components-to-a-jframe";
-	
-	public static void main(String[] args) {
-		analyzer = new AnAnalyzer();
-//		replayer = new AReplayer(analyzer);
-//		analyzer.addAnalyzerListener(replayer);	
-//		replayer.createPauseCommandLogs(classFolderPath);
-//		replayer.analyzeFolder(classFolderPath);
-		replayer = new AExperimentalReplayer(analyzer);
-		((AExperimentalReplayer)replayer).readTimestamp();
-//		String s1 = ((AExperimentalReplayer)replayer).readWebContent(url);
-//		String s2 = ((AExperimentalReplayer)replayer).readWebContent2(url);
-//		System.out.println(s1.equals(s2));
-//		analyzer.addAnalyzerListener(replayer);	
-//		replayer.createPauseCommandLogs(experimentalClassFolderPath);
-		replayer.analyzeFolder(experimentalClassFolderPath);
-//		String s1 = ((AExperimentalReplayer)replayer).readWebContent(url);
-//		String s2 = "";
-//		System.out.println();
-//		try {
-//			s2 = get(url);
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			e.printStackTrace();
-//		}
-//		System.out.println(s1.equals(s2));
-//		Date d = new Date(1379108460000L);
-//		System.out.println(d);
-	}
-	
-//	public static String get(String urlString) throws Exception{
-//         HttpURLConnection httpClient =(HttpURLConnection) new URL(urlString).openConnection();
-//        httpClient.setRequestMethod("GET");
-//        httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");
-//        int responseCode = httpClient.getResponseCode();
-//        System.out.println("Response Code : " + responseCode);
-//        try (BufferedReader in = new BufferedReader(
-//                new InputStreamReader(httpClient.getInputStream()))) {
-//            StringBuilder response = new StringBuilder();
-//            String line;
-//            while ((line = in.readLine()) != null) {
-//                response.append(line);
-//            }
-//            System.out.println(response.toString());
-//            return response.toString();
-//        }
-//	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-]]></snapshot>
-  </Command>
-  <Command __id="620" _type="MoveCaretCommand" caretOffset="856" date="Wed Mar 10 14:54:16 EST 2021" docOffset="1153" starttimestamp="1615397223589" timestamp="8833126" />
-  <Command __id="621" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 14:54:20 EST 2021" docASTNodeCount="5848" docActiveCodeLength="33454" docExpressionCount="4027" docLength="38060" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8837221">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\LogAnalyzer\src\logAnalyzer\AExperimentalReplayer.java]]></filePath>
-    <diff><![CDATA[[Diff(EQUAL,"package logAnalyzer;¶¶import java.io.BufferedWriter;¶import java.io.File;¶import java.io.FileFilter;¶import java.io.FileNotFoundException;¶import java.io.FileReader;¶import java.io.FileWriter;¶import java.io.IOException;¶import java.net.MalformedURLException;¶import java.net.URL;¶import java.net.URLConnection;¶import java.text.DateFormat;¶import java.text.ParseException;¶import java.text.SimpleDateFormat;¶import java.util.ArrayList;¶import java.util.Comparator;¶import java.util.Date;¶import java.util.HashMap;¶import java.util.Iterator;¶import java.util.LinkedHashMap;¶import java.util.List;¶import java.util.Map;¶import java.util.Scanner;¶import java.util.concurrent.CountDownLatch;¶import analyzer.Analyzer;¶import au.com.bytecode.opencsv.CSVReader;¶import au.com.bytecode.opencsv.CSVWriter;¶import fluorite.commands.ConsoleInput;¶import fluorite.commands.ConsoleOutputCommand;¶import fluorite.commands.CopyCommand;¶import fluorite.commands.Delete;¶import fluorite.commands.EHExceptionCommand;¶import fluorite.commands.EHICommand;¶import fluorite.commands.ExceptionCommand;¶import fluorite.commands.GetHelpCommand;¶import fluorite.commands.InsertStringCommand;¶import fluorite.commands.PasteCommand;¶import fluorite.commands.PauseCommand;¶import fluorite.commands.Replace;¶import fluorite.commands.RequestHelpCommand;¶import fluorite.commands.RunCommand;¶import fluorite.commands.ShellCommand;¶import fluorite.commands.WebCommand;¶import jdk.internal.jline.internal.InputStreamReader;¶¶public class AExperimentalReplayer extends AReplayer{¶	private Map<String, List<List<EHICommand>>> data;¶	private static final int THREAD_LIM = 6;¶	private static final String TIMESTAMP = "C:\\Users\\Zhizhou\\Desktop\\timestamp for each participant.csv";¶	private Map<String, Long[]> timestamps = new HashMap<>();¶	¶	public AExperimentalReplayer(Analyzer anAnalyzer) {¶		super(anAnalyzer);¶		analyzer = anAnalyzer;¶		data = new HashMap<>();¶		System.setProperty("http.agent", "Chrome");¶	}¶	¶	public void readTimestamp() {¶		try {¶			SimpleDateFormat df = new SimpleDateFormat("HH:mm");¶			File timestampFile = new File(TIMESTAMP);¶			CSVReader cr = new CSVReader(new FileReader(timestampFile));¶			cr.readNext();¶			String[] token = null;¶			while ((token = cr.readNext()) != null) {¶				long startTime = df.parse(token[4]).getTime();¶				if (startTime < 15*3600*1000) {¶					startTime += 12*3600*1000;¶				}¶				long endTime = df.parse(token[5]).getTime();¶				if (endTime < 15*3600*1000) {¶					endTime += 12*3600*1000;¶				}¶				Long[] times = {startTime, endTime};¶				timestamps.put(token[0], times);¶			}¶		} catch (FileNotFoundException e) {¶			// TODO Auto-generated catch block¶			e.printStackTrace();¶		} catch (IOException e) {¶			// TODO Auto-generated catch block¶			e.printStackTrace();¶		} catch (ParseException e) {¶			// TODO Auto-generated catch block¶			e.printStackTrace();¶		}¶		¶	}¶	¶	public void createPauseCommandLogs(String classFolderPath) {¶		File folder = new File(classFolderPath);¶		if (!folder.exists()) {¶			System.out.println("Class Folder does not exist");¶			System.exit(0);¶		}¶		File[] students = folder.listFiles(new FileFilter() {¶			public boolean accept(File pathname) {¶				return pathname.isDirectory();¶			}¶		});¶		latch = new CountDownLatch(students.length);¶		for (int j = 0; j < students.length; j++) {¶			File studentFolder  = students[j];¶			File logFolder = new File(studentFolder,"Eclipse");¶			if (!logFolder.exists()) {¶				latch.countDown();¶				continue;¶			}¶			System.out.println("Reading " + studentFolder.getName());¶			File[] logs = new File(logFolder.getPath()).listFiles(new FileFilter() {¶				public boolean accept(File pathname) {¶					return pathname.getName().startsWith("Log") && pathname.getName().endsWith(".xml");¶				}¶			});¶			Thread thread = new Thread(new Runnable() {¶				public void run() {¶					if (logs == null) {¶						synchronized (this) {¶							threadCount--;¶						}¶						latch.countDown();¶						return;¶					}¶//					if (!studentFolder.getName().equals("16")) {¶//						synchronized (this) {¶//							threadCount--;¶//						}¶//						latch.countDown();¶//						return;¶//					}¶					try {¶						File browser = new File(studentFolder, "Browser");¶						List<EHICommand> webCommands = null;¶						Iterator<EHICommand> webCommandIterator = null;¶						if (browser.exists() && browser.listFiles().length != 0) {¶							webCommands = readWebCommands(browser.listFiles()[0]);¶							if (webCommands != null) {¶								webCommandIterator = webCommands.iterator();¶							}¶						}¶						EHICommand webCommand = null;¶						for (File file : logs) {¶							¶							long startTimestamp = getLogFileCreationTime(file);¶							long logStartTimestamp = startTimestamp;¶//							long endTimestamp = Long.MAX_VALUE;¶//							if (timestamps.containsKey(studentFolder.getName())) {¶//								startTimestamp = startTimestamp / DAY * DAY + timestamps.get(studentFolder.getName())[0] - 60*ONE_MIN;¶//								endTimestamp = startTimestamp / DAY * DAY + timestamps.get(studentFolder.getName())[1] - 59*ONE_MIN;¶//							}¶							List<EHICommand> commands = readOneLogFile(file.getPath(), analyzer);¶							if (commands.size() < 2) {¶								continue;¶							}¶							List<EHICommand> newCommands = new ArrayList<>();¶							EHICommand last = null;¶							EHICommand cur = null;¶							if (webCommand == null) {¶//								webCommand = maybeAddWebCommandBeforeLogs(webCommandIterator, startTimestamp, newCommands);¶								webCommand = webCommandIterator.next();¶							}¶							long timestamp = 0;¶							if (webCommand != null) {¶								timestamp = webCommand.getTimestamp() - logStartTimestamp;¶							}¶							for (EHICommand command : commands) {¶//								if (command.getTimestamp() + logStartTimestamp < startTimestamp || command.getTimestamp() + logStartTimestamp > endTimestamp) {¶//									continue;¶//								}¶								command.setStartTimestamp(logStartTimestamp);¶								if (cur == null) {¶									cur = command;¶									newCommands.add(command);¶								} else {¶									last = cur;¶									cur = command;¶//									boolean webCommandAdded = false;¶//									while(webCommand != null && maybeAddWebCommand(newCommands, last, cur, webCommand, webCommandIterator, startTimestamp)) {¶//										webCommandAdded = true;¶//										last = webCommand;¶//										try {¶//											webCommand = webCommandIterator.next();¶//										} catch (NoSuchElementException e) {¶//											webCommand = null;¶//										}¶//									} ¶//									if (!webCommandAdded) {¶//										maybeAddPauseCommand(newCommands, last, cur);¶//									}¶									¶//									boolean added = false;¶									while (webCommand != null && timestamp >= last.getTimestamp() && timestamp <= cur.getTimestamp()) {¶										webCommand.setStartTimestamp(logStartTimestamp);¶										webCommand.setTimestamp(timestamp);¶										maybeAddPauseCommand(newCommands, last,	webCommand);¶//										webCommandAdded = true;¶										if (webCommandIterator.hasNext()) {¶											last = webCommand;¶											webCommand = webCommandIterator.next();¶											timestamp = webCommand.getTimestamp() - logStartTimestamp;¶										} else {¶											webCommand = null;¶											break;¶										}¶									}¶//									if (webCommandAdded) {¶//										maybeAddPauseCommand(newCommands, last, cur);¶////										return webCommand;¶//									} else {¶										maybeAddPauseCommand(newCommands, last, cur);¶//									}¶								}¶							}¶							¶							String logContent = XML_START1 + getLogFileCreationTime(file) + XML_START2 + XML_VERSION + XML_START3;¶							for (EHICommand c : newCommands) {¶								logContent += c.persist();¶							}¶							logContent += XML_FILE_ENDING;¶							try {¶								File newLog = new File(file.getParent()+File.separator+"RestOld"+File.separator+file.getName());¶								if (newLog.exists()) {¶									newLog.delete();¶								}¶								if (newCommands.size() == 0) {¶									continue;¶								}¶								newLog.getParentFile().mkdirs();¶								newLog.createNewFile();¶								BufferedWriter writer = new BufferedWriter(new FileWriter(newLog, true));¶								System.out.println("Writing to file " + newLog.getPath());¶								writer.write(logContent);¶								writer.close();¶								System.out.println("Finished writing to file " + newLog.getPath());¶							} catch (IOException e) {¶								e.printStackTrace();¶							}¶						}¶						¶					} catch (Exception e) {¶						e.printStackTrace();¶					} finally {¶						synchronized (this) {¶							threadCount--;¶						}¶						latch.countDown();¶					}¶				}							¶			});¶			while(true) {¶				if (threadCount > THREAD_LIM) {¶					try {¶						Thread.sleep(1000);¶					} catch (InterruptedException e) {¶						e.printStackTrace();¶					}¶				}¶				¶				if (threadCount <= THREAD_LIM) {¶					synchronized (this) {¶						threadCount++;¶						thread.start();¶						break;¶					}¶				}¶			}¶		}¶		try {¶			latch.await();¶		} catch (InterruptedException e) {¶			e.printStackTrace();¶		} finally {¶			System.exit(0);¶		}¶	}¶¶	public void analyzeFolder(String classFolderPath) {¶		File folder = new File(classFolderPath);¶		if (!folder.exists()) {¶			System.exit(0);¶		}¶		File[] participants = folder.listFiles(new FileFilter() {¶			public boolean accept(File pathname) {¶				return pathname.isDirectory();¶			}¶		});¶		for (int i = 0; i < participants.length; i++) {¶			File participantFolder = new File(participants[i],"Eclipse");¶			if (!participantFolder.exists()) {¶				continue;¶			}¶			System.out.println("Reading student " + participantFolder.getName());¶			data.put(participants[i].getName(), replayLogs(participantFolder.getPath(), analyzer));¶		}¶		List<List<EHICommand>> nestedCommands = data.get("26");¶		for (int i = 0; i < nestedCommands.size(); i++) {¶			for (EHICommand command:nestedCommands.get(i)) {¶				if (command instanceof ExceptionCommand) {¶					System.out.println(command);¶				}¶			}¶		}¶//		createAssignData("Experiment", folder);¶//		createDistributionData("Experiment", folder);¶//		createPrevPauseDistribution("Experiment", folder);¶//		createNextPauseDistribution("Experiment", folder);¶		createWebStats("Experiment", folder);¶		System.exit(0);¶	}¶¶	private void createAssignData(String assign, File folder) {¶		File csv = new File(folder,assign+"Old.csv");¶		FileWriter fw;¶		File csv2 = new File(folder,assign+"EventOld.csv");¶		FileWriter fw2;¶		int[] sum = new int[10];¶		try {¶			if (csv.exists()) {¶				csv.delete();¶			}¶			csv.createNewFile();¶			fw = new FileWriter(csv);¶			CSVWriter cw = new CSVWriter(fw);¶			String[] header = {"Student", "Total Time Spent", "Active Time", "Rest Time", "Wall Clock Time", "Pause", "Web Visit", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Exception", "Exception Breakdown"};¶			cw.writeNext(header);¶¶			if (csv2.exists()) {¶				csv2.delete();¶			}¶			csv2.createNewFile();¶			fw2 = new FileWriter(csv2);¶			CSVWriter cw2 = new CSVWriter(fw2);¶			String[] header2 = {"case_id", "timestamp", "activity", "user"};¶			cw2.writeNext(header2);¶¶			for (String student : data.keySet()) {¶				System.out.println("Writing " + assign + " student " + student + "to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				List<String> retVal = new ArrayList<>();¶				retVal.add(student);¶				long totalTime = totalTimeSpent(nestedCommands);¶				long[] restTime = restTime(nestedCommands, FIVE_MIN, Long.MAX_VALUE);¶				long wallClockTime = wallClockTime(nestedCommands);¶				retVal.add(convertToHourMinuteSecond(totalTime));¶				retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));¶				retVal.add(convertToHourMinuteSecond(restTime[0]));¶				retVal.add(convertToHourMinuteSecond(wallClockTime));¶				int[] numCommands = new int[9];¶				List<String> breakdownList = new ArrayList<>();¶				String list = "";¶				for (List<EHICommand> commands : nestedCommands) {¶					long lastTime = -1;¶					long curTime = -1;¶					for (int i = 0; i < commands.size(); i++) {¶						EHICommand command = commands.get(i);¶¶						if (i > 0) {¶							lastTime = curTime;¶						}¶						if (command != null) {¶							curTime = command.getTimestamp() + command.getStartTimestamp();¶						}¶						if (lastTime - curTime > 5*60*1000) {¶							writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);¶						}¶						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {¶							writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);¶						} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {¶							writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);¶						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand ||¶								command instanceof Delete ||¶								command instanceof Replace || command instanceof PasteCommand || command instanceof ExceptionCommand ||¶								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||¶								command instanceof RequestHelpCommand || command instanceof GetHelpCommand) {¶							writeOneLine(cw2, assign, curTime, getEventType(command), student);¶						}¶						if (command instanceof PauseCommand) {¶							numCommands[0]++;¶							list += "A";¶						}¶						if (command instanceof WebCommand) {¶							numCommands[1]++;¶							list += "W";¶						}¶						if (command instanceof InsertStringCommand) {¶							numCommands[2]++;¶							list += "I";¶						}¶						if (command instanceof Delete) {¶							numCommands[3]++;¶							list += "D";¶						}¶						if (command instanceof Replace) {¶							numCommands[4]++;¶							list += "R";¶						}¶						if (command instanceof CopyCommand) {¶							numCommands[5]++;¶							list += "C";¶						}¶						if (command instanceof PasteCommand) {¶							numCommands[6]++;¶							list += "P";¶						}¶						if (command instanceof RunCommand) {¶							numCommands[7]++;¶							list += "U";¶						}¶						if (command instanceof ExceptionCommand || command instanceof EHExceptionCommand) {¶							if(isException(command)) {¶								if (command instanceof EHExceptionCommand) {¶									ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");¶									ex.setTimestamp(command.getTimestamp());¶									ex.setStartTimestamp(command.getStartTimestamp());¶								}¶								numCommands[8]++;¶								list += "E";¶								if (i < commands.size()-1) {¶									command = commands.get(i+1);¶								} else {¶									continue;¶								}¶								while(!(command instanceof InsertStringCommand || command instanceof Replace ¶										|| command instanceof Delete ¶										|| command instanceof CopyCommand || command instanceof PasteCommand)) {¶									if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||¶											command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof ExceptionCommand ||¶											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_LOST_FOCUS")) ||¶											(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_CLOSED"))) {¶										if (i > 0) {¶											lastTime = curTime;¶										}¶										curTime = command.getTimestamp() + command.getStartTimestamp();¶										if (lastTime - curTime > 5*60*1000) {¶											writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);¶										}¶										if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {¶											writeOneLine(cw2, assign, curTime, REST_LOSEFOCUS, student);¶										} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {¶											writeOneLine(cw2, assign, curTime, REST_ENDSESSION, student);¶										} else {¶											writeOneLine(cw2, assign, curTime, getEventType(command), student);¶										}¶									}¶									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand) && isException(command)) {¶										if (command instanceof EHExceptionCommand) {¶											ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");¶											ex.setTimestamp(command.getTimestamp());¶											ex.setStartTimestamp(command.getStartTimestamp());¶											if (i > 0) {¶												lastTime = curTime;¶											}¶											curTime = command.getTimestamp() + command.getStartTimestamp();¶											if (lastTime - curTime > 5*60*1000) {¶												writeOneLine(cw2, assign, lastTime, REST_INSESSION, student);¶											}¶											writeOneLine(cw2, assign, curTime, getEventType(ex), student);¶										}¶										numCommands[8]++;¶										list += "E";¶									}¶									i++;¶									if (i+1 < commands.size()) {¶										command = commands.get(i+1);¶									} else {¶										break;¶									}¶								}¶								breakdownList.add(countConsecutiveCommands(list));¶								list = "";¶							}¶						}¶					}¶				}¶				if (!list.equals("")) {¶					breakdownList.add(countConsecutiveCommands(list));¶				}¶				for(int i = 0; i < numCommands.length; i++) {¶					retVal.add(i+5, numCommands[i]+"");¶					sum[i] += numCommands[i];¶					if (i > 1) {¶						sum[9] += numCommands[i];¶					}¶				}¶				for(int i = 0; i < breakdownList.size(); i++) {¶					retVal.add(i+14, breakdownList.get(i));¶				}¶				String[] nextLine = retVal.toArray(new String[1]);¶				cw.writeNext(nextLine);¶				¶				System.out.println("written " + assign + " student " + student + "to " + csv.getName());¶			}¶			List<String> retVal = new ArrayList<>();¶			retVal.add("Sum");¶			retVal.add("");¶			retVal.add("");¶			retVal.add("");¶			retVal.add("");¶			for (int i = 0; i < sum.length; i++) {¶				retVal.add(sum[i]+"");¶			}¶			String[] nextLine = retVal.toArray(new String[1]);¶			cw.writeNext(nextLine);¶			fw.close();¶			cw.close();¶¶			fw2.close();¶			cw2.close();¶		} catch (IOException e) {¶			e.printStackTrace();¶		}¶	}¶¶	private void createDistributionData(String assign, File folder) {¶		File csv = new File(folder,assign+"DistributionOld.csv");¶		FileWriter fw;¶		try {¶			if (csv.exists()) {¶				csv.delete();¶			}¶			csv.createNewFile();¶			fw = new FileWriter(csv);¶			CSVWriter cw = new CSVWriter(fw);¶			String[] header = getHeader();¶			cw.writeNext(header);¶			¶			String[] sum = new String[header.length];¶			long[] restTimeSum = new long[REST.length];¶			sum[0] = "Sum";¶			for (int i = 1; i < sum.length; i++) {¶				sum[i] = "";¶			}¶			int[] restSum = new int[REST.length];¶			for (String student : data.keySet()) {¶				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				List<String> retVal = new ArrayList<>();¶				retVal.add(student);¶				long totalTime = totalTimeSpent(nestedCommands);¶				if (totalTime == 0) {¶					continue;¶				}¶				long wallClockTime = wallClockTime(nestedCommands);¶				retVal.add(convertToHourMinuteSecond(totalTime));¶				retVal.add(convertToHourMinuteSecond(wallClockTime));¶¶				long[] restTime = {0,0};¶				for (int i = 0; i < REST.length; i++) {¶					if (i < REST.length-1) {¶						restTime = restTime(nestedCommands, REST[i], REST[i+1]);¶					} else {¶						restTime = restTime(nestedCommands, REST[i], Long.MAX_VALUE);¶					}¶					retVal.add(convertToHourMinuteSecond(totalTime - restTime[0]));¶					retVal.add(convertToHourMinuteSecond(restTime[0]));¶					retVal.add(restTime[1]+"");¶					retVal.add(getTime(restTime[1] == 0? 0:1.0*restTime[2]/restTime[1]));¶					restSum[i] += restTime[1];¶					restTimeSum[i] += restTime[2];¶				}¶				¶				String[] days = daysSpent(nestedCommands);¶				if (days != null) {¶					for (int i = 0; i < days.length; i++) {¶						retVal.add(days[i]);¶					}¶				}¶				¶				String[] nextLine = retVal.toArray(new String[1]);¶				cw.writeNext(nextLine);¶				System.out.println("written " + assign + " student " + student + "to " + csv.getName());¶			}¶			int sum2 = 0;¶			for (int i = 0; i < restSum.length; i++) {¶				sum[4*i+5] = restSum[i]+"";¶				sum2 += restSum[i];¶				sum[4*i+6] = getTime(restSum[i] == 0? 0:1.0*restTimeSum[i]/restSum[i]);¶			}¶			sum[1] = sum2+"";¶			cw.writeNext(sum);¶			fw.close();¶			cw.close();¶		} catch (IOException e) {¶			e.printStackTrace();¶		} ¶	}¶	¶	private void createPrevPauseDistribution(String assign, File folder) {¶		File csv = new File(folder,assign+"PauseDistributionOld.csv");¶		FileWriter fw;¶		try {¶			if (csv.exists()) {¶				csv.delete();¶			}¶			csv.createNewFile();¶			fw = new FileWriter(csv);¶			CSVWriter cw = new CSVWriter(fw);¶			String[] prev = {"Prev"};¶			cw.writeNext(prev);¶			String[] header = getPauseHeader();¶			cw.writeNext(header);¶¶			String[] nextLine = new String[header.length];¶			int[] sum = new int[PauseCommand.TYPES.length];¶			long[] sumPause = new long[sum.length];¶			for (String student : data.keySet()) {¶				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				List<String> retVal = new ArrayList<>();¶				int[] numCommmands = new int[sum.length];¶				long[] pauseTimes = new long[sum.length];¶				retVal.add(student);¶				for (List<EHICommand> commands : nestedCommands) {¶					for (EHICommand command : commands) {¶						if (command instanceof PauseCommand) {¶							for (int i = 0; i < sum.length; i++) {¶								if (command.getDataMap().get("prevType").equals(PauseCommand.TYPES[i])) {¶									numCommmands[i]++;¶									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); ¶									break;¶								}¶							}¶						}¶					}¶				}¶				for (int i = 0; i < sum.length; i++) {¶					retVal.add(numCommmands[i]+"");¶					if (numCommmands[i] == 0) {¶						retVal.add("0");¶					} else {¶						retVal.add(pauseTimes[i]/numCommmands[i]+"");¶					}¶					sum[i] += numCommmands[i];¶					sumPause[i] += pauseTimes[i];¶				}¶//				String[] nextLine = retVal.toArray(new String[1]);¶				nextLine = retVal.toArray(new String[1]);¶				cw.writeNext(nextLine);¶				System.out.println("written " + assign + " student " + student + "to " + csv.getName());¶			}¶//			String[] nextLine = new String[header.length];¶			nextLine = new String[header.length];¶			nextLine[0] = "Sum";¶			for (int i = 0; i < sum.length; i++) {¶				nextLine[1+i*2] = sum[i]+"";¶				if (sum[i] == 0) {¶					nextLine[2+i*2] = 0+"";¶				} else {¶					nextLine[2+i*2] = sumPause[i]/sum[i]+"";¶				}¶			}¶			cw.writeNext(nextLine);¶			¶			String[] empty = {};¶			cw.writeNext(empty);¶			String[] next = {"next"};¶			cw.writeNext(next);¶			sum = new int[PauseCommand.TYPES.length];¶			sumPause = new long[sum.length];¶			for (String student : data.keySet()) {¶				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				List<String> retVal = new ArrayList<>();¶				int[] numCommmands = new int[sum.length];¶				long[] pauseTimes = new long[sum.length];¶				retVal.add(student);¶				for (List<EHICommand> commands : nestedCommands) {¶					for (EHICommand command : commands) {¶						if (command instanceof PauseCommand) {¶							for (int i = 0; i < sum.length; i++) {¶								if (command.getDataMap().get("nextType").equals(PauseCommand.TYPES[i])) {¶									numCommmands[i]++;¶									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); ¶									break;¶								}¶							}¶						}¶					}¶				}¶				for (int i = 0; i < sum.length; i++) {¶					retVal.add(numCommmands[i]+"");¶					if (numCommmands[i] == 0) {¶						retVal.add("0");¶					} else {¶						retVal.add(pauseTimes[i]/numCommmands[i]+"");¶					}¶					sum[i] += numCommmands[i];¶					sumPause[i] += pauseTimes[i];¶				}¶				nextLine = retVal.toArray(new String[1]);¶				cw.writeNext(nextLine);¶				System.out.println("written " + assign + " student " + student + "to " + csv.getName());¶			}¶			nextLine = new String[header.length];¶			nextLine[0] = "Sum";¶			for (int i = 0; i < sum.length; i++) {¶				nextLine[1+i*2] = sum[i]+"";¶				if (sum[i] == 0) {¶					nextLine[2+i*2] = 0+"";¶				} else {¶					nextLine[2+i*2] = sumPause[i]/sum[i]+"";¶				}¶			}¶			cw.writeNext(nextLine);¶			¶			fw.close();¶			cw.close();¶		} catch (IOException e) {¶			e.printStackTrace();¶		} ¶	}¶	¶	private void createWebStats(String assign, File folder) {¶		File csv = new File(folder,assign+"WebStatsBert.csv");¶		FileWriter fw;¶		File csv2 = new File(folder,assign+"WebSearchesBert.csv");¶		FileWriter fw2;¶		try {¶			if (csv.exists()) {¶				csv.delete();¶			}¶			if (csv2.exists()) {¶				csv2.delete();¶			}¶			csv.createNewFile();¶			csv2.createNewFile();¶			fw = new FileWriter(csv);¶			fw2 = new FileWriter(csv2);¶			CSVWriter cw = new CSVWriter(fw);¶			CSVWriter cw2 = new CSVWriter(fw2);¶			String[] header = {"Title", "URL", "# of Visits", "Provided?"};¶//			String[] header2 = {"ID", "Search Word", "Title", "URL", "Sequence", "Last Page of the Search?", "Pasted Text"};¶			String[] header2 = {"Search Word"};¶			cw.writeNext(header);¶			cw2.writeNext(header2);¶¶			Map<String, Integer> urls = new HashMap<>();¶			Map<String, String> titles = new HashMap<>();¶			Map<String, List<String>> searches = new LinkedHashMap<>();¶			Map<String, List<String>> contents = new HashMap<>();¶			for (String student : data.keySet()) {¶				EHICommand lastSearch = null;¶				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				for (List<EHICommand> commands : nestedCommands) {¶					for (int i = 0; i < commands.size(); i++) {¶						EHICommand command = commands.get(i);¶						if (command instanceof WebCommand) {¶							String url = command.getDataMap().get("URL");¶							if (command.getAttributesMap().get("type").equals("Search")) {¶								lastSearch = command;¶								if (!searches.containsKey(lastSearch.getDataMap().get("keyword"))) {¶									searches.put(lastSearch.getDataMap().get("keyword"), new ArrayList<>());¶								}¶							} ¶							if (command.getAttributesMap().get("type").equals("Search Result") || command.getAttributesMap().get("type").equals("Stack Overflow")) {¶								String searchWord = "null";¶								if (lastSearch != null) {¶									searchWord = lastSearch.getDataMap().get("keyword");¶								}¶								if (!searches.containsKey(searchWord)) {¶									searches.put(searchWord, new ArrayList<>());¶								}¶								searches.get(searchWord).add(url);¶//								if (!contents.containsKey(url)) {¶//									List<String> list = new ArrayList<>();¶//									if (!url.contains("google.com")) {¶//										list.add(readWebContent(url));¶////										list.add(readWebContent2(url));¶//										contents.put(url, list);¶//									}¶//								}¶							}¶							if (command.getAttributesMap().get("type").contains("Provided")) {¶//								if (!searches.containsKey("Provided")) {¶//									searches.put("Provided", new ArrayList<>());¶//								}¶//								searches.get("Provided").add(url);¶//								if (!contents.containsKey(url)) {¶//									List<String> list = new ArrayList<>();¶//									list.add(readWebContent(url));¶////									list.add(readWebContent2(url));¶//									contents.put(url, list);¶//								}¶							}¶							urls.merge(url, 1, Integer::sum);¶							titles.put(url, command.getDataMap().get("keyword"));¶						}¶						if (command instanceof PasteCommand) {¶							outer:¶							for (int j = i-1; j >= 0 && j > i-20; j--) {¶								EHICommand command2 = commands.get(j);¶								String pastedText = "";¶								if (command2 instanceof InsertStringCommand || command2 instanceof Replace) {¶									if (command2 instanceof InsertStringCommand) {¶										pastedText = command2.getDataMap().get(InsertStringCommand.XML_Data_Tag);¶									} else {¶										pastedText = command2.getDataMap().get("insertedText");¶									}¶									if (pastedText.length() > 10) {¶										for (String url : contents.keySet()) {¶											List<String> list = contents.get(url);¶											String pastedText2 = pastedText.replaceAll("\\s", "");¶											if (list.get(0).contains(pastedText2)) {¶												for (int k = 1; k < list.size(); k++) {¶													if (list.get(k).replaceAll("\\s",  "").equals(pastedText2)) {¶														break outer;¶													}¶												}¶												list.add(pastedText);¶												break outer;¶											}¶										}¶									}¶								}¶							}¶						}¶					}¶				}¶				for (String s : searches.keySet()) {¶					List<String> nextLine = new ArrayList<>();¶//					nextLine.add(student);¶					if (s.contains(" - Google Search")) {¶						s = s.substring(0,s.indexOf(" - Google Search"));¶					} ¶					nextLine.add(s);¶					cw2.writeNext(nextLine.toArray(new String[1]));¶¶//					if (searches.get(s).size() == 0) {¶//						nextLine.add("No Result");¶//						cw2.writeNext(nextLine.toArray(new String[1]));¶//						continue;¶//					}¶//					for (int i = 0; i < searches.get(s).size(); i++) {¶//						String url = searches.get(s).get(i);¶//						nextLine.add(titles.get(url));¶//						nextLine.add(url);¶//						nextLine.add(i+1+"");¶//						nextLine.add(i == searches.get(s).size()-1 ? "Last" : "");¶//						if (contents.containsKey(url)) {¶//							List<String> list = contents.get(url);¶//							for (int j = 1; j < list.size(); j++) {¶//								nextLine.add(list.get(j));¶//							}¶//						}¶//						cw2.writeNext(nextLine.toArray(new String[1]));¶//						nextLine = new ArrayList<>();¶//						nextLine.add(student);¶//						nextLine.add("");¶//					}¶				}¶				searches.clear();¶			}¶			Map<String, Integer> sortedMap = new LinkedHashMap<>();¶			urls.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));¶			for (String s : sortedMap.keySet()) {¶				String[] nextLine = {titles.get(s), s, sortedMap.get(s)+"", isProvided(s)? "Provided":""};¶				cw.writeNext(nextLine);¶			}¶			fw.close();¶			cw.close();¶			¶			fw2.close();¶			cw2.close();¶		} catch (IOException e) {¶			e.printStackTrace();¶		} ¶	}¶	¶	private void createNextPauseDistribution(String assign, File folder) {¶		File csv = new File(folder,assign+"NextPauseDistribution.csv");¶		FileWriter fw;¶		try {¶			if (csv.exists()) {¶				csv.delete();¶			}¶			csv.createNewFile();¶			fw = new FileWriter(csv);¶			CSVWriter cw = new CSVWriter(fw);¶			String[] header = getPauseHeader();¶			cw.writeNext(header);¶			¶			int[] sum = new int[PauseCommand.TYPES.length];¶			long[] sumPause = new long[sum.length];¶			for (String student : data.keySet()) {¶				System.out.println("Writing " + assign + " student " + student + " to " + csv.getName());¶				List<List<EHICommand>> nestedCommands = data.get(student);¶				List<String> retVal = new ArrayList<>();¶				int[] numCommmands = new int[sum.length];¶				long[] pauseTimes = new long[sum.length];¶				retVal.add(student);¶				for (List<EHICommand> commands : nestedCommands) {¶					for (EHICommand command : commands) {¶						if (command instanceof PauseCommand) {¶							for (int i = 0; i < sum.length; i++) {¶								if (command.getDataMap().get("nextType").equals(PauseCommand.TYPES[i])) {¶									numCommmands[i]++;¶									pauseTimes[i] += Long.parseLong(command.getDataMap().get("pause")); ¶									break;¶								}¶							}¶						}¶					}¶				}¶				for (int i = 0; i < sum.length; i++) {¶					retVal.add(numCommmands[i]+"");¶					if (numCommmands[i] == 0) {¶						retVal.add("0");¶					} else {¶						retVal.add(pauseTimes[i]/numCommmands[i]+"");¶					}¶					sum[i] += numCommmands[i];¶					sumPause[i] += pauseTimes[i];¶				}¶				String[] nextLine = retVal.toArray(new String[1]);¶				cw.writeNext(nextLine);¶				System.out.println("written " + assign + " student " + student + "to " + csv.getName());¶			}¶			String[] nextLine = new String[header.length];¶			nextLine[0] = "Sum";¶			for (int i = 0; i < sum.length; i++) {¶				nextLine[1+i*2] = sum[i]+"";¶				if (sum[i] == 0) {¶					nextLine[2+i*2] = 0+"";¶				} else {¶					nextLine[2+i*2] = sumPause[i]/sum[i]+"";¶				}¶			}¶			cw.writeNext(nextLine);¶			fw.close();¶			cw.close();¶		} catch (IOException e) {¶			e.printStackTrace();¶		} ¶	}¶	¶	private String[] getPauseHeader() {¶		List<String> retVal = new ArrayList<>();¶		retVal.add("ID");¶		for (String s : PauseCommand.TYPES) {¶			retVal.add(s);¶			retVal.add("Avg. Time");¶//			retVal.add("Longest Time");¶//			retVal.add("Shortest Time");¶		}¶		return retVal.toArray(new String[1]);¶	}¶	¶	private void writeOneLine(CSVWriter cw, String assign, long time, String type, String pid) {¶		String[] nextLine = new String[4]; ¶		nextLine[0] = assign + " " + pid;¶		Date date = new Date(time);¶		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");¶		nextLine[1] = df.format(date);¶		nextLine[2] = type;¶		nextLine[3] = pid;¶		if (nextLine != null) {¶			cw.writeNext(nextLine);¶		}¶	}¶	¶	public List<List<EHICommand>> replayLogs(String projectPath, Analyzer analyzer){¶		List<List<EHICommand>> nestedCommands = analyzer.convertXMLLogToObjects(projectPath+File.separator+"Rest");¶		sortNestedCommands(nestedCommands);¶		return nestedCommands;¶	}¶¶	private void maybeAddPauseCommand(List<EHICommand> newCommands, EHICommand last, EHICommand cur) {¶		long rest = cur.getTimestamp()-last.getTimestamp();¶		if (rest >= 1*ONE_SECOND) {¶			String range = "";¶			if (rest < 2*ONE_SECOND) {¶				range = "1s-2s";¶			} else if (rest < 5*ONE_SECOND) {¶				range = "2s-5s";¶			} else if (rest < 10*ONE_SECOND) {¶				range = "5s-10s";¶			} else if (rest < 20*ONE_SECOND) {¶				range = "10s-20s";¶			} else if (rest < 30*ONE_SECOND) {¶				range = "20s-30s";¶			} else if (rest < ONE_MIN) {¶				range = "30s-1m";¶			} else if (rest < TWO_MIN) {¶				range = "1m-2m";¶			} else if (rest < FIVE_MIN) {¶				range = "2m-5m";¶			} else if (rest < TEN_MIN) {¶				range = "5m-10m";¶			} else if (rest < 3*TEN_MIN) {¶				range = "10m-30m";¶			} else if (rest < 6*TEN_MIN) {¶				range = "30m-60m";¶			} else {¶				range = ">1h";¶			}¶			PauseCommand rCommnad = new PauseCommand(last, cur, rest, range);¶			rCommnad.setStartTimestamp(last.getStartTimestamp());¶			rCommnad.setTimestamp(last.getTimestamp()+1);¶			newCommands.add(rCommnad);¶		} ¶		newCommands.add(cur);¶	}¶	¶	private EHICommand maybeAddWebCommandBeforeLogs(Iterator<EHICommand> iterator, long startTimestamp, List<EHICommand> commands) {¶		if (iterator == null) {¶			return null;¶		}¶		EHICommand webCommand = null;¶		long timestamp = 0;¶		while((webCommand = iterator.next()) != null && (timestamp = webCommand.getTimestamp() - startTimestamp) < 0) {¶			webCommand.setStartTimestamp(0);¶			webCommand.setTimestamp(timestamp);¶			commands.add(webCommand);¶		}¶		return webCommand;¶	}¶¶	public String readWebContent(String aURL) {¶		String content = "";¶		Scanner sc = null;¶		try {¶			URL url = new URL(aURL);¶//			System.out.println("accessing webpage " + aURL);¶			URLConnection con = url.openConnection();¶			con.setReadTimeout(5000);¶			sc = new Scanner(con.getInputStream());¶			StringBuffer sb = new StringBuffer();¶			while (sc.hasNext()) {¶				sb.append(sc.next());¶			}¶			content = sb.toString();¶		} catch (MalformedURLException e) {¶			e.printStackTrace();¶		} catch (IOException e) {¶			e.printStackTrace();¶		} finally {¶			if (sc != null) {¶				sc.close();¶			}¶		}¶		if (content.equals("") && !aURL.substring(0,5).equals("https")) {¶			aURL = aURL.replaceFirst("http", "https");¶			return readWebContent(aURL);¶		}¶		¶//		System.out.println("webpage content " + aURL + content);¶//		return content.replaceAll("<[^>]*>", "").replaceAll("\\s", "");¶		return content;¶	}¶	¶	private boolean isProvided(String s) {¶		for (String url : WebCommand.PROVIDED_URL) {¶			if (s.equals(url)) {¶				return true;¶			}¶		}¶		return false;¶	}¶	¶//	public String readWebContent2(String url){¶//		try {¶//			HttpURLConnection httpClient =(HttpURLConnection) new URL(url).openConnection();¶//			httpClient.setRequestMethod("GET");¶//			httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");¶//			int responseCode = httpClient.getResponseCode();¶//			try (BufferedReader in = new BufferedReader(¶//					new InputStreamReader(httpClient.getInputStream()))) {¶//				StringBuilder response = new StringBuilder();¶//				String line;¶//				while ((line = in.readLine()) != null) {¶//					response.append(line);¶//				}¶//				if (response.toString().equals("") && !url.substring(0,5).equals("https")) {¶//					url = url.replaceFirst("http", "https");¶//					return readWebContent2(url);¶//				}	¶//				return response.toString();¶//			}¶//		} catch (Exception e) {¶//			// TODO: handle exception¶//			e.printStackTrace();¶//		}¶//		return "";¶//	}¶}¶")]]]></diff>
-  </Command>
-  <Command __id="622" _type="MoveCaretCommand" caretOffset="32859" date="Wed Mar 10 14:54:20 EST 2021" docOffset="34340" starttimestamp="1615397223589" timestamp="8837331" />
-  <Command __id="623" _type="DiffBasedFileOpenCommand" date="Wed Mar 10 14:54:21 EST 2021" docASTNodeCount="150" docActiveCodeLength="1197" docExpressionCount="90" docLength="2822" projectName="LogAnalyzer" starttimestamp="1615397223589" timestamp="8838207">
-    <filePath><![CDATA[C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\LogAnalyzer\src\logAnalyzer\Driver.java]]></filePath>
-    <diff><![CDATA[[Diff(EQUAL,"package logAnalyzer;¶¶import java.io.BufferedReader;¶import java.io.IOException;¶import java.io.InputStreamReader;¶import java.io.OutputStream;¶import java.net.HttpURLConnection;¶import java.net.URL;¶import java.util.Date;¶¶import org.json.JSONException;¶import org.json.JSONObject;¶¶import analyzer.AnAnalyzer;¶import analyzer.Analyzer;¶¶public class Driver {¶	private static String classFolderPath = "E:\\testdata\\Fall2020";¶	private static String experimentalClassFolderPath = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData";¶	private static Analyzer analyzer;¶	private static AReplayer replayer;¶	private static int timeout = 5000;¶	private static String url = "http://stackoverflow.com/questions/4186835/how-to-add-multiple-components-to-a-jframe";¶	¶	public static void main(String[] args) {¶		analyzer = new AnAnalyzer();¶//		replayer = new AReplayer(analyzer);¶//		analyzer.addAnalyzerListener(replayer);	¶//		replayer.createPauseCommandLogs(classFolderPath);¶//		replayer.analyzeFolder(classFolderPath);¶		replayer = new AExperimentalReplayer(analyzer);¶		((AExperimentalReplayer)replayer).readTimestamp();¶//		String s1 = ((AExperimentalReplayer)replayer).readWebContent(url);¶//		String s2 = ((AExperimentalReplayer)replayer).readWebContent2(url);¶//		System.out.println(s1.equals(s2));¶//		analyzer.addAnalyzerListener(replayer);	¶//		replayer.createPauseCommandLogs(experimentalClassFolderPath);¶		replayer.analyzeFolder(experimentalClassFolderPath);¶//		String s1 = ((AExperimentalReplayer)replayer).readWebContent(url);¶//		String s2 = "";¶//		System.out.println();¶//		try {¶//			s2 = get(url);¶//		} catch (Exception e) {¶//			// TODO: handle exception¶//			e.printStackTrace();¶//		}¶//		System.out.println(s1.equals(s2));¶//		Date d = new Date(1379108460000L);¶//		System.out.println(d);¶	}¶	¶//	public static String get(String urlString) throws Exception{¶//         HttpURLConnection httpClient =(HttpURLConnection) new URL(urlString).openConnection();¶//        httpClient.setRequestMethod("GET");¶//        httpClient.setRequestProperty("User-Agent", "Mozilla/5.0");¶//        int responseCode = httpClient.getResponseCode();¶//        System.out.println("Response Code : " + responseCode);¶//        try (BufferedReader in = new BufferedReader(¶//                new InputStreamReader(httpClient.getInputStream()))) {¶//            StringBuilder response = new StringBuilder();¶//            String line;¶//            while ((line = in.readLine()) != null) {¶//                response.append(line);¶//            }¶//            System.out.println(response.toString());¶//            return response.toString();¶//        }¶//	}¶}¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶¶")]]]></diff>
-  </Command>
-  <Command __id="624" _type="MoveCaretCommand" caretOffset="856" date="Wed Mar 10 14:54:21 EST 2021" docOffset="1153" starttimestamp="1615397223589" timestamp="8838308" />
-</Events>

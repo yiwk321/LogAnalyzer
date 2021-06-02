@@ -1,1218 +1,0 @@
-<Events startTimestamp="1614193252183" logVersion="1.0.0.202102091426">
-  <Command __id="4" _type="ShellCommand" date="Wed Feb 24 14:03:55 EST 2021" starttimestamp="1614193252183" timestamp="183587" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="7" _type="PauseCommand" date="Wed Feb 24 14:03:58 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="186810">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[3223]]></pause>
-    <nextType><![CDATA[Open File]]></nextType>
-    <next><![CDATA[DiffBasedFileOpenCommand]]></next>
-  </Command>
-  <Command __id="8" _type="MoveCaretCommand" caretOffset="4554" date="Wed Feb 24 14:03:59 EST 2021" docOffset="6035" starttimestamp="1614193252183" timestamp="187000" />
-  <Command __id="10" _type="PauseCommand" date="Wed Feb 24 14:04:00 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="188250">
-    <prevType><![CDATA[Move Caret]]></prevType>
-    <prev><![CDATA[MoveCaretCommand]]></prev>
-    <pause><![CDATA[1250]]></pause>
-    <nextType><![CDATA[Lost Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="9" _type="ShellCommand" date="Wed Feb 24 14:04:00 EST 2021" starttimestamp="1614193252183" timestamp="188250" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="12" _type="PauseCommand" date="Wed Feb 24 14:04:02 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="190014">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[1764]]></pause>
-    <nextType><![CDATA[Gained Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="11" _type="ShellCommand" date="Wed Feb 24 14:04:02 EST 2021" starttimestamp="1614193252183" timestamp="190014" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="13" _type="MoveCaretCommand" caretOffset="4444" date="Wed Feb 24 14:04:02 EST 2021" docOffset="5925" starttimestamp="1614193252183" timestamp="190118" />
-  <Command __id="15" _type="PauseCommand" date="Wed Feb 24 14:05:34 EST 2021" range="1m-2m" starttimestamp="1614193252183" timestamp="282730">
-    <prevType><![CDATA[Move Caret]]></prevType>
-    <prev><![CDATA[MoveCaretCommand]]></prev>
-    <pause><![CDATA[92612]]></pause>
-    <nextType><![CDATA[Move Caret]]></nextType>
-    <next><![CDATA[MoveCaretCommand]]></next>
-  </Command>
-  <Command __id="14" _type="MoveCaretCommand" caretOffset="3741" date="Wed Feb 24 14:05:34 EST 2021" docOffset="5222" starttimestamp="1614193252183" timestamp="282730" />
-  <Command __id="16" _type="ShellCommand" date="Wed Feb 24 14:05:35 EST 2021" starttimestamp="1614193252183" timestamp="283688" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="129" _type="PauseCommand" date="Wed Feb 24 16:08:18 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7645954">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[1464]]></pause>
-    <nextType><![CDATA[Move Caret]]></nextType>
-    <next><![CDATA[MoveCaretCommand]]></next>
-  </Command>
-  <Command __id="128" _type="MoveCaretCommand" caretOffset="1690" date="Wed Feb 24 16:08:18 EST 2021" docOffset="2035" starttimestamp="1614193252183" timestamp="7645954" />
-  <Command __id="131" _type="MoveCaretCommand" caretOffset="1164" date="Wed Feb 24 16:08:19 EST 2021" docOffset="1461" starttimestamp="1614193252183" timestamp="7647098" />
-  <Command __id="133" _type="PauseCommand" date="Wed Feb 24 16:08:21 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7648989">
-    <prevType><![CDATA[Move Caret]]></prevType>
-    <prev><![CDATA[MoveCaretCommand]]></prev>
-    <pause><![CDATA[1891]]></pause>
-    <nextType><![CDATA[Edit]]></nextType>
-    <next><![CDATA[Insert]]></next>
-  </Command>
-  <Command __id="134" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:21 EST 2021" starttimestamp="1614193252183" timestamp="7649012" />
-  <Command __id="135" _type="MoveCaretCommand" caretOffset="1238" date="Wed Feb 24 16:08:22 EST 2021" docOffset="1535" starttimestamp="1614193252183" timestamp="7649833" />
-  <Command __id="137" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:22 EST 2021" starttimestamp="1614193252183" timestamp="7649974" />
-  <Command __id="139" _type="PauseCommand" date="Wed Feb 24 16:08:25 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7653093">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[3119]]></pause>
-    <nextType><![CDATA[Move Caret]]></nextType>
-    <next><![CDATA[MoveCaretCommand]]></next>
-  </Command>
-  <Command __id="138" _type="MoveCaretCommand" caretOffset="1264" date="Wed Feb 24 16:08:25 EST 2021" docOffset="1561" starttimestamp="1614193252183" timestamp="7653093" />
-  <Command __id="141" _type="PauseCommand" date="Wed Feb 24 16:08:26 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7654356">
-    <prevType><![CDATA[Move Caret]]></prevType>
-    <prev><![CDATA[MoveCaretCommand]]></prev>
-    <pause><![CDATA[1263]]></pause>
-    <nextType><![CDATA[Open File]]></nextType>
-    <next><![CDATA[DiffBasedFileOpenCommand]]></next>
-  </Command>
-  <Command __id="142" _type="MoveCaretCommand" caretOffset="3741" date="Wed Feb 24 16:08:26 EST 2021" docOffset="5222" starttimestamp="1614193252183" timestamp="7654560" />
-  <Command __id="144" _type="PauseCommand" date="Wed Feb 24 16:08:32 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7660549">
-    <prevType><![CDATA[Move Caret]]></prevType>
-    <prev><![CDATA[MoveCaretCommand]]></prev>
-    <pause><![CDATA[5989]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[EclipseCommand]]></next>
-  </Command>
-  <Command __id="143" _type="EclipseCommand" commandID="org.eclipse.ui.edit.text.folding.collapse_all" date="Wed Feb 24 16:08:32 EST 2021" starttimestamp="1614193252183" timestamp="7660549" />
-  <Command __id="146" _type="PauseCommand" date="Wed Feb 24 16:08:38 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7666284">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[5735]]></pause>
-    <nextType><![CDATA[Move Caret]]></nextType>
-    <next><![CDATA[MoveCaretCommand]]></next>
-  </Command>
-  <Command __id="145" _type="MoveCaretCommand" caretOffset="1382" date="Wed Feb 24 16:08:38 EST 2021" docOffset="10252" starttimestamp="1614193252183" timestamp="7666284" />
-  <Command __id="148" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:39 EST 2021" starttimestamp="1614193252183" timestamp="7667113" />
-  <Command __id="149" _type="MoveCaretCommand" caretOffset="1424" date="Wed Feb 24 16:08:39 EST 2021" docOffset="10294" starttimestamp="1614193252183" timestamp="7667420" />
-  <Command __id="151" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:39 EST 2021" starttimestamp="1614193252183" timestamp="7667550" />
-  <Command __id="152" _type="MoveCaretCommand" caretOffset="1527" date="Wed Feb 24 16:08:40 EST 2021" docOffset="10397" starttimestamp="1614193252183" timestamp="7668374" />
-  <Command __id="154" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:40 EST 2021" starttimestamp="1614193252183" timestamp="7668582" />
-  <Command __id="156" _type="PauseCommand" date="Wed Feb 24 16:08:46 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7674187">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[5605]]></pause>
-    <nextType><![CDATA[Lost Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="155" _type="ShellCommand" date="Wed Feb 24 16:08:46 EST 2021" starttimestamp="1614193252183" timestamp="7674187" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="157" _type="ShellCommand" date="Wed Feb 24 16:08:46 EST 2021" starttimestamp="1614193252183" timestamp="7674312" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="159" _type="PauseCommand" date="Wed Feb 24 16:08:47 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7675741">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[1429]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[EclipseCommand]]></next>
-  </Command>
-  <Command __id="158" _type="EclipseCommand" commandID="org.eclipse.ui.navigate.backwardHistory" date="Wed Feb 24 16:08:47 EST 2021" starttimestamp="1614193252183" timestamp="7675741" />
-  <Command __id="161" _type="PauseCommand" date="Wed Feb 24 16:08:51 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7679278">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[3537]]></pause>
-    <nextType><![CDATA[Lost Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="160" _type="ShellCommand" date="Wed Feb 24 16:08:51 EST 2021" starttimestamp="1614193252183" timestamp="7679278" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="162" _type="ShellCommand" date="Wed Feb 24 16:08:51 EST 2021" starttimestamp="1614193252183" timestamp="7679386" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="164" _type="PauseCommand" date="Wed Feb 24 16:08:55 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7683025">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[3639]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[EclipseCommand]]></next>
-  </Command>
-  <Command __id="163" _type="EclipseCommand" commandID="org.eclipse.ui.navigate.backwardHistory" date="Wed Feb 24 16:08:55 EST 2021" starttimestamp="1614193252183" timestamp="7683025" />
-  <Command __id="166" _type="PauseCommand" date="Wed Feb 24 16:08:56 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7684637">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[1612]]></pause>
-    <nextType><![CDATA[Move Caret]]></nextType>
-    <next><![CDATA[MoveCaretCommand]]></next>
-  </Command>
-  <Command __id="165" _type="MoveCaretCommand" caretOffset="1617" date="Wed Feb 24 16:08:56 EST 2021" docOffset="10395" starttimestamp="1614193252183" timestamp="7684637" />
-  <Command __id="168" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:57 EST 2021" starttimestamp="1614193252183" timestamp="7685419" />
-  <Command __id="169" _type="MoveCaretCommand" caretOffset="1673" date="Wed Feb 24 16:08:58 EST 2021" docOffset="10451" starttimestamp="1614193252183" timestamp="7685898" />
-  <Command __id="171" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:08:58 EST 2021" starttimestamp="1614193252183" timestamp="7686084" />
-  <Command __id="173" _type="PauseCommand" date="Wed Feb 24 16:08:59 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7687237">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[EclipseCommand]]></prev>
-    <pause><![CDATA[1153]]></pause>
-    <nextType><![CDATA[Save]]></nextType>
-    <next><![CDATA[EclipseCommand]]></next>
-  </Command>
-  <Command __id="172" _type="EclipseCommand" commandID="org.eclipse.ui.file.save" date="Wed Feb 24 16:08:59 EST 2021" starttimestamp="1614193252183" timestamp="7687237" />
-  <Command __id="174" _type="EclipseCommand" commandID="" date="Wed Feb 24 16:08:59 EST 2021" starttimestamp="1614193252183" timestamp="7687376" />
-  <Command __id="175" _type="EclipseCommand" commandID="" date="Wed Feb 24 16:09:00 EST 2021" starttimestamp="1614193252183" timestamp="7688110" />
-  <Command __id="176" _type="ShellCommand" date="Wed Feb 24 16:09:01 EST 2021" starttimestamp="1614193252183" timestamp="7688971" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="178" _type="PauseCommand" date="Wed Feb 24 16:09:02 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7690403">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[1432]]></pause>
-    <nextType><![CDATA[Gained Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="177" _type="ShellCommand" date="Wed Feb 24 16:09:02 EST 2021" starttimestamp="1614193252183" timestamp="7690403" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="179" _type="EclipseCommand" commandID="" date="Wed Feb 24 16:09:02 EST 2021" starttimestamp="1614193252183" timestamp="7690578" />
-  <Command __id="180" _type="EclipseCommand" commandID="" date="Wed Feb 24 16:09:02 EST 2021" starttimestamp="1614193252183" timestamp="7690680" />
-  <Command __id="181" _type="RunCommand" date="Wed Feb 24 16:09:02 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1614193252183" timestamp="7690801" type="Run" />
-  <Command __id="182" _type="RunCommand" date="Wed Feb 24 16:09:02 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1614193252183" timestamp="7690801" type="Run" />
-  <Command __id="184" _type="PauseCommand" date="Wed Feb 24 16:09:04 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7691862">
-    <prevType><![CDATA[Run]]></prevType>
-    <prev><![CDATA[RunCommand]]></prev>
-    <pause><![CDATA[1061]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="183" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7691862" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\16\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\16\Eclipse\Rest\Log2013-09-13-14-54-59-878.xml
-]]></outputString>
-    <diff><![CDATA[null]]></diff>
-  </Command>
-  <Command __id="185" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692133" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\17\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\17\Eclipse\Rest\Log2013-09-13-09-53-29-705.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"6"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"6"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-13-"), Diff(DELETE,"14-54-59-878"), Diff(INSERT,"09-53-29-705.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="186" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692237" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\19\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\19\Eclipse\Rest\Log2013-09-12-15-05-47-820.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"7"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\1"), Diff(DELETE,"7"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"3-09-53-29-705.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\18\Eclipse\Rest\Log2013-09-17-10-06-32-242"), Diff(INSERT,"2-15-05-47-820"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="187" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692320" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\20\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\20\Eclipse\Rest\Log2013-09-12-10-40-05-321.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\21\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\21\Eclipse\Rest\Log2013-09-16-10-05-18-718.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(INSERT,"20\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\20\Eclipse\Rest\Log2013-09-12-10-40-05-321.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(EQUAL,"1"), Diff(DELETE,"9"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(INSERT,"2"), Diff(EQUAL,"1"), Diff(DELETE,"9"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"2"), Diff(INSERT,"6"), Diff(EQUAL,"-1"), Diff(DELETE,"5"), Diff(INSERT,"0"), Diff(EQUAL,"-05-"), Diff(DELETE,"47-820"), Diff(INSERT,"18-718"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="188" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692427" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\22\Eclipse\Rest has 0 file(s)
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013-09-14-09-48-24-508.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013-09-14-10-54-43-267.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-12-59-39-052.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-13-40-09-552.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"1"), Diff(INSERT,"0 file(s)¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest has 2"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"0"), Diff(INSERT,"3"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"2-10-40-05-321"), Diff(INSERT,"4-09-48-24-508.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\23\Eclipse\Rest\Log2013-09-14-10-54-43-267"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"1"), Diff(INSERT,"4"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"1"), Diff(INSERT,"2"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"1"), Diff(INSERT,"4"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"6"), Diff(INSERT,"4"), Diff(EQUAL,"-1"), Diff(DELETE,"0-05-18-718"), Diff(INSERT,"2-59-39-052.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\24\Eclipse\Rest\Log2013-09-14-13-40-09-552"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="189" _type="ConsoleOutput" date="Wed Feb 24 16:09:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692752" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-14-39-04-982.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-15-33-03-226.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest\Log2013-09-20-10-17-49-071.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\28\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\28\Eclipse\Rest\Log2013-09-20-14-30-38-379.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\29\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\29\Eclipse\Rest\Log2013-09-23-12-56-55-221.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30\Eclipse\Rest\Log2013-09-11-15-13-48-829.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"2"), Diff(INSERT,"6"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL," file(s)¶"), Diff(INSERT,"Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-14-39-04-982.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-15-33-03-226.xml¶"), Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"7"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"14-09-48-24-508.xml¶Reading"), Diff(INSERT,"20-10-17-49-071.xml¶Reading student Eclipse¶Particpant"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"3"), Diff(INSERT,"8\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\28"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(INSERT,"20-"), Diff(EQUAL,"14-"), Diff(DELETE,"1"), Diff(INSERT,"3"), Diff(EQUAL,"0-"), Diff(DELETE,"54-43-267"), Diff(INSERT,"38-379"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"4"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\2"), Diff(DELETE,"4"), Diff(INSERT,"9"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"14"), Diff(INSERT,"23"), Diff(EQUAL,"-12-5"), Diff(DELETE,"9-39-052"), Diff(INSERT,"6-55-221"), Diff(EQUAL,".xml¶Reading "), Diff(INSERT,"student Eclipse¶Particpant "), Diff(EQUAL,"C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"24"), Diff(INSERT,"30\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-1"), Diff(DELETE,"4"), Diff(INSERT,"1-15"), Diff(EQUAL,"-13-4"), Diff(DELETE,"0-09-552"), Diff(INSERT,"8-829"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="190" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692823" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\31\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\31\Eclipse\Rest\Log2013-09-06-16-07-40-790.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\32\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\32\Eclipse\Rest\Log2013-09-13-12-11-53-568.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest has 2 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-35-18-862.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-57-56-864.xml
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"26"), Diff(INSERT,"31"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"26\Eclipse\Rest\Log2013-09-18-14-39-04-982.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\26\Eclipse\Rest\Log2013-09-18-15-33-03-226.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\27\Eclipse\Rest\Log2013-09-20-10-17-49-071"), Diff(INSERT,"31\Eclipse\Rest\Log2013-09-06-16-07-40-790"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(INSERT,"3"), Diff(EQUAL,"2"), Diff(DELETE,"8"), Diff(EQUAL,"\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(INSERT,"3"), Diff(EQUAL,"2"), Diff(DELETE,"8"), Diff(EQUAL,"\Eclipse\Rest\Log2013-09-"), Diff(DELETE,"20-14-30-38-379"), Diff(INSERT,"13-12-11-53-568"), Diff(EQUAL,".xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"29"), Diff(INSERT,"33"), Diff(EQUAL,"\Eclipse\Rest has "), Diff(DELETE,"1"), Diff(INSERT,"2"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"29"), Diff(INSERT,"33"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"3"), Diff(INSERT,"5"), Diff(EQUAL,"-0"), Diff(DELETE,"9-23-12-56-55-221.xml¶Reading student Eclipse¶Particpant"), Diff(INSERT,"2-12-12-35-18-862.xml¶Reading"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\3"), Diff(DELETE,"0\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\30"), Diff(INSERT,"3"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"3"), Diff(INSERT,"5"), Diff(EQUAL,"-0"), Diff(DELETE,"9"), Diff(INSERT,"2"), Diff(EQUAL,"-1"), Diff(DELETE,"1"), Diff(INSERT,"2"), Diff(EQUAL,"-1"), Diff(DELETE,"5-13-48-829"), Diff(INSERT,"2-57-56-864"), Diff(EQUAL,".xml¶")]]]></diff>
-  </Command>
-  <Command __id="191" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7692903" type="ConsoleOutput">
-    <outputString><![CDATA[Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest has 18 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-09-23-822.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-30-44-271.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-53-58-501.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-54-11-604.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-01-19-061.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-11-54-779.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml
-Reading student Eclipse
-Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)
-Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml
-ExceptionCommand EHException  EventLogger utility command
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"3"), Diff(INSERT,"pd"), Diff(EQUAL,"1\Eclipse\Rest has 1"), Diff(INSERT,"8"), Diff(EQUAL," file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"3"), Diff(INSERT,"pd"), Diff(EQUAL,"1\Eclipse\Rest\Log201"), Diff(DELETE,"3"), Diff(INSERT,"4"), Diff(EQUAL,"-09-"), Diff(DELETE,"0"), Diff(INSERT,"2"), Diff(EQUAL,"6-1"), Diff(DELETE,"6"), Diff(INSERT,"0"), Diff(EQUAL,"-0"), Diff(DELETE,"7-40-790.xml¶Reading student Eclipse¶Particpant"), Diff(INSERT,"9-23-822.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-30-44-271.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml¶Reading"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"32"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest"), Diff(DELETE," has 1 file(s)"), Diff(INSERT,"\Log2014-10-02-09-53-58-501.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml"), Diff(EQUAL,"¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"32"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"3-09-13-12-11-53-568.xml¶Reading student Eclipse¶Particpant"), Diff(INSERT,"4-10-04-09-54-11-604.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml¶Reading"), Diff(EQUAL," C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"33"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest"), Diff(DELETE," has 2 file(s)"), Diff(INSERT,"\Log2014-10-04-11-01-19-061.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml"), Diff(EQUAL,"¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\"), Diff(DELETE,"33"), Diff(INSERT,"pd1"), Diff(EQUAL,"\Eclipse\Rest\Log201"), Diff(DELETE,"5-02-12-12-35-18-862.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\33\Eclipse\Rest\Log2015-02-12-12-57-56-864.xml"), Diff(INSERT,"4-10-04-12-11-54-779.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml¶Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml¶ExceptionCommand EHException  EventLogger utility command"), Diff(EQUAL,"¶")]]]></diff>
-  </Command>
-  <Command __id="192" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693002" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 22to Experiment.csv
-written Experiment student 22to Experiment.csv
-Writing Experiment student 33to Experiment.csv
-written Experiment student 33to Experiment.csv
-Writing Experiment student 23to Experiment.csv
-written Experiment student 23to Experiment.csv
-Writing Experiment student 24to Experiment.csv
-written Experiment student 24to Experiment.csv
-Writing Experiment student 26to Experiment.csv
-written Experiment student 26to Experiment.csv
-Writing Experiment student 16to Experiment.csv
-written Experiment student 16to Experiment.csv
-Writing Experiment student 27to Experiment.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"Reading student Eclipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest has 18 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-09-23-822.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-30-44-271.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-09-26-10-32-16-955.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-48-45-037.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-02-09-53-58-501.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-47-36-829.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-09-54-11-604.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-08-45-537.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-11-06-680.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-10-55-07-198.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-01-19-061.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-11-54-18-232.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-11-54-779.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-12-53-09-775.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-06-57-784.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-13-24-337.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-15-38-180.xml¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd1\Eclipse\Rest\Log2014-10-04-13-17-08-589.xml¶Reading stud"), Diff(INSERT,"Writing Experiment student 22to Experiment.csv¶written Experiment student 22to Experiment.csv¶Writing Experiment student 33to Experiment.csv¶written Experiment student 33to Experiment.csv¶Writing Experiment student 23to Experiment.csv¶written Experiment student 23to Experiment.csv¶Writing Experiment student 24to Experiment.csv¶written Experiment student 24to Experiment.csv¶Writing Experiment student 26to Experiment.csv¶written Experiment student 26to Experiment.csv¶Writing Experiment student 16to Experiment.csv¶writt"), Diff(EQUAL,"en"), Diff(DELETE,"t"), Diff(EQUAL," E"), Diff(DELETE,"clipse¶Particpant C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest has 1 file(s)¶Reading C:\Users\Zhizhou\OneDrive\UNC CH\Junior 1st Sem\hermes\git\Hermes\Hermes\data\ExperimentalData\pd2\Eclipse\Rest\Log2014-10-04-13-38-06-627.xml¶ExceptionCommand EHException  EventLogger utility command"), Diff(INSERT,"xperiment student 16to Experiment.csv¶Writing Experiment student 27to Experiment.csv"), Diff(EQUAL,"¶")]]]></diff>
-  </Command>
-  <Command __id="193" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693063" type="ConsoleOutput">
-    <outputString><![CDATA[written Experiment student 27to Experiment.csv
-Writing Experiment student 17to Experiment.csv
-written Experiment student 17to Experiment.csv
-Writing Experiment student 28to Experiment.csv
-written Experiment student 28to Experiment.csv
-Writing Experiment student 18to Experiment.csv
-written Experiment student 18to Experiment.csv
-Writing Experiment student 29to Experiment.csv
-written Experiment student 29to Experiment.csv
-Writing Experiment student 19to Experiment.csv
-written Experiment student 19to Experiment.csv
-Writing Experiment student pd1to Experiment.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"Writing Experiment student 22to Experiment.csv¶"), Diff(EQUAL,"written Experiment student 2"), Diff(DELETE,"2"), Diff(INSERT,"7"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(DELETE,"33"), Diff(INSERT,"17"), Diff(EQUAL,"to Experiment.csv¶written Experiment student "), Diff(DELETE,"33"), Diff(INSERT,"17"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student 2"), Diff(DELETE,"3"), Diff(INSERT,"8"), Diff(EQUAL,"to Experiment.csv¶written Experiment student 2"), Diff(DELETE,"3"), Diff(INSERT,"8"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(DELETE,"24"), Diff(INSERT,"18"), Diff(EQUAL,"to Experiment.csv¶written Experiment student "), Diff(DELETE,"24"), Diff(INSERT,"18"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student 2"), Diff(DELETE,"6"), Diff(INSERT,"9"), Diff(EQUAL,"to Experiment.csv¶written Experiment student 2"), Diff(DELETE,"6"), Diff(INSERT,"9"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student 1"), Diff(DELETE,"6"), Diff(INSERT,"9"), Diff(EQUAL,"to Experiment.csv¶written Experiment student 1"), Diff(DELETE,"6"), Diff(INSERT,"9"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(DELETE,"27"), Diff(INSERT,"pd1"), Diff(EQUAL,"to Experiment.csv¶")]]]></diff>
-  </Command>
-  <Command __id="194" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693123" type="ConsoleOutput">
-    <outputString><![CDATA[written Experiment student pd1to Experiment.csv
-Writing Experiment student 30to Experiment.csv
-written Experiment student 30to Experiment.csv
-Writing Experiment student 20to Experiment.csv
-written Experiment student 20to Experiment.csv
-Writing Experiment student 31to Experiment.csv
-written Experiment student 31to Experiment.csv
-Writing Experiment student 21to Experiment.csv
-written Experiment student 21to Experiment.csv
-Writing Experiment student 32to Experiment.csv
-written Experiment student 32to Experiment.csv
-Writing Experiment student pd2to Experiment.csv
-written Experiment student pd2to Experiment.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"written Experiment student "), Diff(DELETE,"27"), Diff(INSERT,"pd1"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(DELETE,"17"), Diff(INSERT,"30"), Diff(EQUAL,"to Experiment.csv¶written Experiment student "), Diff(DELETE,"17"), Diff(INSERT,"30"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student 2"), Diff(DELETE,"8"), Diff(INSERT,"0"), Diff(EQUAL,"to Experiment.csv¶written Experiment student 2"), Diff(DELETE,"8"), Diff(INSERT,"0"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(INSERT,"3"), Diff(EQUAL,"1"), Diff(DELETE,"8"), Diff(EQUAL,"to Experiment.csv¶written Experiment student "), Diff(INSERT,"3"), Diff(EQUAL,"1"), Diff(DELETE,"8"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student 2"), Diff(DELETE,"9"), Diff(INSERT,"1"), Diff(EQUAL,"to Experiment.csv¶written Experiment student 2"), Diff(DELETE,"9"), Diff(INSERT,"1"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student "), Diff(DELETE,"19"), Diff(INSERT,"32"), Diff(EQUAL,"to Experiment.csv¶written Experiment student "), Diff(DELETE,"19"), Diff(INSERT,"32"), Diff(EQUAL,"to Experiment.csv¶Writing Experiment student pd"), Diff(DELETE,"1"), Diff(INSERT,"2to Experiment.csv¶written Experiment student pd2"), Diff(EQUAL,"to Experiment.csv¶")]]]></diff>
-  </Command>
-  <Command __id="195" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693182" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 22 to ExperimentDistribution.csv
-Writing Experiment student 33 to ExperimentDistribution.csv
-written Experiment student 33to ExperimentDistribution.csv
-Writing Experiment student 23 to ExperimentDistribution.csv
-written Experiment student 23to ExperimentDistribution.csv
-Writing Experiment student 24 to ExperimentDistribution.csv
-written Experiment student 24to ExperimentDistribution.csv
-Writing Experiment student 26 to ExperimentDistribution.csv
-written Experiment student 26to ExperimentDistribution.csv
-Writing Experiment student 16 to ExperimentDistribution.csv
-written Experiment student 16to ExperimentDistribution.csv
-Writing Experiment student 27 to ExperimentDistribution.csv
-written Experiment student 27to ExperimentDistribution.csv
-Writing Experiment student 17 to ExperimentDistribution.csv
-written Experiment student 17to ExperimentDistribution.csv
-Writing Experiment student 28 to ExperimentDistribution.csv
-written Experiment student 28to ExperimentDistribution.csv
-Writing Experiment student 18 to ExperimentDistribution.csv
-written Experiment student 18to ExperimentDistribution.csv
-Writing Experiment student 29 to ExperimentDistribution.csv
-written Experiment student 29to ExperimentDistribution.csv
-Writing Experiment student 19 to ExperimentDistribution.csv
-written Experiment student 19to ExperimentDistribution.csv
-Writing Experiment student pd1 to ExperimentDistribution.csv
-written Experiment student pd1to ExperimentDistribution.csv
-Writing Experiment student 30 to ExperimentDistribution.csv
-written Experiment student 30to ExperimentDistribution.csv
-Writing Experiment student 20 to ExperimentDistribution.csv
-written Experiment student 20to ExperimentDistribution.csv
-Writing Experiment student 31 to ExperimentDistribution.csv
-written Experiment student 31to ExperimentDistribution.csv
-Writing Experiment student 21 to ExperimentDistribution.csv
-written Experiment student 21to ExperimentDistribution.csv
-Writing Experiment student 32 to ExperimentDistribution.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"written Experiment student pd1"), Diff(INSERT,"Writing Experiment student 22 to ExperimentDistribution.csv¶Writing Experiment student 33 to ExperimentDistribution.csv¶written Experiment student 33"), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶Writing Experiment student "), Diff(DELETE,"30"), Diff(INSERT,"23 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student "), Diff(DELETE,"30"), Diff(INSERT,"23to ExperimentDistribution.csv¶Writing Experiment student 24 to ExperimentDistribution.csv¶written Experiment student 24"), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶Writing Experiment student 2"), Diff(DELETE,"0"), Diff(INSERT,"6 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student 2"), Diff(DELETE,"0"), Diff(INSERT,"6"), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶Writing Experiment student "), Diff(DELETE,"3"), Diff(EQUAL,"1"), Diff(INSERT,"6 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student "), Diff(DELETE,"3"), Diff(EQUAL,"1"), Diff(INSERT,"6"), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶Writing Experiment student 2"), Diff(DELETE,"1"), Diff(INSERT,"7 to ExperimentDistribution.csv¶written Experiment student 27to ExperimentDistribution.csv¶Writing Experiment student 17 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student "), Diff(DELETE,"21to Experiment.csv¶Writing Experiment student 32"), Diff(INSERT,"17to ExperimentDistribution.csv¶Writing Experiment student 28 to ExperimentDistribution.csv¶written Experiment student 28to ExperimentDistribution.csv¶Writing Experiment student 18 to ExperimentDistribution.csv¶written Experiment student 18to ExperimentDistribution.csv¶Writing Experiment student 29 to ExperimentDistribution.csv¶written Experiment student 29to ExperimentDistribution.csv¶Writing Experiment student 19 to ExperimentDistribution.csv¶written Experiment student 19to ExperimentDistribution.csv¶Writing Experiment student pd1 to ExperimentDistribution.csv¶written Experiment student pd1to ExperimentDistribution.csv¶Writing Experiment student 30 to ExperimentDistribution.csv¶written Experiment student 30to ExperimentDistribution.csv¶Writing Experiment student 20 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student "), Diff(DELETE,"3"), Diff(EQUAL,"2"), Diff(INSERT,"0"), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶Writing Experiment student "), Diff(DELETE,"pd2"), Diff(INSERT,"31 to ExperimentDistribution.csv¶written Experiment student 31to ExperimentDistribution.csv¶Writing Experiment student 21 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶written Experiment student "), Diff(DELETE,"pd2"), Diff(INSERT,"21to ExperimentDistribution.csv¶Writing Experiment student 32 "), Diff(EQUAL,"to Experiment"), Diff(INSERT,"Distribution"), Diff(EQUAL,".csv¶")]]]></diff>
-  </Command>
-  <Command __id="196" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693241" type="ConsoleOutput">
-    <outputString><![CDATA[written Experiment student 32to ExperimentDistribution.csv
-Writing Experiment student pd2 to ExperimentDistribution.csv
-written Experiment student pd2to ExperimentDistribution.csv
-Writing Experiment student 22 to ExperimentPauseDistribution.csv
-written Experiment student 22to ExperimentPauseDistribution.csv
-Writing Experiment student 33 to ExperimentPauseDistribution.csv
-written Experiment student 33to ExperimentPauseDistribution.csv
-Writing Experiment student 23 to ExperimentPauseDistribution.csv
-written Experiment student 23to ExperimentPauseDistribution.csv
-Writing Experiment student 24 to ExperimentPauseDistribution.csv
-written Experiment student 24to ExperimentPauseDistribution.csv
-Writing Experiment student 26 to ExperimentPauseDistribution.csv
-written Experiment student 26to ExperimentPauseDistribution.csv
-Writing Experiment student 16 to ExperimentPauseDistribution.csv
-written Experiment student 16to ExperimentPauseDistribution.csv
-Writing Experiment student 27 to ExperimentPauseDistribution.csv
-written Experiment student 27to ExperimentPauseDistribution.csv
-Writing Experiment student 17 to ExperimentPauseDistribution.csv
-written Experiment student 17to ExperimentPauseDistribution.csv
-Writing Experiment student 28 to ExperimentPauseDistribution.csv
-written Experiment student 28to ExperimentPauseDistribution.csv
-Writing Experiment student 18 to ExperimentPauseDistribution.csv
-written Experiment student 18to ExperimentPauseDistribution.csv
-Writing Experiment student 29 to ExperimentPauseDistribution.csv
-written Experiment student 29to ExperimentPauseDistribution.csv
-Writing Experiment student 19 to ExperimentPauseDistribution.csv
-written Experiment student 19to ExperimentPauseDistribution.csv
-Writing Experiment student pd1 to ExperimentPauseDistribution.csv
-written Experiment student pd1to ExperimentPauseDistribution.csv
-Writing Experiment student 30 to ExperimentPauseDistribution.csv
-written Experiment student 30to ExperimentPauseDistribution.csv
-Writing Experiment student 20 to ExperimentPauseDistribution.csv
-written Experiment student 20to ExperimentPauseDistribution.csv
-Writing Experiment student 31 to ExperimentPauseDistribution.csv
-written Experiment student 31to ExperimentPauseDistribution.csv
-Writing Experiment student 21 to ExperimentPauseDistribution.csv
-written Experiment student 21to ExperimentPauseDistribution.csv
-Writing Experiment student 32 to ExperimentPauseDistribution.csv
-written Experiment student 32to ExperimentPauseDistribution.csv
-Writing Experiment student pd2 to ExperimentPauseDistribution.csv
-written Experiment student pd2to ExperimentPauseDistribution.csv
-Writing Experiment student 22 to ExperimentPauseDistribution.csv
-written Experiment student 22to ExperimentPauseDistribution.csv
-Writing Experiment student 33 to ExperimentPauseDistribution.csv
-written Experiment student 33to ExperimentPauseDistribution.csv
-Writing Experiment student 23 to ExperimentPauseDistribution.csv
-written Experiment student 23to ExperimentPauseDistribution.csv
-Writing Experiment student 24 to ExperimentPauseDistribution.csv
-written Experiment student 24to ExperimentPauseDistribution.csv
-Writing Experiment student 26 to ExperimentPauseDistribution.csv
-written Experiment student 26to ExperimentPauseDistribution.csv
-Writing Experiment student 16 to ExperimentPauseDistribution.csv
-written Experiment student 16to ExperimentPauseDistribution.csv
-Writing Experiment student 27 to ExperimentPauseDistribution.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"Writing Experiment student 22 to Experiment"), Diff(INSERT,"written Experiment student 32to ExperimentDistribution.csv¶Writing Experiment student pd2 to ExperimentDistribution.csv¶written Experiment student pd2to ExperimentDistribution.csv¶Writing Experiment student 22 to ExperimentPauseDistribution.csv¶written Experiment student 22to ExperimentPause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 33 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 33to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 23 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 23to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 24 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 24to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 26 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 26to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 16 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 16to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 27 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 27to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 17 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 17to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 28 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 28to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 18 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 18to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 29 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 29to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 19 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 19to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student pd1 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student pd1to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 30 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 30to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 20 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 20to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 31 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 31to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 21 to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶written Experiment student 21to Experiment"), Diff(INSERT,"Pause"), Diff(EQUAL,"Distribution.csv¶Writing Experiment student 32 to Experiment"), Diff(INSERT,"PauseDistribution.csv¶written Experiment student 32to ExperimentPauseDistribution.csv¶Writing Experiment student pd2 to ExperimentPauseDistribution.csv¶written Experiment student pd2to ExperimentPauseDistribution.csv¶Writing Experiment student 22 to ExperimentPauseDistribution.csv¶written Experiment student 22to ExperimentPauseDistribution.csv¶Writing Experiment student 33 to ExperimentPauseDistribution.csv¶written Experiment student 33to ExperimentPauseDistribution.csv¶Writing Experiment student 23 to ExperimentPauseDistribution.csv¶written Experiment student 23to ExperimentPauseDistribution.csv¶Writing Experiment student 24 to ExperimentPauseDistribution.csv¶written Experiment student 24to ExperimentPauseDistribution.csv¶Writing Experiment student 26 to ExperimentPauseDistribution.csv¶written Experiment student 26to ExperimentPauseDistribution.csv¶Writing Experiment student 16 to ExperimentPauseDistribution.csv¶written Experiment student 16to ExperimentPauseDistribution.csv¶Writing Experiment student 27 to ExperimentPause"), Diff(EQUAL,"Distribution.csv¶")]]]></diff>
-  </Command>
-  <Command __id="197" _type="ConsoleOutput" date="Wed Feb 24 16:09:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7693295" type="ConsoleOutput">
-    <outputString><![CDATA[written Experiment student 27to ExperimentPauseDistribution.csv
-Writing Experiment student 17 to ExperimentPauseDistribution.csv
-written Experiment student 17to ExperimentPauseDistribution.csv
-Writing Experiment student 28 to ExperimentPauseDistribution.csv
-written Experiment student 28to ExperimentPauseDistribution.csv
-Writing Experiment student 18 to ExperimentPauseDistribution.csv
-written Experiment student 18to ExperimentPauseDistribution.csv
-Writing Experiment student 29 to ExperimentPauseDistribution.csv
-written Experiment student 29to ExperimentPauseDistribution.csv
-Writing Experiment student 19 to ExperimentPauseDistribution.csv
-written Experiment student 19to ExperimentPauseDistribution.csv
-Writing Experiment student pd1 to ExperimentPauseDistribution.csv
-written Experiment student pd1to ExperimentPauseDistribution.csv
-Writing Experiment student 30 to ExperimentPauseDistribution.csv
-written Experiment student 30to ExperimentPauseDistribution.csv
-Writing Experiment student 20 to ExperimentPauseDistribution.csv
-written Experiment student 20to ExperimentPauseDistribution.csv
-Writing Experiment student 31 to ExperimentPauseDistribution.csv
-written Experiment student 31to ExperimentPauseDistribution.csv
-Writing Experiment student 21 to ExperimentPauseDistribution.csv
-written Experiment student 21to ExperimentPauseDistribution.csv
-Writing Experiment student 32 to ExperimentPauseDistribution.csv
-written Experiment student 32to ExperimentPauseDistribution.csv
-Writing Experiment student pd2 to ExperimentPauseDistribution.csv
-written Experiment student pd2to ExperimentPauseDistribution.csv
-Writing Experiment student 22 to ExperimentWebStats.csv
-Writing Experiment student 33 to ExperimentWebStats.csv
-Writing Experiment student 23 to ExperimentWebStats.csv
-Writing Experiment student 24 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"written Experiment student 32to ExperimentDistribution.csv¶Writing Experiment student pd2 to ExperimentDistribution.csv¶written Experiment student pd2to ExperimentDistribution.csv¶Writing Experiment student 22 to ExperimentPauseDistribution.csv¶written Experiment student 22to ExperimentPauseDistribution.csv¶Writing Experiment student 33 to ExperimentPauseDistribution.csv¶written Experiment student 33to ExperimentPauseDistribution.csv¶Writing Experiment student 23 to ExperimentPauseDistribution.csv¶written Experiment student 23to ExperimentPauseDistribution.csv¶Writing Experiment student 24 to ExperimentPauseDistribution.csv¶written Experiment student 24to ExperimentPauseDistribution.csv¶Writing Experiment student 26 to ExperimentPauseDistribution.csv¶written Experiment student 26to ExperimentPauseDistribution.csv¶Writing Experiment student 16 to ExperimentPauseDistribution.csv¶written Experiment student 16to ExperimentPauseDistribution.csv¶Writing Experiment student 27 to ExperimentPauseDistribution.csv¶"), Diff(EQUAL,"written Experiment student 27to ExperimentPauseDistribution.csv¶"), Diff(INSERT,""), Diff(EQUAL,"Writing Experiment student 17 to ExperimentPauseDistribution.csv¶written Experiment student 17to ExperimentPauseDistribution.csv¶Writing Experiment student 28 to ExperimentPauseDistribution.csv¶written Experiment student 28to ExperimentPauseDistribution.csv¶Writing Experiment student 18 to ExperimentPauseDistribution.csv¶written Experiment student 18to ExperimentPauseDistribution.csv¶Writing Experiment student 29 to ExperimentPauseDistribution.csv¶written Experiment student 29to ExperimentPauseDistribution.csv¶Writing Experiment student 19 to ExperimentPauseDistribution.csv¶written Experiment student 19to ExperimentPauseDistribution.csv¶Writing Experiment student pd1 to ExperimentPauseDistribution.csv¶written Experiment student pd1to ExperimentPauseDistribution.csv¶Writing Experiment student 30 to ExperimentPauseDistribution.csv¶written Experiment student 30to ExperimentPauseDistribution.csv¶Writing Experiment student 20 to ExperimentPauseDistribution.csv¶written Experiment student 20to ExperimentPauseDistribution.csv¶Writing Experiment student 31 to ExperimentPauseDistribution.csv¶written Experiment student 31to ExperimentPauseDistribution.csv¶Writing Experiment student 21 to ExperimentPauseDistribution.csv¶written Experiment student 21to ExperimentPauseDistribution.csv¶Writing Experiment student 32 to ExperimentPauseDistribution.csv¶written Experiment student 32to ExperimentPauseDistribution.csv¶Writing Experiment student pd2 to ExperimentPauseDistribution.csv¶written Experiment student pd2to ExperimentPauseDistribution.csv¶Writing Experiment student 22 to Experiment"), Diff(DELETE,"PauseDistribution.csv¶written Experiment student 22to ExperimentPauseDistribution.csv¶Writing Experiment student 33 to ExperimentPauseDistribution.csv¶written Experiment student 33to ExperimentPauseDistribution.csv¶Writing Experiment student 23 to ExperimentPauseDistribution.csv¶written Experiment student 23to ExperimentPauseDistribution.csv¶Writing Experiment student 24 to ExperimentPauseDistribution.csv¶written Experiment student 24to ExperimentPauseDistribution"), Diff(INSERT,"WebStats.csv¶Writing Experiment student 33 to ExperimentWebStats.csv¶Writing Experiment student 23 to ExperimentWebStats"), Diff(EQUAL,".csv¶Writing Experiment student 2"), Diff(DELETE,"6"), Diff(INSERT,"4"), Diff(EQUAL," to Experiment"), Diff(DELETE,"PauseDistribution.csv¶written Experiment student 26to ExperimentPauseDistribution.csv¶Writing Experiment student 16 to ExperimentPauseDistribution.csv¶written Experiment student 16to ExperimentPauseDistribution.csv¶Writing Experiment student 27 to ExperimentPauseDistribution"), Diff(INSERT,"WebStats"), Diff(EQUAL,".csv¶")]]]></diff>
-  </Command>
-  <Command __id="199" _type="PauseCommand" date="Wed Feb 24 16:09:06 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7694687">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[1392]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="198" _type="ExceptionCommand" date="Wed Feb 24 16:09:06 EST 2021" starttimestamp="1614193252183" timestamp="7694687" type="Exception">
-    <exceptionString><![CDATA[java.io.IOException: Server returned HTTP response code: 403 for URL: http://www.geom.uiuc.edu/~daeron/docs/apidocs/java.awt.Rectangle.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1900)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="201" _type="PauseCommand" date="Wed Feb 24 16:09:09 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7697126">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[2439]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="200" _type="ExceptionCommand" date="Wed Feb 24 16:09:09 EST 2021" starttimestamp="1614193252183" timestamp="7697126" type="Exception">
-    <exceptionString><![CDATA[java.net.ConnectException: Connection refused: connect
-	at java.net.DualStackPlainSocketImpl.connect0(Native Method)
-	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:79)
-	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
-	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:666)
-	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
-	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="203" _type="PauseCommand" date="Wed Feb 24 16:09:12 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7700646">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[3520]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="202" _type="ExceptionCommand" date="Wed Feb 24 16:09:12 EST 2021" starttimestamp="1614193252183" timestamp="7700646" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://stackoverflow.com/questions/628830/netbeans-tips-and-tricks
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="205" _type="PauseCommand" date="Wed Feb 24 16:09:16 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7704736">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[4090]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="204" _type="ExceptionCommand" date="Wed Feb 24 16:09:16 EST 2021" starttimestamp="1614193252183" timestamp="7704736" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: http://javalessons.com/cgi-bin/fun/java-programming.cgi?1cd=mev&sid=ao789&j2ee=jsp
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="207" _type="PauseCommand" date="Wed Feb 24 16:09:18 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7706226">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1490]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="206" _type="ExceptionCommand" date="Wed Feb 24 16:09:18 EST 2021" starttimestamp="1614193252183" timestamp="7706226" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://javalessons.com/cgi-bin/fun/java-programming.cgi?1cd=mev&sid=ao789&j2ee=jsp
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="209" _type="PauseCommand" date="Wed Feb 24 16:09:25 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7713062">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[6836]]></pause>
-    <nextType><![CDATA[Lost Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="208" _type="ShellCommand" date="Wed Feb 24 16:09:25 EST 2021" starttimestamp="1614193252183" timestamp="7713062" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="211" _type="PauseCommand" date="Wed Feb 24 16:09:30 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7718645">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[5583]]></pause>
-    <nextType><![CDATA[Gained Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="210" _type="ShellCommand" date="Wed Feb 24 16:09:30 EST 2021" starttimestamp="1614193252183" timestamp="7718645" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="212" _type="ShellCommand" date="Wed Feb 24 16:09:30 EST 2021" starttimestamp="1614193252183" timestamp="7718751" type="ECLIPSE_MINIMIZED" />
-  <Command __id="213" _type="ShellCommand" date="Wed Feb 24 16:09:30 EST 2021" starttimestamp="1614193252183" timestamp="7718759" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="215" _type="PauseCommand" date="Wed Feb 24 16:09:39 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7726974">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[8215]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="214" _type="ExceptionCommand" date="Wed Feb 24 16:09:39 EST 2021" starttimestamp="1614193252183" timestamp="7726974" type="Exception">
-    <exceptionString><![CDATA[java.net.ConnectException: Connection timed out: connect
-	at java.net.DualStackPlainSocketImpl.connect0(Native Method)
-	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:79)
-	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
-	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at java.net.Socket.connect(Socket.java:555)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.http.HttpClient.<init>(HttpClient.java:242)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:339)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:357)
-	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1226)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:990)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="217" _type="PauseCommand" date="Wed Feb 24 16:10:00 EST 2021" range="20s-30s" starttimestamp="1614193252183" timestamp="7748028">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[21054]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="216" _type="ExceptionCommand" date="Wed Feb 24 16:10:00 EST 2021" starttimestamp="1614193252183" timestamp="7748028" type="Exception">
-    <exceptionString><![CDATA[java.net.ConnectException: Connection timed out: connect
-	at java.net.DualStackPlainSocketImpl.connect0(Native Method)
-	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:79)
-	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:350)
-	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:206)
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:188)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:666)
-	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
-	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="219" _type="PauseCommand" date="Wed Feb 24 16:10:05 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7753573">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[5545]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="218" _type="ConsoleOutput" date="Wed Feb 24 16:10:05 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7753573" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 26 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(DELETE,"written Experiment student 27to ExperimentPauseDistribution.csv¶Writing Experiment student 17 to ExperimentPauseDistribution.csv¶written Experiment student 17to ExperimentPauseDistribution.csv¶Writing Experiment student 28 to ExperimentPauseDistribution.csv¶written Experiment student 28to ExperimentPauseDistribution.csv¶Writing Experiment student 18 to ExperimentPauseDistribution.csv¶written Experiment student 18to ExperimentPauseDistribution.csv¶Writing Experiment student 29 to ExperimentPauseDistribution.csv¶written Experiment student 29to ExperimentPauseDistribution.csv¶Writing Experiment student 19 to ExperimentPauseDistribution.csv¶written Experiment student 19to ExperimentPauseDistribution.csv¶Writing Experiment student pd1 to ExperimentPauseDistribution.csv¶written Experiment student pd1to ExperimentPauseDistribution.csv¶Writing Experiment student 30 to ExperimentPauseDistribution.csv¶written Experiment student 30to ExperimentPauseDistribution.csv¶Writing Experiment student 20 to ExperimentPauseDistribution.csv¶written Experiment student 20to ExperimentPauseDistribution.csv¶Writing Experiment student 31 to ExperimentPauseDistribution.csv¶written Experiment student 31to ExperimentPauseDistribution.csv¶Writing Experiment student 21 to ExperimentPauseDistribution.csv¶written Experiment student 21to ExperimentPauseDistribution.csv¶Writing Experiment student 32 to ExperimentPauseDistribution.csv¶written Experiment student 32to ExperimentPauseDistribution.csv¶Writing Experiment student pd2 to ExperimentPauseDistribution.csv¶written Experiment student pd2to ExperimentPauseDistribution.csv¶Writing Experiment student 22 to ExperimentWebStats.csv¶Writing Experiment student 33 to ExperimentWebStats.csv¶Writing Experiment student 23 to ExperimentWebStats.csv¶Writing Experiment student 24"), Diff(INSERT,"Writing Experiment student 26"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="221" _type="PauseCommand" date="Wed Feb 24 16:10:13 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7761350">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[7777]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="220" _type="ConsoleOutput" date="Wed Feb 24 16:10:13 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7761350" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 16 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL,"6 to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="223" _type="PauseCommand" date="Wed Feb 24 16:10:24 EST 2021" range="10s-20s" starttimestamp="1614193252183" timestamp="7772549">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[11199]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="222" _type="ExceptionCommand" date="Wed Feb 24 16:10:24 EST 2021" starttimestamp="1614193252183" timestamp="7772549" type="Exception">
-    <exceptionString><![CDATA[java.net.SocketTimeoutException: Read timed out
-	at java.net.SocketInputStream.socketRead0(Native Method)
-	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
-	at java.net.SocketInputStream.read(SocketInputStream.java:171)
-	at java.net.SocketInputStream.read(SocketInputStream.java:141)
-	at sun.security.ssl.InputRecord.readFully(InputRecord.java:465)
-	at sun.security.ssl.InputRecord.read(InputRecord.java:503)
-	at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:975)
-	at sun.security.ssl.SSLSocketImpl.readDataRecord(SSLSocketImpl.java:933)
-	at sun.security.ssl.AppInputStream.read(AppInputStream.java:105)
-	at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
-	at java.io.BufferedInputStream.read1(BufferedInputStream.java:286)
-	at java.io.BufferedInputStream.read(BufferedInputStream.java:345)
-	at sun.net.www.http.HttpClient.parseHTTPHeader(HttpClient.java:735)
-	at sun.net.www.http.HttpClient.parseHTTP(HttpClient.java:678)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1593)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="225" _type="PauseCommand" date="Wed Feb 24 16:10:27 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7774960">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[2411]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="224" _type="ConsoleOutput" date="Wed Feb 24 16:10:27 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7774960" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 27 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"16"), Diff(INSERT,"27"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="227" _type="PauseCommand" date="Wed Feb 24 16:10:39 EST 2021" range="10s-20s" starttimestamp="1614193252183" timestamp="7787698">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[12738]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="226" _type="ExceptionCommand" date="Wed Feb 24 16:10:39 EST 2021" starttimestamp="1614193252183" timestamp="7787698" type="Exception">
-    <exceptionString><![CDATA[java.net.UnknownHostException: www.apl.jhu.edu
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at java.net.Socket.connect(Socket.java:555)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.http.HttpClient.<init>(HttpClient.java:242)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:339)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:357)
-	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1226)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:990)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-java.net.UnknownHostException: www.apl.jhu.edu
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:666)
-	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
-	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="228" _type="ConsoleOutput" date="Wed Feb 24 16:10:40 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7788194" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 17 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL,"7 to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="230" _type="PauseCommand" date="Wed Feb 24 16:10:41 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7789586">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[1392]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="229" _type="ConsoleOutput" date="Wed Feb 24 16:10:41 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7789586" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 28 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"17"), Diff(INSERT,"28"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="232" _type="PauseCommand" date="Wed Feb 24 16:10:46 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7794211">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[4625]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="231" _type="ExceptionCommand" date="Wed Feb 24 16:10:46 EST 2021" starttimestamp="1614193252183" timestamp="7794211" type="Exception">
-    <exceptionString><![CDATA[java.net.UnknownHostException: www.apl.jhu.edu
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at java.net.Socket.connect(Socket.java:555)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.http.HttpClient.<init>(HttpClient.java:242)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:339)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:357)
-	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1226)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:990)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-java.net.UnknownHostException: www.apl.jhu.edu
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:666)
-	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
-	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="234" _type="PauseCommand" date="Wed Feb 24 16:10:47 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7795306">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1095]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="233" _type="ConsoleOutput" date="Wed Feb 24 16:10:47 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7795306" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 18 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"2"), Diff(INSERT,"1"), Diff(EQUAL,"8 to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="236" _type="PauseCommand" date="Wed Feb 24 16:10:50 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7798776">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[3470]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="235" _type="ExceptionCommand" date="Wed Feb 24 16:10:50 EST 2021" starttimestamp="1614193252183" timestamp="7798776" type="Exception">
-    <exceptionString><![CDATA[java.net.UnknownHostException: leepoint.net
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at java.net.Socket.connect(Socket.java:555)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.http.HttpClient.<init>(HttpClient.java:242)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:339)
-	at sun.net.www.http.HttpClient.New(HttpClient.java:357)
-	at sun.net.www.protocol.http.HttpURLConnection.getNewHttpClient(HttpURLConnection.java:1226)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.http.HttpURLConnection.connect(HttpURLConnection.java:990)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-java.net.UnknownHostException: leepoint.net
-	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
-	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
-	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.net.Socket.connect(Socket.java:606)
-	at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:666)
-	at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
-	at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
-	at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
-	at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
-	at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1162)
-	at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1056)
-	at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1570)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-Writing Experiment student 29 to ExperimentWebStats.csv
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="238" _type="PauseCommand" date="Wed Feb 24 16:10:53 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7801003">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[2227]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="237" _type="ConsoleOutput" date="Wed Feb 24 16:10:53 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7801003" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 19 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student 1"), Diff(DELETE,"8"), Diff(INSERT,"9"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="240" _type="PauseCommand" date="Wed Feb 24 16:10:55 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7803028">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[2025]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="239" _type="ExceptionCommand" date="Wed Feb 24 16:10:55 EST 2021" starttimestamp="1614193252183" timestamp="7803028" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fGraphics2D.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="242" _type="PauseCommand" date="Wed Feb 24 16:10:56 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7804539">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1511]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="241" _type="ExceptionCommand" date="Wed Feb 24 16:10:56 EST 2021" starttimestamp="1614193252183" timestamp="7804539" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fShape.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="244" _type="PauseCommand" date="Wed Feb 24 16:10:58 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7805839">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1300]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="243" _type="ExceptionCommand" date="Wed Feb 24 16:10:58 EST 2021" starttimestamp="1614193252183" timestamp="7805839" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fpackage-tree.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="246" _type="PauseCommand" date="Wed Feb 24 16:11:04 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="7811882">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[6043]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="245" _type="ExceptionCommand" date="Wed Feb 24 16:11:04 EST 2021" starttimestamp="1614193252183" timestamp="7811882" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fevent%2fKeyAdapter.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="247" _type="ConsoleOutput" date="Wed Feb 24 16:11:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7812215" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student pd1 to ExperimentWebStats.csv
-Writing Experiment student 30 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"19"), Diff(INSERT,"pd1 to ExperimentWebStats.csv¶Writing Experiment student 30"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="248" _type="ConsoleOutput" date="Wed Feb 24 16:11:04 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7812315" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 20 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"pd1 to ExperimentWebStats.csv¶Writing Experiment student 3"), Diff(INSERT,"2"), Diff(EQUAL,"0 to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="250" _type="PauseCommand" date="Wed Feb 24 16:11:07 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7814880">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[2565]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="249" _type="ConsoleOutput" date="Wed Feb 24 16:11:07 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7814880" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 31 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"20"), Diff(INSERT,"31"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="251" _type="ConsoleOutput" date="Wed Feb 24 16:11:07 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7814946" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 21 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(DELETE,"3"), Diff(INSERT,"2"), Diff(EQUAL,"1 to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="253" _type="PauseCommand" date="Wed Feb 24 16:11:11 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="7819134">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[ConsoleOutput]]></prev>
-    <pause><![CDATA[4188]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="252" _type="ExceptionCommand" date="Wed Feb 24 16:11:11 EST 2021" starttimestamp="1614193252183" timestamp="7819134" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fGraphics.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="255" _type="PauseCommand" date="Wed Feb 24 16:11:12 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7820560">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1426]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="254" _type="ExceptionCommand" date="Wed Feb 24 16:11:12 EST 2021" starttimestamp="1614193252183" timestamp="7820560" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fGraphics.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="257" _type="PauseCommand" date="Wed Feb 24 16:11:14 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7821832">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1272]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="256" _type="ExceptionCommand" date="Wed Feb 24 16:11:14 EST 2021" starttimestamp="1614193252183" timestamp="7821832" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fColor.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="259" _type="PauseCommand" date="Wed Feb 24 16:11:15 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7823207">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1375]]></pause>
-    <nextType><![CDATA[Exception]]></nextType>
-    <next><![CDATA[ExceptionCommand]]></next>
-  </Command>
-  <Command __id="258" _type="ExceptionCommand" date="Wed Feb 24 16:11:15 EST 2021" starttimestamp="1614193252183" timestamp="7823207" type="Exception">
-    <exceptionString><![CDATA[java.io.FileNotFoundException: https://docs.oracle.com/pls/rdman/handle404?X_ORCL_404path=%2fjavase%2f1.4.2%2fdocs%2fapi%2fjava%2fawt%2fColor.html
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1896)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1498)
-	at sun.net.www.protocol.https.HttpsURLConnectionImpl.getInputStream(HttpsURLConnectionImpl.java:268)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1023)
-	at logAnalyzer.AExperimentalReplayer.readWebContent(AExperimentalReplayer.java:1040)
-	at logAnalyzer.AExperimentalReplayer.createWebStats(AExperimentalReplayer.java:769)
-	at logAnalyzer.AExperimentalReplayer.analyzeFolder(AExperimentalReplayer.java:309)
-	at logAnalyzer.Driver.main(Driver.java:38)
-]]></exceptionString>
-    <language><![CDATA[java]]></language>
-  </Command>
-  <Command __id="261" _type="PauseCommand" date="Wed Feb 24 16:11:16 EST 2021" range="1s-2s" starttimestamp="1614193252183" timestamp="7824395">
-    <prevType><![CDATA[Exception]]></prevType>
-    <prev><![CDATA[ExceptionCommand]]></prev>
-    <pause><![CDATA[1188]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ConsoleOutput]]></next>
-  </Command>
-  <Command __id="260" _type="ConsoleOutput" date="Wed Feb 24 16:11:16 EST 2021" overflow="false" starttimestamp="1614193252183" timestamp="7824395" type="ConsoleOutput">
-    <outputString><![CDATA[Writing Experiment student 32 to ExperimentWebStats.csv
-Writing Experiment student pd2 to ExperimentWebStats.csv
-]]></outputString>
-    <diff><![CDATA[[Diff(EQUAL,"Writing Experiment student "), Diff(INSERT,"32 to ExperimentWebStats.csv¶Writing Experiment student pd"), Diff(EQUAL,"2"), Diff(DELETE,"1"), Diff(EQUAL," to ExperimentWebStats.csv¶")]]]></diff>
-  </Command>
-  <Command __id="262" _type="RunCommand" date="Wed Feb 24 16:11:16 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1614193252183" timestamp="7824566" type="Run" />
-  <Command __id="263" _type="RunCommand" date="Wed Feb 24 16:11:16 EST 2021" kind="HitBreakPoint" projectName="LogAnalyzer" starttimestamp="1614193252183" timestamp="7824566" type="Run" />
-  <Command __id="265" _type="PauseCommand" date="Wed Feb 24 16:18:17 EST 2021" range="5m-10m" starttimestamp="1614193252183" timestamp="8245413">
-    <prevType><![CDATA[Other]]></prevType>
-    <prev><![CDATA[RunCommand]]></prev>
-    <pause><![CDATA[420847]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="264" _type="ShellCommand" date="Wed Feb 24 16:18:17 EST 2021" starttimestamp="1614193252183" timestamp="8245413" type="ECLIPSE_MAXIMIZED" />
-  <Command __id="266" _type="ShellCommand" date="Wed Feb 24 16:18:17 EST 2021" starttimestamp="1614193252183" timestamp="8245477" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="267" _type="ShellCommand" date="Wed Feb 24 16:18:17 EST 2021" starttimestamp="1614193252183" timestamp="8245658" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="269" _type="PauseCommand" date="Wed Feb 24 16:24:42 EST 2021" range="5m-10m" starttimestamp="1614193252183" timestamp="8630488">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[384830]]></pause>
-    <nextType><![CDATA[Gained Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="268" _type="ShellCommand" date="Wed Feb 24 16:24:42 EST 2021" starttimestamp="1614193252183" timestamp="8630488" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="271" _type="PauseCommand" date="Wed Feb 24 16:24:49 EST 2021" range="5s-10s" starttimestamp="1614193252183" timestamp="8636922">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[6434]]></pause>
-    <nextType><![CDATA[Lost Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="270" _type="ShellCommand" date="Wed Feb 24 16:24:49 EST 2021" starttimestamp="1614193252183" timestamp="8636922" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="273" _type="PauseCommand" date="Wed Feb 24 16:26:04 EST 2021" range="1m-2m" starttimestamp="1614193252183" timestamp="8711826">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[74904]]></pause>
-    <nextType><![CDATA[Gained Focus]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="272" _type="ShellCommand" date="Wed Feb 24 16:26:04 EST 2021" starttimestamp="1614193252183" timestamp="8711826" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="274" _type="ShellCommand" date="Wed Feb 24 16:26:04 EST 2021" starttimestamp="1614193252183" timestamp="8711922" type="ECLIPSE_MINIMIZED" />
-  <Command __id="275" _type="ShellCommand" date="Wed Feb 24 16:26:04 EST 2021" starttimestamp="1614193252183" timestamp="8711938" type="ECLIPSE_LOST_FOCUS" />
-  <Command __id="277" _type="PauseCommand" date="Wed Feb 24 16:26:19 EST 2021" range="10s-20s" starttimestamp="1614193252183" timestamp="8727188">
-    <prevType><![CDATA[Lost Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[15250]]></pause>
-    <nextType><![CDATA[Other]]></nextType>
-    <next><![CDATA[ShellCommand]]></next>
-  </Command>
-  <Command __id="276" _type="ShellCommand" date="Wed Feb 24 16:26:19 EST 2021" starttimestamp="1614193252183" timestamp="8727188" type="ECLIPSE_MAXIMIZED" />
-  <Command __id="278" _type="ShellCommand" date="Wed Feb 24 16:26:19 EST 2021" starttimestamp="1614193252183" timestamp="8727239" type="ECLIPSE_GAINED_FOCUS" />
-  <Command __id="280" _type="PauseCommand" date="Wed Feb 24 16:26:22 EST 2021" range="2s-5s" starttimestamp="1614193252183" timestamp="8730737">
-    <prevType><![CDATA[Gained Focus]]></prevType>
-    <prev><![CDATA[ShellCommand]]></prev>
-    <pause><![CDATA[3498]]></pause>
-    <nextType><![CDATA[Open File]]></nextType>
-    <next><![CDATA[DiffBasedFileOpenCommand]]></next>
-  </Command>
-  <Command __id="281" _type="MoveCaretCommand" caretOffset="1264" date="Wed Feb 24 16:26:23 EST 2021" docOffset="1561" starttimestamp="1614193252183" timestamp="8730888" />
-  <Command __id="282" _type="MoveCaretCommand" caretOffset="1233" date="Wed Feb 24 16:26:24 EST 2021" docOffset="1530" starttimestamp="1614193252183" timestamp="8731857" />
-  <Command __id="284" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:26:24 EST 2021" starttimestamp="1614193252183" timestamp="8732619" />
-  <Command __id="285" _type="MoveCaretCommand" caretOffset="1170" date="Wed Feb 24 16:26:25 EST 2021" docOffset="1467" starttimestamp="1614193252183" timestamp="8733059" />
-  <Command __id="287" _type="EclipseCommand" commandID="org.eclipse.jdt.ui.edit.text.java.toggle.comment" date="Wed Feb 24 16:26:25 EST 2021" starttimestamp="1614193252183" timestamp="8733189" />
-  <Command __id="289" _type="SelectTextCommand" caretOffset="15358" date="Wed Feb 24 16:26:26 EST 2021" end="15358" start="15336" starttimestamp="1614193252183" timestamp="8734368" />
-  <Command __id="291" _type="PauseCommand" date="Wed Feb 24 16:26:38 EST 2021" range="10s-20s" starttimestamp="1614193252183" timestamp="8746167">
-    <prevType><![CDATA[Select]]></prevType>
-    <prev><![CDATA[SelectTextCommand]]></prev>
-    <pause><![CDATA[11799]]></pause>
-    <nextType><![CDATA[Select]]></nextType>
-    <next><![CDATA[SelectTextCommand]]></next>
-  </Command>
-  <Command __id="290" _type="SelectTextCommand" caretOffset="17174" date="Wed Feb 24 16:26:38 EST 2021" end="17315" start="17174" starttimestamp="1614193252183" timestamp="8746167" />
-  <Command __id="292" _type="CopyCommand" date="Wed Feb 24 16:26:38 EST 2021" starttimestamp="1614193252183" timestamp="8746284" />
-  <Command __id="293" _type="MoveCaretCommand" caretOffset="17315" date="Wed Feb 24 16:26:39 EST 2021" docOffset="19007" starttimestamp="1614193252183" timestamp="8746869" />

@@ -1,3 +1,0 @@
-Id,Prediction,Date,File,StartTime,ElapsedTime,BusyTime,Commands,editOrInsertPercentage,debugPercentage,navigationPercentage,focusPercentage,removePercentage,editPercentage,COMMAND_RATE,NAVIGATION_RATE,DEBUG_RATE,FOCUS_RATE,EDIT_RATE,REMOVE_RATE,INSERT_RATE,webLinkTimes,Web Page Visits
-1,,Fri Feb 05 12:23:47 EST 2021,AReplayer.java,1612545827365,42488,0,(I)2(F)4(D)1(F)2(I)3(F)1,0.38461538461538464,7.6923076923076925,0.0,53.84615384615385,0.0,0.0,0.30952380952380953,0.0,0.023809523809523808,0.16666666666666666,0.0,0.0,0.11904761904761904,0.0,[]
-,/modelData/A0UserStudy2010.arff,Fri Feb 05 12:23:47 EST 2021,AReplayer.java, 1612545827365
