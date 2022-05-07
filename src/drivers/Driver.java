@@ -2,10 +2,10 @@ package drivers;
 
 import java.io.File;
 import java.util.Scanner;
-
 import logAnalyzer.AContextBasedReplayer;
 import logAnalyzer.ASemesterReplayer;
 import logAnalyzer.AnAssignmentReplayer;
+import logAnalyzer.AnExperimentReplayer;
 import logAnalyzer.Replayer;
 import mains.Main;
 
@@ -60,11 +60,12 @@ public class Driver {
 	
 	public static void generate() {
 		System.out.println("Generating LocalChecks log");
-		String[] args = {path};
-		Main.main(args);
+//		String[] args = {path};
+//		Main.main(args);
 		if (!isRead) read();
-		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
+//		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
 //		replayer.createExtraCommand("Generated", Replayer.PAUSE);
+		replayer.createExtraCommand("Generated", Replayer.WEB);
 		isRead = false;
 	}
 	
@@ -86,7 +87,7 @@ public class Driver {
 	
 	public static void chooseMode(Scanner scanner) {
 		while (true){
-			System.out.println("Choose mode: semester/assign/intell");
+			System.out.println("Choose mode: semester/assign/intell/experiment");
 			String input = scanner.nextLine();
 			switch (input.toLowerCase()) {
 			case "assign":
@@ -126,6 +127,36 @@ public class Driver {
 					}
 				}
 				replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
+				return;
+			case "experiment":
+			case "e":
+//				System.out.println("Enter pause time multiplier (default is 1):");
+//				while (true) {
+//					try {
+//						String string = scanner.nextLine();
+//						if (string.isEmpty()) {
+//							break;
+//						}
+//						multiplier = Double.parseDouble(string);
+//						break;
+//					} catch (Exception e) {
+//						System.out.println("Multiplier must be double or empty line");
+//					}
+//				}
+//				System.out.println("Enter default pause time (default is 5 min):");
+//				while (true) {
+//					try {
+//						String string = scanner.nextLine();
+//						if (string.isEmpty()) {
+//							break;
+//						}
+//						defaultPauseTime = Integer.parseInt(string);
+//						break;
+//					} catch (Exception e) {
+//						System.out.println("Default pause time must be int or empty line");
+//					}
+//				}
+				replayer = new AnExperimentReplayer(multiplier, defaultPauseTime);
 				return;
 			default:
 				System.out.println("Command Not Recognized, Enter Again");

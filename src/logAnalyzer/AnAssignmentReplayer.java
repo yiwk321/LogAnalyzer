@@ -35,7 +35,7 @@ public class AnAssignmentReplayer extends Replayer {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
 		for (String student : assignLog.keySet()) {
-			createExtraCommandStudent(latch, assignLog.get(student), surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
 		}
 	}
 	
@@ -66,9 +66,11 @@ public class AnAssignmentReplayer extends Replayer {
 			for (String student : assignLogs.keySet()) {
 				commands.put(student, new ArrayList<List<EHICommand>>(assignLogs.get(student).values()));
 			}
-			createDistributionData(assign, commands);
-			createPauseDistribution(assign, commands);
-			createAssignData(assign, commands);
+//			createDistributionData(assign, commands);
+//			createPauseDistribution(assign, commands);
+//			createAssignData(assign, commands);
+			createEvents(assign, commands);
+			
 			latch.countDown();
 		}).start();
 	}

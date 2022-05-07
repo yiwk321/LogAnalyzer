@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,8 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 			"Request", "Web", "Save", "Gained Focus", 
 			"Lost Focus", "Terminate", "Difficulty", 
 			"Move Caret", "Open File", "Select", "Compile", 
-			"LocalChecks", "Other"}; 
+			"LocalChecks", 
+			"Other"}; 
 	public static final String[] RANGES = {"1s-2s","2s-5s","5s-10s","10s-20s","20s-30s",
 			"30s-1m","1m-2m","2m-5m","5m-10m","10m-20m",
 			"20m-30m","30m-1h",">1h"};
@@ -42,6 +44,7 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 			24868, 0, 50953, 102979, 3984, 50202, 51718, 0, 79218};
 	public static final long[] NEXT_THRESHOLD = {59079, 30031, 13407, 0, 19062, 0, 493000, 10125, 
 			472825, 104170, 0, 13780, 102797, 65204, 50202, 20110, 0, 58702};
+	public static final String PAUSE_TIME_DISTRIBUTION = "C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData\\ExperimentPauseDistribution.csv";
 	
 	public static String outputFolder = "E:\\submissions\\Distribution";
 	
@@ -67,67 +70,67 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 		}
 	}
 	
-//	protected void readPauseTime() {
-//		try {
-//			CSVReader cr = new CSVReader(new FileReader("C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData\\ExperimentPauseDistribution.csv"));
-//			String[] line = null;
-//			while ((line = cr.readNext()) != null) {
-//				if (line[0].equals("Sum")) {
-//					break;
-//				}
-//			}
-//			for (int i = 0; i < TYPES.length; i++) {
-//				String s = line[4+i*5];
-//				long pause = 0;
-//				if (s.length() > 0) {
-//					try {
-//						pause = Long.parseLong(s);
-//						if (pause > 0) {
-//							pauseMap.put(TYPES[i], (long)(pause * multiplier));
-//						} else {
-//							pauseMap.put(TYPES[i], defaultPauseTime);
-//						}
-//					} catch (Exception e) {
-//						System.out.println("reading pause time for " + TYPES[i] + " but read " + s);
-//						pauseMap.put(TYPES[i], defaultPauseTime);
-//					}
-//				} else {
-//					pauseMap.put(TYPES[i], defaultPauseTime);
-//				}
-//			}
-//			pauseMap.put("LocalChecks", defaultPauseTime);
-//			while ((line = cr.readNext()) != null) {
-//				if (line[0].equals("Sum")) {
-//					break;
-//				}
-//			}
-//			for (int i = 0; i < TYPES.length; i++) {
-//				String s = line[4+i*5];
-//				long pause = defaultPauseTime;
-//				if (s.length() > 0) {
-//					try {
-//						pause = Long.parseLong(s);
-//						if (pause > 0) {
-//							nextPauseMap.put(TYPES[i], (long)(pause * multiplier));
-//						} else {
-//							nextPauseMap.put(TYPES[i], defaultPauseTime);
-//						}
-//					} catch (Exception e) {
-//						System.out.println("reading pause time for " + TYPES[i] + " but read " + s);
-//						nextPauseMap.put(TYPES[i], defaultPauseTime);
-//					}
-//				} else {
-//					nextPauseMap.put(TYPES[i], defaultPauseTime);
-//				}
-//			}
-//			nextPauseMap.put("LocalChecks", defaultPauseTime);
-//			cr.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
+	protected void readPauseTime() {
+		try {
+			CSVReader cr = new CSVReader(new FileReader(PAUSE_TIME_DISTRIBUTION));
+			String[] line = null;
+			while ((line = cr.readNext()) != null) {
+				if (line[0].equals("Sum")) {
+					break;
+				}
+			}
+			for (int i = 0; i < TYPES.length; i++) {
+				String s = line[4+i*5];
+				long pause = 0;
+				if (s.length() > 0) {
+					try {
+						pause = Long.parseLong(s);
+						if (pause > 0) {
+							pauseMap.put(TYPES[i], (long)(pause * multiplier));
+						} else {
+							pauseMap.put(TYPES[i], defaultPauseTime);
+						}
+					} catch (Exception e) {
+						System.out.println("reading pause time for " + TYPES[i] + " but read " + s);
+						pauseMap.put(TYPES[i], defaultPauseTime);
+					}
+				} else {
+					pauseMap.put(TYPES[i], defaultPauseTime);
+				}
+			}
+			pauseMap.put("LocalChecks", defaultPauseTime);
+			while ((line = cr.readNext()) != null) {
+				if (line[0].equals("Sum")) {
+					break;
+				}
+			}
+			for (int i = 0; i < TYPES.length; i++) {
+				String s = line[4+i*5];
+				long pause = defaultPauseTime;
+				if (s.length() > 0) {
+					try {
+						pause = Long.parseLong(s);
+						if (pause > 0) {
+							nextPauseMap.put(TYPES[i], (long)(pause * multiplier));
+						} else {
+							nextPauseMap.put(TYPES[i], defaultPauseTime);
+						}
+					} catch (Exception e) {
+						System.out.println("reading pause time for " + TYPES[i] + " but read " + s);
+						nextPauseMap.put(TYPES[i], defaultPauseTime);
+					}
+				} else {
+					nextPauseMap.put(TYPES[i], defaultPauseTime);
+				}
+			}
+			nextPauseMap.put("LocalChecks", defaultPauseTime);
+			cr.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 //	protected long restTime(List<List<EHICommand>> nestedCommands) {
 //		long restTime = 0;
@@ -149,7 +152,8 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 	protected long[] restTime(List<List<EHICommand>> nestedCommands, long time) {
 		long[] restTime = new long[2];
 		for (List<EHICommand> commands : nestedCommands) {
-			for (EHICommand command : commands) {
+			for (int i = 0; i < commands.size()-1; i++) {
+				EHICommand command = commands.get(i);
 				if (command instanceof PauseCommand) {
 					long pause = Long.parseLong(command.getDataMap().get("pause"));
 					String prevType = command.getDataMap().get("prevType");
@@ -222,6 +226,65 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 //			e.printStackTrace();
 //		}
 //	}
+	
+	public void createAssignData2(String assign, Map<String, List<List<EHICommand>>> data) {
+		File csv = new File(assign+"2.csv");
+		FileWriter fw;
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			csv.createNewFile();
+			fw = new FileWriter(csv);
+			CSVWriter cw = new CSVWriter(fw);
+			String[] header = {"Student", "Start Time", "End Time", "Wall Time", 
+							   "Total Time Spent", "Active Time (5min)", "Rest Time (5min)", 
+							   "Active Time (context)", "Rest Time (context)"};
+			cw.writeNext(header);
+			
+			assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+			for (String student : data.keySet()) {
+				System.out.println("Generating AssignData for student " + student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				student = student.substring(student.lastIndexOf(File.separator)+1);
+				
+				List<String> retVal = new ArrayList<>();
+				retVal.add(student);
+				long wallClockTime = wallClockTime(nestedCommands);
+				EHICommand c1 = null;
+				for (int j = 0; j < nestedCommands.get(0).size(); j++) {
+					c1 = nestedCommands.get(0).get(j);
+					if (c1.getStartTimestamp() > 0 || c1.getTimestamp() > 0) {
+						break;
+					}
+				}
+				long startTime = 0;
+				if (c1 != null) {
+					startTime = c1.getStartTimestamp() + c1.getTimestamp();
+				}
+				retVal.add(new Date(startTime).toString());
+				retVal.add(new Date(startTime + wallClockTime).toString());
+				retVal.add(format(wallClockTime));
+
+				long totalTime = totalTimeSpent(nestedCommands);
+				if (totalTime == 0) {
+					continue;
+				}
+				long[] restTime = restTime(nestedCommands, FIVE_MIN);
+				retVal.add(format(totalTime));
+				retVal.add(format(totalTime - restTime[1]));
+				retVal.add(format(restTime[1]));
+				retVal.add(format(totalTime - restTime[0]));
+				retVal.add(format(restTime[0]));
+				String[] nextLine = retVal.toArray(new String[1]);
+				cw.writeNext(nextLine);
+			}
+			fw.close();
+			cw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void createDistributionData(String assign, Map<String, List<List<EHICommand>>> data) {
 		File temp = new File(assign);
@@ -372,11 +435,11 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 				commands.put(student, new ArrayList<List<EHICommand>>(assignLogs.get(student).values()));
 			}
 //			createLocalCheckSuiteEvents(assign, commands);
-			createDistributionData(assign, commands);
+//			createDistributionData(assign, commands);
 //			createLocalCheckPassEvents(assign, commands);
 //			createBreakDistributionData(assign, commands);
 //			createPauseDistribution(assign, commands);
-//			createAssignData(assign, commands);
+			createAssignData2(assign, commands);
 			latch.countDown();
 		}).start();
 	}
@@ -386,12 +449,12 @@ public class AContextBasedReplayer extends AnAssignmentReplayer{
 		header[0] = "Student";
 		header[1] = "Total Time Spent";
 		header[2] = "Number of Days";
-		header[3] = "Active Time(lab)";
+		header[3] = "Active Time(Context-Based)";
 		header[4] = "Active Time(5min)";
 		header[5] = "Difference";
-		header[6] = "Active Time(compile30min)";
+		header[6] = "Active Time(Retina)";
 		header[7] = "Difference";
-		header[8] = "Rest Time(lab)";
+		header[8] = "Rest Time(Context-Based)";
 		header[9] = "Rest Time(5min)";
 		header[10] = "Regular Credit Milestone Time";
 		header[11] = "Pass";

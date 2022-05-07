@@ -9,7 +9,7 @@ import java.util.Scanner;
 import logAnalyzer.AnIntervalReplayer;
 
 public class IntervalDriver {
-	public static final File STUDENT_FOLDER = new File("C:\\Users\\Zhizhou\\eclipse2021-workspace\\A1");
+	public static final File STUDENT_FOLDER = new File("E:\\Test\\Assignment 4\\Zheng, Chongyi(harryzcy)");
 	//Parse time stamps to long if they are strings
 	public static final DateFormat DF = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 	//For context based work time, a pause is considered a rest if pauseTime > MULTIPLIER * context-based-threshold
@@ -18,8 +18,8 @@ public class IntervalDriver {
 	//For fixed work time, a pause is considered a rest if pauseTime > DEFAULT_THRESHOLD
 	//For context based work time, a threshold = DEFAULT_THRESHOLD if it is undefined for that type of command
 	public static final int DEFAULT_THRESHOLD = 5;
-	public static final long START_TIME = 0;
-	public static final long END_TIME = Long.MAX_VALUE;
+	public static final long START_TIME = 1624079964001L;
+	public static final long END_TIME = 1624086187000L;
 	public static final boolean CONSOLE_OUTPUT = false;
 	
 	public static void main(String[] args) {

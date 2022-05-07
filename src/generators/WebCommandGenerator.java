@@ -33,10 +33,11 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 		}
 	}
 	
-	public void addCommands(List<EHICommand> commands, List<EHICommand> newCommands) {
+	public List<EHICommand> addCommands(List<EHICommand> commands, long nextStartTime) {
+		List<EHICommand> newCommands = new ArrayList<>();
 		EHICommand last = null;
 		EHICommand cur = null;
-		if (webCommand == null) {
+		if (webCommand == null && webCommandIterator != null && webCommandIterator.hasNext()) {
 			webCommand = webCommandIterator.next();
 		}
 		long timestamp = 0;
@@ -66,6 +67,7 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 				maybeAddPauseCommand(newCommands, last, cur);
 			}
 		}
+		return newCommands;
 	}
 	
 	protected List<EHICommand> readWebCommands(File file){
