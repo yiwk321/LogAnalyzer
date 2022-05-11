@@ -915,7 +915,8 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 			sortCommands(commands, 0, commands.size()-1);
 			return commands;
 		} catch (Exception e) {
-			System.out.println("Could not read file" + path + e);
+			System.out.println("Could not read file" + path);
+			e.printStackTrace();
 		}
 		return new ArrayList<EHICommand>();
 	}

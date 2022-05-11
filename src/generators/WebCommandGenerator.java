@@ -54,7 +54,7 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 				while (webCommand != null && timestamp >= last.getTimestamp() && timestamp <= cur.getTimestamp()) {
 					webCommand.setStartTimestamp(command.getStartTimestamp());
 					webCommand.setTimestamp(timestamp);
-					maybeAddPauseCommand(newCommands, last,	webCommand);
+//					maybeAddPauseCommand(newCommands, last,	webCommand);
 					if (webCommandIterator.hasNext()) {
 						last = webCommand;
 						webCommand = webCommandIterator.next();
@@ -64,7 +64,7 @@ public class WebCommandGenerator extends PauseCommandGenerator{
 						break;
 					}
 				}
-				maybeAddPauseCommand(newCommands, last, cur);
+//				maybeAddPauseCommand(newCommands, last, cur);
 			}
 		}
 		return newCommands;
