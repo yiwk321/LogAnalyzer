@@ -50,8 +50,8 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench_3.112.0.v20180906-1121.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench.texteditor_3.11.100.v20180824-1030.jar"/>
 	<classpathentry kind="lib" path="lib/org.hamcrest.core_1.3.0.v20180420-1519.jar"/>
-	<classpathentry kind="lib" path="lib/dayton.ellwanger.Hermes.jar"/>
 	<classpathentry kind="lib" path="lib/HelpView.jar"/>
 	<classpathentry kind="lib" path="lib/oeall22.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Hermes"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

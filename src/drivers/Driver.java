@@ -17,6 +17,8 @@ public class Driver {
 	static boolean isRead = false;
 	public static double multiplier = 1;
 	public static int defaultPauseTime = -1;
+	static String generateFolderName = "Generated";
+	static int generateCommandType = Replayer.LOCALCHECK;
 	
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
@@ -65,7 +67,7 @@ public class Driver {
 		if (!isRead) read();
 //		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
 //		replayer.createExtraCommand("Generated", Replayer.PAUSE);
-		replayer.createExtraCommand("Generated", Replayer.WEB);
+		replayer.createExtraCommand(generateFolderName, generateCommandType);
 		isRead = false;
 	}
 	

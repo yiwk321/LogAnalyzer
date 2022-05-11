@@ -4,6 +4,7 @@ import logAnalyzer.AContextBasedReplayer;
 import logAnalyzer.ASemesterReplayer;
 import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.AnExperimentReplayer;
+import logAnalyzer.Replayer;
 
 public class Driver2 extends Driver{
 	public static String[] folders = {
@@ -24,12 +25,11 @@ public class Driver2 extends Driver{
 //										5,
 //										6
 										};
+	static boolean generate = true;
+	static String generateFolderName = "Generated";
+	static int generateCommandType = Replayer.LOCALCHECK;
 	
 	public static void main(String[] args) {
-
-		boolean generate = true;
-//		boolean generate = false;
-
 		for (String folder: folders) {
 //			replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
 			replayer = new AnAssignmentReplayer();

@@ -184,6 +184,7 @@ public abstract class Replayer{
 			return commands;
 		} catch (Exception e) {
 			System.err.println("Could not read file" + path + "\n"+ e);
+			e.printStackTrace();
 		}
 		return null;
 	}
