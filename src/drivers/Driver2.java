@@ -12,14 +12,15 @@ public class Driver2 extends Driver{
 //										"C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData",
 //										"D:\\Assignment 4",
 //										"D:\\Assignment 4\\Bruno, Adrian(abruno)\\Submission attachment(s)",
-										"E:\\Test\\Assignment 4"
+										"F:\\Hermes Data\\Assignment 0"
 										};
 	public static String prefix = "Assignment ";
 	public static int[] assignments = {
+			0
 //										1,
 //										2,
 //										3,
-										4,
+//										4,
 //										5,
 //										6
 										};

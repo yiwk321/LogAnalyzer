@@ -68,7 +68,7 @@ public class AnAssignmentReplayer extends Replayer {
 			}
 //			createDistributionData(assign, commands);
 //			createPauseDistribution(assign, commands);
-//			createAssignData(assign, commands);
+			createAssignData(assign, commands);
 			createEvents(assign, commands);
 			
 			latch.countDown();

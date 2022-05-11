@@ -2,127 +2,56 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Hermes"/>
-	<classpathentry kind="lib" path="E:/eclipse/plugins/org.eclipse.ui.workbench_3.112.0.v20180906-1121.jar" sourcepath="D:/eclipse/plugins/org.eclipse.ui.workbench.source_3.112.0.v20180906-1121.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/D:/eclipse/plugins/org.eclipse.platform.doc.isv_4.9.0.v20180905-1254.jar!/reference/api"/>
-		</attributes>
-		<accessrules>
-			<accessrule kind="discouraged" pattern="org/eclipse/e4/ui/workbench/addons/perspectiveswitcher/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/about/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/actions/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/activities/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/application/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/branding/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/browser/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/commands/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/contexts/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/databinding/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/dialogs/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/dnd/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/fieldassist/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/handlers/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/help/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/about/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/actions/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/activities/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/activities/ws/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/application/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/browser/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/commands/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/contexts/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/decorators/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/dialogs/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/dialogs/cpd/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/dnd/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/e4/compatibility/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/e4/migration/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/editorsupport/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/expressions/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/handlers/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/help/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/intro/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/keys/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/keys/model/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/layout/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/menus/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/misc/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/model/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/operations/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/part/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/preferences/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/progress/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/provisional/application/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/quickaccess/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/registry/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/services/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/splash/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/statushandlers/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/testing/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/themes/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/tweaklets/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/util/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/wizards/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/ui/internal/wizards/preferences/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/intro/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/keys/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/menus/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/model/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/operations/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/part/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/plugin/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/preferences/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/progress/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/services/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/splash/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/statushandlers/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/swt/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/themes/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/views/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/ui/wizards/*"/>
-			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
-		</accessrules>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/yiwk3/OneDrive/UNC CH/Junior 2nd Sem/COMP533LA/libs/opencsv-2.3.jar" sourcepath="C:/Users/Zhizhou/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/Zhizhou/.m2/repository/net/sf/opencsv/opencsv/2.3/opencsv-2.3-javadoc.jar!/"/>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="maven.groupId" value="net.sf.opencsv"/>
-			<attribute name="maven.artifactId" value="opencsv"/>
-			<attribute name="maven.version" value="2.3"/>
-			<attribute name="maven.scope" value="compile"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="E:/eclipse/plugins/org.eclipse.core.resources_3.13.100.v20180828-0158.jar" sourcepath="D:/eclipse/plugins/org.eclipse.core.resources.source_3.13.100.v20180828-0158.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/D:/eclipse/plugins/org.eclipse.platform.doc.isv_4.9.0.v20180905-1254.jar!/reference/api"/>
-		</attributes>
-		<accessrules>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/dtree/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/events/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/localstore/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/properties/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/propertytester/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/refresh/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/resources/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/resources/mapping/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/resources/projectvariables/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/resources/refresh/win32/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/utils/*"/>
-			<accessrule kind="discouraged" pattern="org/eclipse/core/internal/watson/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/filtermatchers/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/mapping/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/refresh/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/team/*"/>
-			<accessrule kind="accessible" pattern="org/eclipse/core/resources/variableresolvers/*"/>
-			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
-		</accessrules>
-	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/HelpView"/>
-	<classpathentry kind="lib" path="/Hermes/lib/json-20170516.jar"/>
 	<classpathentry kind="lib" path="lib/Hermes_Log_Parser.jar"/>
+	<classpathentry kind="lib" path="lib/java10api.jar"/>
+	<classpathentry kind="lib" path="lib/javax.inject_1.0.0.v20091030.jar"/>
+	<classpathentry kind="lib" path="lib/jdi.jar"/>
+	<classpathentry kind="lib" path="lib/jdimodel.jar"/>
+	<classpathentry kind="lib" path="lib/json-20170516.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.9.200.v20180827-1727.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype_3.7.100.v20180817-1401.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.filebuffers_3.6.300.v20180822-1339.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs_3.10.100.v20180817-1215.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.resources_3.13.100.v20180828-0158.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.runtime_3.15.0.v20180817-1401.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.variables_3.4.200.v20180821-1744.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.debug.core_3.13.0.v20180821-1744.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.debug.ui_3.13.100.v20180827-0649.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.e4.ui.di_1.2.300.v20180906-1121.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.e4.ui.workbench3_0.14.200.v20180828-0227.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.app_1.3.600.v20180827-1235.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.10.100.v20180827-1235.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences_3.7.200.v20180827-1235.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.registry_3.8.100.v20180827-1235.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.security_1.2.500.v20180827-1235.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.compiler.apt_1.3.300.v20180905-0315.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.compiler.tool_1.2.300.v20180905-0319.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.15.0.v20180905-0317.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core.manipulation_1.10.100.v20180829-0618.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.debug.ui_3.10.0.v20180827-1040.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.launching_3.11.0.v20180827-1040.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.ui_3.15.0.v20180829-2215.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.14.100.v20180828-0836.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface.text_3.14.0.v20180824-1140.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ltk.core.refactoring_3.9.100.v20180828-0626.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.13.100.v20180827-1536.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi.compatibility.state_1.1.200.v20180827-1536.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt_3.108.0.v20180904-1901.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.win32.win32.x86_64_3.108.0.v20180904-1901.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.text_3.7.0.v20180822-1511.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui_3.110.0.v20180828-1350.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.browser_3.6.300.v20180828-0837.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.console_3.8.100.v20180821-1744.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.editors_3.11.200.v20180822-1511.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.ide_3.14.100.v20180828-1350.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.views_3.9.200.v20180828-0837.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench_3.112.0.v20180906-1121.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench.texteditor_3.11.100.v20180824-1030.jar"/>
+	<classpathentry kind="lib" path="lib/org.hamcrest.core_1.3.0.v20180420-1519.jar"/>
+	<classpathentry kind="lib" path="lib/dayton.ellwanger.Hermes.jar"/>
+	<classpathentry kind="lib" path="lib/HelpView.jar"/>
+	<classpathentry kind="lib" path="lib/oeall22.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
