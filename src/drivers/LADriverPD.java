@@ -39,7 +39,12 @@ public class LADriverPD extends Driver{
 			isRead = false;
 			if (generate) {
 				delete();
-				generate();
+				try {
+				generate(); 
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
 			}
 			analyze();
 		}
