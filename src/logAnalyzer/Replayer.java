@@ -220,6 +220,9 @@ public abstract class Replayer{
 		try {
 			File folder = new File(LOCALCHECK_EVENTS);
 			File[] files = folder.listFiles((f)->{return f.getName().endsWith(".csv");});
+			if (files == null) {
+				return null;
+			}
 			for (File file : files) {
 				logMatcher = pattern.matcher(assign.substring(assign.lastIndexOf(File.separator)));
 				eventsMatcher = pattern.matcher(file.getName());
@@ -256,7 +259,10 @@ public abstract class Replayer{
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
-		} 
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return null;
+		}
 		return localCheckEvents;
 	}
 	
