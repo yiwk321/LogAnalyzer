@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -30,6 +31,17 @@ public abstract class CommandGenerator implements Runnable {
 		}
 	}
 
+	public static String newFileName (String aFileName, long aTime) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+		Date aDate = new Date(aTime);
+		String aNewDateFormat = df.format(aDate);
+		int aLogIndex = aFileName.lastIndexOf("Log");
+		String aPrefix = aFileName.substring(0, aLogIndex);
+		String newFileName = aPrefix + "Log" + aNewDateFormat + ".xml";
+
+		return  newFileName;
+		
+	}
 	public void run() {
 		try {
 			if (latch != null) {
@@ -65,7 +77,10 @@ public abstract class CommandGenerator implements Runnable {
 					newCommands = addCommands(commands, nextStartTime);
 				}
 				StringBuffer buf = new StringBuffer();
-				buf.append(Replayer.XML_START1 + getLogFileCreationTime(file) + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
+				long aStartTime = newCommands.get(0).getTimestamp2();
+//				buf.append(Replayer.XML_START1 + getLogFileCreationTime(file) + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
+				buf.append(Replayer.XML_START1 + aStartTime + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
+
 				int i = 0;
 				while(i < newCommands.size() && (newCommands.get(i) instanceof DifficultyCommand || newCommands.get(i) instanceof PauseCommand)) {
 					i++;
@@ -78,7 +93,10 @@ public abstract class CommandGenerator implements Runnable {
 					}
 				}
 				buf.append(Replayer.XML_FILE_ENDING);
-				replayer.updateLogMap(fileName, buf.toString());
+//				replayer.updateLogMap(fileName, buf.toString());
+				String aNewFileName = newFileName(fileName, aStartTime);
+				replayer.updateLogMap(aNewFileName, buf.toString());
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

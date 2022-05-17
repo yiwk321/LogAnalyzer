@@ -62,8 +62,8 @@ public class Driver {
 	
 	public static void generate() {
 		System.out.println("Generating LocalChecks log");
-//		String[] args = {path};
-//		Main.main(args);
+		String[] args = {path};
+		Main.main(args);
 		if (!isRead) read();
 //		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
 //		replayer.createExtraCommand("Generated", Replayer.PAUSE);

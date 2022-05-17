@@ -12,6 +12,10 @@ import fluorite.commands.EHICommand;
 public class AnAssignmentReplayer extends Replayer {
 	protected Map<String, Map<String, List<EHICommand>>> allLogs;
 	
+	public AnAssignmentReplayer() {
+		System.setProperty("user.timezone", "America/New_York");
+	}
+	
 	public void readLogs(String path) {
 		root = new File(path);
 		allLogs = readAssignment(root);

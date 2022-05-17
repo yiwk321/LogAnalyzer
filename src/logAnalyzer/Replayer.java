@@ -307,7 +307,7 @@ public abstract class Replayer{
 	public void createExtraCommandStudent(CountDownLatch latch, Map<String, List<EHICommand>> studentLog, String student, String surfix, int mode, List<String[]> localCheckEvents) {
 		CommandGenerator cg;
 		if (mode == LOCALCHECK && localCheckEvents != null) {
-			cg = new LocalCheckCommandGenerator(this, latch, studentLog, localCheckEvents);
+			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
 		} else if (mode == WEB) {
 			cg = new WebCommandGenerator(this, latch, studentLog, getLogFolder(new File(student)).getParentFile());
 		} else {
@@ -391,6 +391,8 @@ public abstract class Replayer{
 	public abstract void analyze(CountDownLatch latch);
 	
 	public void createAssignData(String assign, Map<String, List<List<EHICommand>>> data) {
+		notifyNewAssignment(assign, data);
+		
 		File csv = new File(assign+".csv");
 		FileWriter fw;
 		File csv2 = new File(assign+"Event.csv");
@@ -439,11 +441,24 @@ public abstract class Replayer{
 				int[] numCommands = new int[10];
 				List<String> breakdownList = new ArrayList<>();
 				StringBuffer list = new StringBuffer();
+				notifyNewStudent(student, nestedCommands, totalTime, wallClockTime, restTime);
+				int aSessionNumber = -1;
 				for (List<EHICommand> commands : nestedCommands) {
 					long lastTime = -1;
 					long curTime = -1;
+					aSessionNumber++;
+					notifyNewSession(aSessionNumber);
 					for (int i = 0; i < commands.size(); i++) {
+						int aStartCommandIndex = i;						
+						String aRestType= null;
 						EHICommand command = commands.get(i);
+						EHICommand aStartCommand = command;
+						boolean aRestInSession = false;
+						String aRestKind = null;
+						String aCommandTypeChar = "";
+						String anEventTypeString = "";
+						String aText = null;
+						
 						
 						if (i > 0) {
 							lastTime = curTime;
@@ -453,60 +468,86 @@ public abstract class Replayer{
 						}
 						if (lastTime - curTime > FIVE_MIN) {
 							addOneLine(output, assign, lastTime, REST_INSESSION, student);
+							aRestInSession = true;
+							aRestKind = REST_INSESSION;
 						}
 						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
 							addOneLine(output, assign, curTime, REST_LOSEFOCUS, student);
+							aRestKind = REST_LOSEFOCUS;
 						} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
 							addOneLine(output, assign, curTime, REST_ENDSESSION, student);
+							aRestKind = REST_ENDSESSION;
 						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand ||
 								command instanceof Delete || command instanceof Insert || (command instanceof EclipseCommand && ((EclipseCommand)command).getCommandID().equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) ||
 								command instanceof Replace || command instanceof PasteCommand || command instanceof ExceptionCommand ||
 								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
 								command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof LocalCheckCommand) {
-							addOneLine(output, assign, curTime, getEventType(command), student);
+							
+							anEventTypeString = getEventType(command);
+//							addOneLine(output, assign, curTime, getEventType(command), student);
+							addOneLine(output, assign, curTime, anEventTypeString, student);
+
 						}
 						if (command instanceof PauseCommand) {
 							numCommands[0]++;
-							list.append("A");
+							aCommandTypeChar = "A";
+							list.append(aCommandTypeChar);
+//							list.append("A");
+
 						}
 						if (command instanceof WebCommand) {
 							numCommands[1]++;
-							list.append("W");
+							aCommandTypeChar = "W";
+							list.append(aCommandTypeChar);
+//							list.append("W");
 						}
 //						if (command instanceof InsertStringCommand) {
 //							numCommands[2]++;
 //							list.append("I");
 //						}
 						if (command instanceof Insert) {
+							aText = command.getDataMap().get("text");
 							numCommands[2] += command.getDataMap().get("text").length();
 						}
 						if (command instanceof Delete) {
 //							numCommands[3]++;
 							numCommands[3] += command.getDataMap().get("text").length();
-							list.append("D");
+							aCommandTypeChar = "D";
+							list.append(aCommandTypeChar);
+//							list.append("D");
 						}
 						if (command instanceof EclipseCommand && ((EclipseCommand)command).getCommandID().equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) {
 							numCommands[3]++;
 						}
 						if (command instanceof Replace) {
 							numCommands[4]++;
-							list.append("R");
+							aCommandTypeChar = "R";
+							list.append(aCommandTypeChar);
+//							list.append("R");
 						}
 						if (command instanceof CopyCommand) {
 							numCommands[5]++;
-							list.append("C");
+							aCommandTypeChar = "C";
+							list.append(aCommandTypeChar);
+//							list.append("C");
 						}
 						if (command instanceof PasteCommand) {
 							numCommands[6]++;
-							list.append("P");
+							aCommandTypeChar = "P";
+							list.append(aCommandTypeChar);
+//							list.append("P");
 						}
 						if (command instanceof RunCommand) {
 							numCommands[7]++;
-							list.append("U");
+							aCommandTypeChar = "U";
+							list.append(aCommandTypeChar);
+//							list.append("U");
 						}
 						if (command instanceof LocalCheckCommand) {
 							numCommands[9]++;
-							list.append("L");
+							aCommandTypeChar = "L";
+							list.append(aCommandTypeChar);
+//							list.append("L");
 						}
 						if (command instanceof ExceptionCommand || command instanceof EHExceptionCommand) {
 							if(isException(command)) {
@@ -514,10 +555,13 @@ public abstract class Replayer{
 									ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
 									ex.setTimestamp(command.getTimestamp());
 									ex.setStartTimestamp(command.getStartTimestamp());
+ 									 aStartCommand = ex;
 								}
 								numCommands[8]++;
-								list.append("E");
-								if (i < commands.size()-1) {
+								aCommandTypeChar = "E";
+								list.append(aCommandTypeChar);
+//								list.append("E");
+  								if (i < commands.size()-1) {
 									command = commands.get(i+1);
 								} else {
 									continue;
@@ -560,7 +604,9 @@ public abstract class Replayer{
 											addOneLine(output, assign, curTime, getEventType(ex), student);
 										}
 										numCommands[8]++;
-										list.append("E");
+										aCommandTypeChar = "E";
+										list.append(aCommandTypeChar);
+//										list.append("E");
 									}
 									i++;
 									if (i+1 < commands.size()) {
@@ -568,12 +614,33 @@ public abstract class Replayer{
 									} else {
 										break;
 									}
+									
 								}
 								breakdownList.add(countConsecutiveCommands(list));
 								list = new StringBuffer();
+							
+//								notifyNewCommandInSession(
+//										aSessionNumber, 
+//										i, 
+//										command, 
+//										aCommandTypeChar, 
+//										aRestType, 
+//										aText);
 							}
 						}
+						notifyNewCommandInSession(
+								aStartCommandIndex, 
+								curTime, 
+								aStartCommand, 
+								aCommandTypeChar, 
+								anEventTypeString, 
+								aRestInSession, 
+								aRestType, 
+								aText,
+								i,
+								command);
 					}
+					
 				}
 				if (list.length() != 0) {
 					breakdownList.add(countConsecutiveCommands(list));
@@ -1726,6 +1793,54 @@ public abstract class Replayer{
 		int second = (int) (timeSpent % 60000 / 1000);
 		return hour + ":" + minute + ":" + second;
 	}
+	
+	List<ReplayerListener> replayerListeners = new ArrayList();
+	public void addReplayerListener(ReplayerListener aListener) {
+		replayerListeners.add(aListener);
+	}
+	 void notifyNewStudent( 
+				String aStudent,
+				List<List<EHICommand>> aNestedCommandList,
+				long aTotalTimeSpent,
+				long aWallClockTime,
+				long[] aRestTimes) {
+		 for (ReplayerListener aListener:replayerListeners) {
+			 aListener.newStudent( aStudent, aNestedCommandList, aTotalTimeSpent, aWallClockTime, aRestTimes);
+		 }
+	}
+	 void notifyNewAssignment(
+			 String anAssignment,
+			 Map<String, List<List<EHICommand>>> anAssignmentData) {
+		 for (ReplayerListener aListener:replayerListeners) {
+			 aListener.newAssignment(anAssignment, anAssignmentData);
+		 }
+	}
+	 void notifyNewSession(
+			 int aSessionNumber) {
+		 for (ReplayerListener aListener:replayerListeners) {
+			 aListener.newSession(aSessionNumber);
+		 }
+	}
+	 
+	 void notifyNewCommandInSession (
+				int aStartCommandIndex,
+				long aCommandTime,
+				EHICommand aStartCommand,
+				String aStartCommandTypeChar,
+				String anEventTypeString,
+				boolean anInSession,
+				String aRestType,
+				String aText,
+				int anEndCommandIndex,
+				EHICommand anEndCommand) {
+		 for (ReplayerListener aListener:replayerListeners) {
+//		  
+//			 aListener.newCommandInSession(aSession, aCommandIndex, aCommand, aCommandTypeChar, aRestType, aText);
+			 aListener.newCommandInSession(aStartCommandIndex, aCommandTime, aStartCommand, aStartCommandTypeChar, anEventTypeString, anInSession, aRestType, aText, anEndCommandIndex, anEndCommand);
+		 }
+	 }
+	 
+	 
 }
 
 class Command {
