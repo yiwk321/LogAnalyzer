@@ -37,7 +37,7 @@ import fluorite.commands.Replace;
 import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.Replayer;
 
-public class DistillerReplayerPD extends AnAssignmentReplayer {
+public class DistillerSourceCodeReplayer extends AnAssignmentReplayer {
 
 	public static final String PROJECT = "C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1\\Beier, Isiah(Isiah Beier)\\Submission attachment(s)\\A1";
 	public static final String SEPARATOR = File.separator;
@@ -62,7 +62,7 @@ public class DistillerReplayerPD extends AnAssignmentReplayer {
 
 	public static void printChangesByTime(String aProject) {
 //		Analyzer analyzer = new AnAnalyzer();
-		DistillerReplayerPD replayer = new DistillerReplayerPD();
+		DistillerSourceCodeReplayer replayer = new DistillerSourceCodeReplayer();
 //		analyzer.addAnalyzerListener(replayer);
 		File[] src = replayer.initProject(aProject);
 		long startTime = replayer.nestedCommands.get(0).get(1).getStartTimestamp();
@@ -89,7 +89,7 @@ public class DistillerReplayerPD extends AnAssignmentReplayer {
 
 	public static void printChangesBetweenCompile(String aProject) {
 //		Analyzer analyzer = new AnAnalyzer();
-		DistillerReplayerPD replayer = new DistillerReplayerPD();
+		DistillerSourceCodeReplayer replayer = new DistillerSourceCodeReplayer();
 //		analyzer.addAnalyzerListener(replayer);
 		int count = 0;
 		for (Map<String, List<SourceCodeChange>> changes : replayer.findChangesBetweenCompile(aProject, 0,
@@ -114,7 +114,7 @@ public class DistillerReplayerPD extends AnAssignmentReplayer {
 
 	public static void printChangesBetweenSave(String aProject) {
 //		Analyzer analyzer = new AnAnalyzer();
-		DistillerReplayerPD replayer = new DistillerReplayerPD();
+		DistillerSourceCodeReplayer replayer = new DistillerSourceCodeReplayer();
 //		analyzer.addAnalyzerListener(replayer);
 		int count = 0;
 		for (Map<String, List<SourceCodeChange>> changes : replayer.findChangesBetweenSave(aProject, 0,
