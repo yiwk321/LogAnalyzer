@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+
 import analyzer.logAnalyzer.AnIntervalReplayer;
 
-public class IntervalDriver {
+public class WorkTimeAndEditDriverPD {
+//	public static final File STUDENT_FOLDER = new File("E:\\Test\\Assignment 4\\Zheng, Chongyi(harryzcy)");
+	public static final File STUDENT_FOLDER = new File("C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1\\Beier, Isiah(Isiah Beier)");
+
 	//Path to student folder
 //	public static final File STUDENT_FOLDER = new File("C:\\Users\\Zhizhou\\eclipse2021-workspace\\A1");
-	public static final File STUDENT_FOLDER = new File("E:\\Test\\Assignment 4\\Alsadoon, Wid(wid)");
 	//Parse time stamps to long if they are strings
 	public static final DateFormat DF = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
 	//For context based work time, a pause is considered a rest if pauseTime > MULTIPLIER * context-based-threshold
@@ -27,6 +30,9 @@ public class IntervalDriver {
 //	public static final long END_TIME = Long.MAX_VALUE;
 	//Print traces messages 
 	public static final boolean TRACE = false;
+	public static final long START_TIME = 1622092284233L;
+	public static final long OFFSET = 5193161L;
+	public static final long END_TIME = START_TIME + OFFSET;
 	
 	public static void main(String[] args) {
 		if (!STUDENT_FOLDER.exists()) {
@@ -36,10 +42,10 @@ public class IntervalDriver {
 		AnIntervalReplayer replayer = new AnIntervalReplayer(MULTIPLIER, DEFAULT_THRESHOLD, TRACE);
 		//getStartTime(File studentFolder) returns the wall time of first FileOpenCommand in the project. -1 when failed
 //		long startTime = replayer.getStartTime(STUDENT_FOLDER);
-		long startTime = 1624286907518L + 1246288L;
+		long startTime = START_TIME;
 		//getEndTime(File studentFolder) returns the wall time of last edit, -1 when failed
 //		long endTime = replayer.getEndTime(STUDENT_FOLDER);
-		long endTime = 1624286907518L + 2104616L;
+		long endTime = END_TIME;
 		System.out.println("Start Time: " + parseWallTime(startTime));
 		System.out.println("End Time: " + parseWallTime(endTime));
 		
@@ -71,6 +77,7 @@ public class IntervalDriver {
 			for (int i = 1; i < value.size(); i++) {
 				System.out.print(value.get(i)+" ");
 			}
+			System.out.println();
 		}
 		System.exit(0);
 	}

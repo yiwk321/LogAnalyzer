@@ -113,7 +113,12 @@ public abstract class Replayer{
 	
 	public abstract void readLogs(String path);
 	
-
+	public List < List<EHICommand>> readStudentNestedList(File student) {
+		Map<String, List<EHICommand>> aMap = readStudent(student);
+		List < List<EHICommand>> retVal = new ArrayList(aMap.values());
+		return retVal;
+	
+	}
 	
 	public Map<String, List<EHICommand>> readStudent(File student) {
 		System.out.println("Reading student " + student);
