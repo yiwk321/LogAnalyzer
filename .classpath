@@ -53,5 +53,6 @@
 	<classpathentry kind="lib" path="lib/HelpView.jar"/>
 	<classpathentry kind="lib" path="lib/oeall22.jar"/>
 	<classpathentry kind="lib" path="lib/dayton.ellwanger.Hermes.jar"/>
+	<classpathentry kind="lib" path="lib/distiller.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
