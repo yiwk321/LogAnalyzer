@@ -1370,6 +1370,9 @@ public abstract class Replayer{
 					break;
 				}
 			}
+			if (j == commands.size()) {
+				j--;
+			}
 			long timestamp1 = commands.get(j).getTimestamp() + commands.get(j).getStartTimestamp();
 			EHICommand command2 = commands.get(commands.size()-1);
 			long timestamp2 = command2.getStartTimestamp() + command2.getTimestamp();

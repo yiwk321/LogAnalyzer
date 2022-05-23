@@ -17,8 +17,14 @@ public class LAListenableDriverPD extends Driver{
 //										"D:\\Assignment 4",
 //										"D:\\Assignment 4\\Bruno, Adrian(abruno)\\Submission attachment(s)",
 //										"E:\\Test\\Assignment 4"
-			"C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1"
-//			"C:\\Users\\dewan\\Downloads\\Assignment2A\\Assignment 2"
+			"C:\\Users\\dewan\\Downloads\\Assignment0A\\Assignment 0"
+
+//			"C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1"
+//			"C:\\Users\\dewan\\Downloads\\Assignment2A\\Assignment 2",
+//			"C:\\Users\\dewan\\Downloads\\Assignment3A\\Assignment 3",
+//			"C:\\Users\\dewan\\Downloads\\Assignment4A\\Assignment 4",
+//			"C:\\Users\\dewan\\Downloads\\Assignment1_1A\\Assignment 1_1",
+//			"C:\\Users\\dewan\\Downloads\\Assignment2_1A\\Assignment 2_1"
 										};
 	
 	public static ReplayerListener[] replayerListeners = {
@@ -29,11 +35,12 @@ public class LAListenableDriverPD extends Driver{
 	public static void main(String[] args) {
 
 		boolean generate = true;
+		boolean delete = true;
 //		boolean generate = false;
 
 		for (String folder: folders) {
 			
-			ListenableFolderAnalyzer.analyzeFolder(folder, true, true, replayerListeners);
+			ListenableFolderAnalyzer.analyzeFolder(folder, generate, delete, replayerListeners);
 		}
 
 	}
