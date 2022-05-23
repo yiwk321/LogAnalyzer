@@ -151,7 +151,7 @@ public abstract class Replayer{
 			System.out.println("No logs found for student " + student.getName());
 			return null;
 		}
-		refineLogFiles(logFolder);
+//		refineLogFiles(logFolder);
 		File[] logFiles = logFolder.listFiles(File::isDirectory);
 		if (logFiles != null && logFiles.length > 0) {
 			logFiles = logFiles[0].listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
@@ -167,12 +167,14 @@ public abstract class Replayer{
 			List<EHICommand> ret = readOneLogFile(logFile);
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
+			} else {
+				System.err.println("Need to append <Events>");
 			}
 		}
 		return logs;
 	}
 	
-	public List<EHICommand> readOneLogFile(File log){
+	public List<EHICommand> readOneLogFileWthoutAppending(File log){
 		String path = log.getPath();
 		System.out.println("Reading file " + path);
 		if (!log.exists()) {
@@ -193,11 +195,48 @@ public abstract class Replayer{
 		}
 		return null;
 	}
+	public List<EHICommand> readOneLogFile(File log){
+		List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
+		if (retVal == null) {
+			appendEvents(log);
+			return readOneLogFileWthoutAppending(log);
+		}
+		return retVal;
+//		String path = log.getPath();
+//		System.out.println("Reading file " + path);
+//		if (!log.exists()) {
+//			System.err.println("log does not exist:" + path);
+//			return null;
+//		}
+//		if (!path.endsWith(".xml")) {
+//			System.err.println("log is not in xml format:" + path);
+//			return null;
+//		}
+//		try {
+//			List<EHICommand> commands = reader.readAll(path);
+//			sortCommands(commands);
+//			return commands;
+//		} catch (Exception e) {
+//			System.err.println("Could not read file" + path + "\n"+ e);
+//			e.printStackTrace();
+//		}
+//		return null;
+	}
 	
-	public void refineLogFiles(File logFolder){
+	static void appendEvents(File logFile) {
+		BufferedWriter writer;
 		try {
-			for (File file : logFolder.listFiles((filename)->{return filename.getName().endsWith(".lck");})) {
-				File logFile = new File(file.getParent(), file.getName().substring(0, file.getName().indexOf(".lck")));
+			writer = new BufferedWriter(new FileWriter(logFile, true));
+			writer.write(XML_FILE_ENDING);
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public void refineLogFile(File logFile){
+		try {
 				BufferedReader reader = new BufferedReader(new FileReader(logFile));
 				String lastLine = null;
 				String currentLine = null;
@@ -205,17 +244,40 @@ public abstract class Replayer{
 					lastLine = currentLine;
 				}
 				if (lastLine != null && !lastLine.endsWith("</Events>")) {
-					BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
-					writer.write(XML_FILE_ENDING);
-					writer.close();
+//					BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
+//					writer.write(XML_FILE_ENDING);
+//					writer.close();
+					appendEvents(logFile);
 				}	
 				reader.close();
-				file.delete();
-			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 	}
+//	public void refineLogFiles(File logFolder){
+//		try {
+//			for (File file : logFolder.listFiles((filename)->{return filename.getName().endsWith(".lck");})) {
+//				File logFile = new File(file.getParent(), file.getName().substring(0, file.getName().indexOf(".lck")));
+//				BufferedReader reader = new BufferedReader(new FileReader(logFile));
+//				String lastLine = null;
+//				String currentLine = null;
+//				while((currentLine = reader.readLine()) != null) {
+//					lastLine = currentLine;
+//				}
+//				if (lastLine != null && !lastLine.endsWith("</Events>")) {
+////					BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
+////					writer.write(XML_FILE_ENDING);
+////					writer.close();
+//					appendEvents(logFile);
+//				}	
+//				reader.close();
+//				file.delete();
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} 
+//	}
 	
 	protected Map<String, List<String[]>> readLocalCheckEvents(String assign) {
 		Map<String, List<String[]>> localCheckEvents = new TreeMap<>();

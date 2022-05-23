@@ -362,7 +362,10 @@ public class DistillerSourceCodeReplayer extends AnAssignmentReplayer {
 						List<SourceCodeChange> changes = findFileChanges(path1.toFile(), path.toFile());
 						if (changes != null) {
 							List<SourceCodeChange> oldChanges = allChanges.get(path.getFileName().toString());
+//							List<SourceCodeChange> oldChanges = new ArrayList( allChanges.get(path.getFileName().toString()));
+
 							if (oldChanges != null) {
+								oldChanges = new ArrayList(oldChanges);
 								oldChanges.addAll(changes);
 							} else {
 								allChanges.put(path.getFileName().toString(), changes);
@@ -381,9 +384,16 @@ public class DistillerSourceCodeReplayer extends AnAssignmentReplayer {
 						}
 						List<SourceCodeChange> changes = findFileChanges(temp, path.toFile());
 						if (changes != null) {
+//							List<SourceCodeChange> oldChanges = allChanges.get(path.getFileName().toString());
 							List<SourceCodeChange> oldChanges = allChanges.get(path.getFileName().toString());
+
 							if (oldChanges != null) {
+								try {
+									oldChanges = new ArrayList(oldChanges);
 								oldChanges.addAll(changes);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
 							} else {
 								allChanges.put(path.getFileName().toString(), changes);
 							}
@@ -505,20 +515,44 @@ public class DistillerSourceCodeReplayer extends AnAssignmentReplayer {
 			List<EHICommand> commands = nestedCommands.get(i);
 			for (; j < commands.size(); j++) {
 				EHICommand command = commands.get(j);
+//				if (command.getTimestamp() == 5015283L) {
+//					System.out.println ("found offending time stamp");
+//				}
 				long timestamp = command.getStartTimestamp() + command.getTimestamp();
 				if (timestamp > endTime) {
+					editor.writeToDisk();
+//					System.out.println("Write to disk:" + editor.getContent());
 					return;
 				}
 				if (command instanceof FileOpenCommand && !ReplayUtility.isNull(command.getDataMap().get("filePath"))) {
 					if (editor != null) {
-						editor.writeToDisk();
+						editor.writeToDisk();// previous file
+//						System.out.println("Write to disk:" + editor.getContent());
+
 					}
 					currentFileName = ReplayUtility.getRelativeFilePath(command);
+//					if (currentFileName.contains("line/Line")) {
+//						System.out.println("Found offending file");
+//					}
 					String snapshot = ReplayUtility.getSnapshot(command);
-					if (!ReplayUtility.isNull(snapshot)) {
+					if (!ReplayUtility.isNull(snapshot) && !snapshot.startsWith("null")) {
 						editor = FileEditor.getEditor(src, currentFileName, snapshot);
 					} else {
-						editor = FileEditor.getEditor(src, currentFileName);
+						File aCurrentFile = new File(src, currentFileName);
+//						if (!editor.getFileName().equals(aCurrentFile.getAbsolutePath())) {
+							if (aCurrentFile.exists()) {
+								snapshot = FileUtility.readFile(aCurrentFile).toString();
+								editor = FileEditor.getEditor(src, currentFileName, snapshot);
+
+							} else {
+								editor = FileEditor.getEditor(src, currentFileName);
+
+							}
+//						}
+
+						
+								 
+//						editor = FileEditor.getEditor(src, currentFileName);
 					}
 				}
 				if (command instanceof Insert) {
@@ -542,6 +576,9 @@ public class DistillerSourceCodeReplayer extends AnAssignmentReplayer {
 			}
 			j = 0;
 		}
+		editor.writeToDisk();// current file
+//		System.out.println("Write to disk:" + editor.getContent());
+
 	}
 
 //	public DistillerReplayerPD(Analyzer anAnalyzer) {

@@ -40,7 +40,10 @@ import logAnalyzer.replayer.DistillerSourceCodeReplayer;
 
 public class DistillerReplayerDriverPD extends AnAssignmentReplayer {
 
-	public static final String PROJECT = "C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1\\Beier, Isiah(Isiah Beier)\\Submission attachment(s)\\A1";
+//	public static final String PROJECT = "C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1\\Beier, Isiah(Isiah Beier)\\Submission attachment(s)\\A1";
+	public static final String PROJECT = "C:\\Users\\dewan\\Downloads\\Assignment1A\\Assignment 1\\Bins, Forrest(Forrest Bins)\\Submission attachment(s)\\A1";
+
+//	\Bins, Forrest(Forrest Bins)
 //	public static final String SEPARATOR = File.separator;
 ////	private Analyzer analyzer;
 //	List<List<EHICommand>> nestedCommands;
@@ -54,6 +57,7 @@ public class DistillerReplayerDriverPD extends AnAssignmentReplayer {
 ////	static File f2 = new File("E:\\Test\\524A5\\replaySrc0\\main\\lisp\\evaluator\\BasicOperationManager.java");
 
 	public static void main(String[] args) {
+//		new DistillerSourceCodeReplayer().printChangesBetweenCompile(PROJECT);
 //		printChangesBetweenCompile();
 		new DistillerSourceCodeReplayer().printChangesBetweenSave(PROJECT);
 //		printChangesByTime();
