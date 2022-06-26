@@ -64,7 +64,7 @@ public abstract class CommandGenerator implements Runnable {
 				}
 				List<EHICommand> newCommands = null;
 				if (j == commandMap.size()-1) {
-					newCommands = addCommands(commands, Long.MAX_VALUE);
+					newCommands = addCommands(j, commands, Long.MAX_VALUE);
 				} else {
 					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
 					long nextStartTime = -1;
@@ -74,7 +74,7 @@ public abstract class CommandGenerator implements Runnable {
 							break;
 						}
 					}
-					newCommands = addCommands(commands, nextStartTime);
+					newCommands = addCommands(j, commands, nextStartTime);
 				}
 				StringBuffer buf = new StringBuffer();
 				long aStartTime = newCommands.get(0).getTimestamp2();
@@ -119,5 +119,5 @@ public abstract class CommandGenerator implements Runnable {
 		return newCommands;
 	}
 	
-	public abstract List<EHICommand> addCommands(List<EHICommand> commands, long nextStartTime);
+	public abstract List<EHICommand> addCommands(int aSessionIndex, List<EHICommand> commands, long nextStartTime);
 }

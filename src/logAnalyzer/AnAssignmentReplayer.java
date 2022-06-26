@@ -11,6 +11,7 @@ import fluorite.commands.EHICommand;
 
 public class AnAssignmentReplayer extends Replayer {
 	protected Map<String, Map<String, List<EHICommand>>> allLogs;
+
 	
 	public AnAssignmentReplayer() {
 		System.setProperty("user.timezone", "America/New_York");
@@ -39,7 +40,9 @@ public class AnAssignmentReplayer extends Replayer {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
 		for (String student : assignLog.keySet()) {
-			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+//			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+
 		}
 	}
 	
@@ -90,4 +93,6 @@ public class AnAssignmentReplayer extends Replayer {
 			}
 		}
 	}
+
+	
 }

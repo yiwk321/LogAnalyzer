@@ -25,8 +25,19 @@ public class PauseCommandGenerator extends CommandGenerator{
 		} 
 		newCommands.add(cur);
 	}
+	public static boolean hasPauseCommand(List<EHICommand> commands) {
+		for (EHICommand aCommand:commands) {
+			if (aCommand instanceof PauseCommand) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-	public List<EHICommand> addCommands(List<EHICommand> commands, long nextStartTime) {
+	public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, long nextStartTime) {
+		if (hasPauseCommand(commands)) {
+			return commands;
+		}
 		List<EHICommand> newCommands = new ArrayList<>();
 		EHICommand last = null;
 		EHICommand cur = null;

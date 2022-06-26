@@ -65,14 +65,18 @@ import fluorite.commands.RunCommand;
 import fluorite.commands.ShellCommand;
 import fluorite.commands.WebCommand;
 import fluorite.util.EHLogReader;
+import generators.ChainedCommandGenerator;
+import generators.CheckstyleCommandGenerator;
 import generators.CommandGenerator;
 import generators.LocalCheckCommandGenerator;
 import generators.PauseCommandGenerator;
+import generators.SourceCodeOnRunGenerator;
 import generators.WebCommandGenerator;
 import tests.Assignment;
 import tests.Suite;
+import util.misc.Common;
 
-public abstract class Replayer{
+public abstract class Replayer {
 	public static final int PAUSE = 0;
 	public static final int LOCALCHECK = 1;
 	public static final int WEB = 2;
@@ -106,6 +110,8 @@ public abstract class Replayer{
 	static Pattern assignSuitePattern = Pattern.compile("[FS]\\d*Assignment\\d*Suite.*");
 	public static final String suite = "E:\\submissions\\524\\Suite Test Mapping.txt";
 	
+//	protected List<CommandGenerator> commandGenerators = new ArrayList();
+
 	public Replayer() {
 		logToWrite = new TreeMap<>();
 		reader = new EHLogReader();
@@ -224,6 +230,17 @@ public abstract class Replayer{
 	}
 	
 	static void appendEvents(File logFile) {
+		String aFileText;
+		try {
+			aFileText = Common.readFile(logFile).toString();
+
+			if (aFileText.endsWith(XML_FILE_ENDING)) {
+				return; // already done this or some other problem
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(logFile, true));
@@ -233,7 +250,7 @@ public abstract class Replayer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 	public void refineLogFile(File logFile){
 		try {
@@ -371,15 +388,52 @@ public abstract class Replayer{
 	
 	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode);
 
-	public void createExtraCommandStudent(CountDownLatch latch, Map<String, List<EHICommand>> studentLog, String student, String surfix, int mode, List<String[]> localCheckEvents) {
-		CommandGenerator cg;
-		if (mode == LOCALCHECK && localCheckEvents != null) {
-			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
-		} else if (mode == WEB) {
-			cg = new WebCommandGenerator(this, latch, studentLog, getLogFolder(new File(student)).getParentFile());
-		} else {
-			cg = new PauseCommandGenerator(this, latch, studentLog);
-		}
+	public void createExtraCommandStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog, String aStudent, String surfix, int mode, List<String[]> localCheckEvents) {
+//		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents);
+//		if (mode == LOCALCHECK && localCheckEvents != null) {
+////			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
+////			cg = new SourceCodeOnRunGenerator(this, latch, student, studentLog, localCheckEvents);
+//			cg = new PauseCommandGenerator(this, latch, aStudentLog);
+//			commandGenerators.add(cg);
+//			cg = new CheckstyleCommandGenerator(this, latch, student, aStudentLog);
+//			commandGenerators.add(cg);
+//
+//
+//		} else if (mode == WEB) {
+//			cg = new WebCommandGenerator(this, latch, aStudentLog, getLogFolder(new File(student)).getParentFile());
+//		} else {
+//			cg = new PauseCommandGenerator(this, latch, aStudentLog);
+//		}
+//		new Thread(cg).start();
+	}
+	protected CountDownLatch latch;
+	Map<String, List<EHICommand>> commandMap;
+	String student;
+	
+	public void createChainedExtraCommandsStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog, String aStudent, String aSuffix, int mode, List<String[]> localCheckEvents) {
+		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents);
+
+//		latch = aLatch;
+//		student = aStudent;
+//		commandMap = aStudentLog;
+////		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
+//		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, aStudent, aStudentLog, localCheckEvents));
+//		commandGenerators.add(new CheckstyleCommandGenerator(this, latch, aStudent, aStudentLog));
+//		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
+//
+//		CommandGenerator cg;
+//		if (mode == LOCALCHECK && localCheckEvents != null) {
+////			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
+////			cg = new SourceCodeOnRunGenerator(this, latch, student, studentLog, localCheckEvents);
+//			cg = new CheckstyleCommandGenerator(this, aLatch, student, studentLog, localCheckEvents);
+//			commandGenerators.add(cg);
+//
+//
+//		} else if (mode == WEB) {
+//			cg = new WebCommandGenerator(this, aLatch, studentLog, getLogFolder(new File(student)).getParentFile());
+//		} else {
+//			cg = new PauseCommandGenerator(this, aLatch, studentLog);
+//		}
 		new Thread(cg).start();
 	}
 	
@@ -550,7 +604,7 @@ public abstract class Replayer{
 								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
 								command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof LocalCheckCommand) {
 							
-							anEventTypeString = getEventType(command);
+							anEventTypeString = getEventType(command).toString();
 //							addOneLine(output, assign, curTime, getEventType(command), student);
 							addOneLine(output, assign, curTime, anEventTypeString, student);
 
@@ -653,7 +707,7 @@ public abstract class Replayer{
 										} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
 											addOneLine(output, assign, curTime, REST_ENDSESSION, student);
 										} else {
-											addOneLine(output, assign, curTime, getEventType(command), student);
+											addOneLine(output, assign, curTime, getEventType(command).toString(), student);
 										}
 									}
 									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand) && isException(command)) {
@@ -668,7 +722,7 @@ public abstract class Replayer{
 											if (lastTime - curTime > FIVE_MIN) {
 												addOneLine(output, assign, lastTime, REST_INSESSION, student);
 											}
-											addOneLine(output, assign, curTime, getEventType(ex), student);
+											addOneLine(output, assign, curTime, getEventType(ex).toString(), student);
 										}
 										numCommands[8]++;
 										aCommandTypeChar = "E";
@@ -1277,26 +1331,36 @@ public abstract class Replayer{
 		return retVal.toArray(new String[1]);
 	}
 	
-	protected String getEventType(EHICommand command) {
+	public static EventType getEventType(EHICommand command) {
 		if (command instanceof InsertStringCommand || 
 			command instanceof CopyCommand ||
 			command instanceof Delete ||
 			command instanceof Replace || command instanceof PasteCommand) {
-			return "Edit";
+//			return "Edit";
+			return EventType.Edit;
+
 		}
 		if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput || command instanceof EHExceptionCommand) {
-			return "IO";
+//			return "IO";
+			return EventType.IO;
 		}
 		if (command instanceof ExceptionCommand) {
-			return "Exception";
+//			return "Exception";
+			return EventType.Exception;
 		}
 		if (command instanceof RequestHelpCommand || command instanceof GetHelpCommand) {
-			return "Request";
+//		        	return "Request";
+			return EventType.Request  ;
+
 		}
 		if (command instanceof LocalCheckCommand) {
-			return "LocalCheck";
+//			return "LocalCheck";
+			return EventType.LocalCheck;
+
 		}
-		return "Other";
+//		return "Other";
+		return EventType.Other;
+
 	}
 	
 	public File getProjectFolder(File folder) {
@@ -1909,9 +1973,83 @@ public abstract class Replayer{
 			 aListener.newCommandInSession(aStartCommandIndex, aCommandTime, aStartCommand, aStartCommandTypeChar, anEventTypeString, anInSession, aRestType, aText, anEndCommandIndex, anEndCommand);
 		 }
 	 }
-	 
+//		protected  List<EHICommand> addCommands(int aSessionIndex, List<EHICommand> commands, long nextStartTime) {
+//			for (CommandGenerator aCommandGenerator:commandGenerators) {
+//				commands = aCommandGenerator.addCommands(aSessionIndex, commands, nextStartTime);
+//			}
+//			return commands;
+//		}
+
+//	 @Override
+//		public void run() {
+//			try {
+//				if (latch != null) {
+//					System.out.println(Thread.currentThread().getName() + " started");
+//				}
+////				for (String fileName : commandMap.keySet()) {
+//				String[] keyset = commandMap.keySet().toArray(new String[0]);
+//				for (int j = 0; j < commandMap.size(); j++) {
+//					String fileName = keyset[j];
+////					List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
+//					List<EHICommand> commands = commandMap.get(fileName);
+//					File file = new File(fileName);
+//					if (commands.size() < 2) {
+//						continue;
+//					}
+//					long startTimestamp = getLogFileCreationTime(file);
+//					if (commands.get(commands.size()-1).getStartTimestamp() == 0) {
+//						for (EHICommand command : commands) {
+//							command.setStartTimestamp(startTimestamp);
+//						}
+//					}
+//					List<EHICommand> newCommands = null;
+//					if (j == commandMap.size()-1) {
+//						newCommands = addCommands(j, commands, Long.MAX_VALUE);
+//					} else {
+//						List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
+//						long nextStartTime = -1;
+//						for(int k = 0; k < nextCommands.size(); k++) {
+//							if (nextCommands.get(k).getStartTimestamp() > 0 || nextCommands.get(k).getTimestamp() > 0) {
+//								nextStartTime = nextCommands.get(k).getStartTimestamp();
+//								break;
+//							}
+//						}
+//						newCommands = addCommands(j, commands, nextStartTime);
+//					}
+//					StringBuffer buf = new StringBuffer();
+//					long aStartTime = newCommands.get(0).getTimestamp2();
+////					buf.append(Replayer.XML_START1 + getLogFileCreationTime(file) + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
+//					buf.append(Replayer.XML_START1 + aStartTime + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
+//
+//					int i = 0;
+//					while(i < newCommands.size() && (newCommands.get(i) instanceof DifficultyCommand || newCommands.get(i) instanceof PauseCommand)) {
+//						i++;
+//					}
+//					for (; i < newCommands.size();i++) {
+//						try {
+//							buf.append(newCommands.get(i).persist());
+//						}catch (Exception e) {
+//							i--;
+//						}
+//					}
+//					buf.append(Replayer.XML_FILE_ENDING);
+////					replayer.updateLogMap(fileName, buf.toString());
+//					String aNewFileName = CommandGenerator.newFileName(fileName, aStartTime);
+//					updateLogMap(aNewFileName, buf.toString());
+//
+//				}
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}finally {
+//				if (latch != null) {
+//					latch.countDown();
+//					System.out.println(Thread.currentThread().getName() + " finished, " + latch.getCount() + " threads remaining");
+//				}
+//			}
+//		} 
 	 
 }
+
 
 class Command {
 	String type;
@@ -1942,4 +2080,5 @@ class Command {
 	public void setType(String type) {
 		this.type = type;
 	}
+	
 }
