@@ -30,6 +30,14 @@ public abstract class CommandGenerator implements Runnable {
 			return 0;
 		}
 	}
+	public static boolean hasCommand(List<EHICommand> commands, Class aCommandClass) {
+		for (EHICommand aCommand:commands) {
+			if (aCommand.getClass() == aCommandClass) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static String newFileName (String aFileName, long aTime) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");

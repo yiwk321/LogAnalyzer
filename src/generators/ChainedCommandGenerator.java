@@ -28,8 +28,8 @@ public class ChainedCommandGenerator extends CommandGenerator {
 //		logToWrite = new TreeMap<>();
 
 //		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
-//		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
-		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
+		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
+//		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
 //
 	}
@@ -83,6 +83,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 				buf.append(Replayer.XML_START1 + aStartTime + Replayer.XML_START2 + Replayer.XML_VERSION + Replayer.XML_START3);
 
 				int i = 0;
+				// reason for this?
 				while(i < newCommands.size() && (newCommands.get(i) instanceof DifficultyCommand || newCommands.get(i) instanceof PauseCommand)) {
 					i++;
 				}

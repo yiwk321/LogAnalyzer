@@ -6,7 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-import logAnalyzer.AnIntervalReplayer;
+import logAnalyzer.AnIntervalReplayerWithEdits;
 
 public class WorkTimeDriverPD {
 //	public static final File STUDENT_FOLDER = new File("E:\\Test\\Assignment 4\\Zheng, Chongyi(harryzcy)");
@@ -30,7 +30,7 @@ public class WorkTimeDriverPD {
 			System.err.println("Error: Student Folder does not exist");
 			return;
 		}
-		AnIntervalReplayer replayer = new AnIntervalReplayer(MULTIPLIER, DEFAULT_THRESHOLD, false);
+		AnIntervalReplayerWithEdits replayer = new AnIntervalReplayerWithEdits(MULTIPLIER, DEFAULT_THRESHOLD, false);
 		/* 
 		 * getWorkTime(File studentFolder, long startTime, long endTime)
 		 * returns a long[] workTimes where 
