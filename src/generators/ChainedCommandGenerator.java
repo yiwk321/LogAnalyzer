@@ -20,7 +20,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 	Map<String, List<EHICommand>> commandMap;
 //	private Map<String, String> logToWrite;
 
-	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, String aStudent, Map<String, List<EHICommand>> aStudentLog, List<String[]> localCheckEvents) {
+	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
+			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
+			List<String[]> localCheckEvents, File piazzaPostsFile) {
 		replayer = aReplayer;
 		student = aStudent;
 		latch = aLatch;
@@ -29,9 +31,11 @@ public class ChainedCommandGenerator extends CommandGenerator {
 
 //		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
 		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
-//		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
+		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
-//
+		if (piazzaPostsFile != null && piazzaPostsFile.exists()) {
+			commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPostsFile));
+		}
 	}
 
 	@Override

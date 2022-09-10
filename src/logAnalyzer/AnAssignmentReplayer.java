@@ -39,11 +39,24 @@ public class AnAssignmentReplayer extends Replayer {
 		if (mode == LOCALCHECK) {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
+		File piazzaPostFile = findPiazzaPostFile(assign);
 		for (String student : assignLog.keySet()) {
 //			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
-			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, 
+					mode, localCheckEvents == null ? null : localCheckEvents.get(student),
+					piazzaPostFile);
 
 		}
+	}
+	
+	public File findPiazzaPostFile(String assign) {
+		File[] files = new File(assign).listFiles((parent, fileName)->{
+			return fileName.startsWith("ByAuthorsPosts") && fileName.endsWith(".json");
+		});
+		if (files.length > 0) {
+			return files[files.length - 1];
+		}
+		return null;
 	}
 	
 	public Map<String, Map<String, List<EHICommand>>> readAssignment(File assign) {
