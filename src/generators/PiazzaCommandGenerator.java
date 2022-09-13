@@ -38,6 +38,9 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 		JSONObject piazzaPosts = new JSONObject(piazzaPostsString);
 //		studentKey = findKeyMatchingStudent(aStudent, piazzaPosts.keySet());
 		findPiazzaPosts(aStudent, piazzaPosts);
+		this.piazzaPosts.sort((o1, o2)->{
+			return (int)(o1.getLong("time") - o2.getLong("time")); 
+		});
 	}
 	
 //	private String findKeyMatchingStudent(String student, Set<String> keyset) {
