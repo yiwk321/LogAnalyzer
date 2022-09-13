@@ -51,7 +51,7 @@ public class AnAssignmentReplayer extends Replayer {
 	
 	public File findPiazzaPostFile(String assign) {
 		File[] files = new File(assign).listFiles((parent, fileName)->{
-			return fileName.startsWith("ByAuthorsPosts") && fileName.endsWith(".json");
+			return fileName.startsWith("ByAuthorPosts") && fileName.endsWith(".json");
 		});
 		if (files.length > 0) {
 			return files[files.length - 1];

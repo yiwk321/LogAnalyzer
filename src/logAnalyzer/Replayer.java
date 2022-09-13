@@ -414,7 +414,7 @@ public abstract class Replayer {
 			Map<String, List<EHICommand>> aStudentLog, String aStudent, 
 			String aSuffix, int mode, List<String[]> localCheckEvents,
 			File piazzaPostsFile) {
-		if (!aStudent.contains("Dewan")) {
+		if (!aStudent.contains("Isobel")) {
 			return;
 		}
 		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents, piazzaPostsFile);

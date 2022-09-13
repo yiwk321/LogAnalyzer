@@ -32,14 +32,12 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 	public PiazzaCommandGenerator(Replayer replayer, CountDownLatch aLatch, String aStudent, 
 								  Map<String, List<EHICommand>> commandMap, File piazzaPostsFile) {
 		super(replayer, aLatch, commandMap);
-		
 		student = aStudent;
 		piazzaPosts = new ArrayList<>();
 		String piazzaPostsString = FileUtility.readFile(piazzaPostsFile).toString();
 		JSONObject piazzaPosts = new JSONObject(piazzaPostsString);
 //		studentKey = findKeyMatchingStudent(aStudent, piazzaPosts.keySet());
 		findPiazzaPosts(aStudent, piazzaPosts);
-		System.out.println("done");
 	}
 	
 //	private String findKeyMatchingStudent(String student, Set<String> keyset) {
@@ -89,14 +87,17 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 //		officeHourRequests = new ArrayList<>();
 //		piazzaPosts = new ArrayList<>();
 		Matcher matcher = studentNamePattern.matcher(student);
-
+		if (!matcher.matches()) {
+			return;
+		}
 		String onyen = matcher.group(3);
 //		String firstName = matcher.group(2);
 //		String lastName = matcher.group(1);
-		if (!piazzaPostsJson.has(onyen)) {
+		String author = onyen+ "(" + onyen + "@live.unc.edu)";
+		if (!piazzaPostsJson.has(author)) {
 			return;
 		}
-		JSONArray posts = piazzaPostsJson.getJSONArray(onyen);
+		JSONArray posts = piazzaPostsJson.getJSONArray(author);
 		for (Object post : posts) {
 			if (!(post instanceof JSONObject)) {
 				continue;
@@ -164,17 +165,23 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 		return lastAddedExternalIndex < piazzaPosts.size();
 	}
 
+	protected JSONObject previousEvent;
+	
 	@Override
 	protected long getNextExternalEventTimeStamp() {
 		// TODO Auto-generated method stub
-		JSONObject event = piazzaPosts.get(lastAddedExternalIndex);
-		return event.getLong("time");
+		previousEvent = piazzaPosts.get(lastAddedExternalIndex);
+		return previousEvent.getLong("time");
 	}
 
+	
 	@Override
 	protected List<EHICommand> createExternalCommands(boolean fromPreviousEvent) {
 		// TODO Auto-generated method stub
-		EHICommand aCommand = new PiazzaPostCommand();
+		if (!fromPreviousEvent) {
+			previousEvent = piazzaPosts.get(lastAddedExternalIndex);
+		}
+		EHICommand aCommand = new PiazzaPostCommand(previousEvent);
 		List<EHICommand> retVal = new ArrayList();
 		retVal.add(aCommand);
 		System.out.println("Adding aCommand " + aCommand + " for " + student);
