@@ -413,8 +413,9 @@ public abstract class Replayer {
 	public void createChainedExtraCommandsStudent(CountDownLatch aLatch, 
 			Map<String, List<EHICommand>> aStudentLog, String aStudent, 
 			String aSuffix, int mode, List<String[]> localCheckEvents,
-			File piazzaPostsFile) {
-		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents, piazzaPostsFile);
+			File piazzaPostsFile, File zoomChatsFolder) {
+		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, 
+				aStudent, aStudentLog, localCheckEvents, piazzaPostsFile, zoomChatsFolder);
 
 //		latch = aLatch;
 //		student = aStudent;

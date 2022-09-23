@@ -185,7 +185,7 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 			previousEvent = piazzaPosts.get(lastAddedExternalIndex);
 		}
 		EHICommand aCommand = new PiazzaPostCommand(previousEvent);
-		List<EHICommand> retVal = new ArrayList();
+		List<EHICommand> retVal = new ArrayList<>();
 		retVal.add(aCommand);
 		System.out.println("Adding aCommand " + aCommand + " for " + student);
 		return retVal;

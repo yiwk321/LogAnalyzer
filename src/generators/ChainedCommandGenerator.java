@@ -22,7 +22,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 
 	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
 			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
-			List<String[]> localCheckEvents, File piazzaPostsFile) {
+			List<String[]> localCheckEvents, File piazzaPostsFile, File zoomChatsFolder) {
 		replayer = aReplayer;
 		student = aStudent;
 		latch = aLatch;
@@ -35,6 +35,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 //		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
 		if (piazzaPostsFile != null && piazzaPostsFile.exists()) {
 			commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPostsFile));
+		}
+		if (zoomChatsFolder != null && zoomChatsFolder.exists()) {
+			commandGenerators.add(new ZoomChatCommandGenerator(replayer, latch, aStudent, aStudentLog, zoomChatsFolder));
 		}
 	}
 
