@@ -1,5 +1,7 @@
 package logAnalyzer;
 
+import static org.junit.Assert.fail;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -27,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
@@ -35,6 +38,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.json.JSONObject;
+
 import analyzer.extension.replayView.FileUtility;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
@@ -42,6 +47,7 @@ import dayton.ellwanger.helpbutton.exceptionMatcher.ExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.JavaExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.PrologExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.SMLExceptionMatcher;
+import fluorite.commands.CheckStyleCommand;
 import fluorite.commands.ConsoleInput;
 import fluorite.commands.ConsoleOutput;
 import fluorite.commands.ConsoleOutputCommand;
@@ -61,9 +67,11 @@ import fluorite.commands.PasteCommand;
 import fluorite.commands.Replace;
 import fluorite.commands.RequestHelpCommand;
 import fluorite.commands.PauseCommand;
+import fluorite.commands.PiazzaPostCommand;
 import fluorite.commands.RunCommand;
 import fluorite.commands.ShellCommand;
 import fluorite.commands.WebCommand;
+import fluorite.commands.ZoomChatCommand;
 import fluorite.util.EHLogReader;
 import generators.ChainedCommandGenerator;
 import generators.CheckstyleCommandGenerator;
@@ -72,6 +80,7 @@ import generators.LocalCheckCommandGenerator;
 import generators.PauseCommandGenerator;
 import generators.SourceCodeOnRunGenerator;
 import generators.WebCommandGenerator;
+import sun.tools.jar.resources.jar;
 import tests.Assignment;
 import tests.Suite;
 import util.misc.Common;
@@ -514,6 +523,115 @@ public abstract class Replayer {
 	}
 	
 	public abstract void analyze(CountDownLatch latch);
+	
+	public void createAssignTimeline(String assign, Map<String, List<List<EHICommand>>> data) {
+		notifyNewAssignment(assign, data);
+		for (String key : data.keySet()) {
+			System.out.println(key);
+		}
+
+//		try {
+//		assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+		for (Entry<String, List<List<EHICommand>>> student : data.entrySet()) {
+			
+			createStudentTimeline(student.getKey(), student.getValue());
+		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	}
+	
+	public void createStudentTimeline(String student, List<List<EHICommand>> nestedCommands) {
+		File timeline = new File(student + File.separator + "Timeline.csv");
+
+		try {
+			if (timeline.exists()) {timeline.delete();}
+			if(!timeline.createNewFile()) {return;}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try (FileWriter fw = new FileWriter(timeline)) {
+			System.out.println("Generating AssignTimeline for student " + student);
+			student = student.substring(student.lastIndexOf(File.separator)+1);
+			List<List<EHICommand>> difficulties = new ArrayList<>();
+			List<EHICommand> difficultySessionCommands = new ArrayList<>();
+			
+			for (List<EHICommand> commands : nestedCommands) {
+				long lastTime = -1;
+				long curTime = -1;
+				for (int i = 0; i < commands.size(); i++) {
+					EHICommand command = commands.get(i);
+					if (i > 0) {
+						lastTime = curTime;
+					}
+					if (command != null) {
+						curTime = command.getTimestamp() + command.getStartTimestamp();
+					}
+					if (command instanceof ExceptionCommand || 
+							command instanceof CheckStyleCommand || 
+							command instanceof ZoomChatCommand ||
+							command instanceof ConsoleOutput || 
+							command instanceof ConsoleInput ||
+							command instanceof LocalCheckCommand ||
+							command instanceof PiazzaPostCommand || 
+							command instanceof RequestHelpCommand || 
+							command instanceof RunCommand) {
+							difficultySessionCommands.add(command);
+					}
+					if (command instanceof PiazzaPostCommand) {
+						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+						if (post.getBoolean("is_OH")) {
+							difficulties.add(difficultySessionCommands);
+							difficultySessionCommands = new ArrayList<>();
+						}
+					}
+
+					if (command instanceof RequestHelpCommand) {
+						difficulties.add(difficultySessionCommands);
+						difficultySessionCommands = new ArrayList<>();
+					}
+//					if (command instanceof ZoomChatCommand) {
+//					}
+//					if (command instanceof PauseCommand) {
+//					}
+//					if (command instanceof WebCommand) {
+//					}
+//					if (command instanceof CheckStyleCommand) {
+//					}
+					if (command instanceof RunCommand && command.getAttributesMap().get("type").equals("Run")) {
+						boolean noException = true;
+						int endIdx = i + 10 < commands.size()? i + 10 : commands.size();
+						for (int j = i + 1; j < endIdx; j++) {
+							if (commands.get(i) instanceof ExceptionCommand) {
+								noException = false;
+							}
+						}
+						if (noException) {
+							difficultySessionCommands.clear();
+						}
+					}
+					if (command instanceof LocalCheckCommand) {
+						if (command.getAttributesMap().get("type").equals("difficulty")) {
+							difficulties.add(difficultySessionCommands);
+							difficultySessionCommands = new ArrayList<>();
+						}
+					}
+
+				}
+			}
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < difficulties.size(); i++) {
+				sb.append("Difficulty " + (i + 1));
+				for (EHICommand command : difficulties.get(i)) {
+					sb.append(command.persist());
+				}
+				sb.append(System.lineSeparator());
+			}
+			fw.write(sb.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void createAssignData(String assign, Map<String, List<List<EHICommand>>> data) {
 		notifyNewAssignment(assign, data);

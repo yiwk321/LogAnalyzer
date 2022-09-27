@@ -105,6 +105,9 @@ public class AnAssignmentReplayer extends Replayer {
 						logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
 					}
 				}
+				if (logFolder == null) {
+					continue;
+				}
 				logFolder.mkdirs();
 				File emptyLogFile = new File(logFolder, "Log2010-01-01-00-00-00-000.xml");
 //				emptyLogFile.createNewFile();
@@ -131,8 +134,9 @@ public class AnAssignmentReplayer extends Replayer {
 			}
 //			createDistributionData(assign, commands);
 //			createPauseDistribution(assign, commands);
-			createAssignData(assign, commands);
-			createEvents(assign, commands);
+//			createAssignData(assign, commands);
+//			createEvents(assign, commands);
+			createAssignTimeline(assign, commands);
 
 			latch.countDown();
 		}).start();

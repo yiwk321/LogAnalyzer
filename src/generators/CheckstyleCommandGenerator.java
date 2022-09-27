@@ -40,9 +40,9 @@ public class CheckstyleCommandGenerator extends ExternalCommandGenerator {
             public boolean accept(File file) {
              return file.isDirectory();
             }});
-		if (aFolders.length == 0) {
-			return null;
-		}
+//		if (aFolders.length == 0) {
+//			return null;
+//		}
 		return aFolders;
 	}
 	

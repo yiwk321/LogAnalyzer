@@ -13,12 +13,12 @@ public class Driver2 extends Driver{
 //										"C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData",
 //										"D:\\Assignment 4",
 //										"D:\\Assignment 4\\Bruno, Adrian(abruno)\\Submission attachment(s)",
-										"F:\\Hermes Data\\Assignment 0"
+										"C:\\Users\\yiwk3\\Downloads\\Compressed\\Assignment 1"
 										};
 	public static String prefix = "Assignment ";
 	public static int[] assignments = {
-			0
-//										1,
+//			0
+										1,
 //										2,
 //										3,
 //										4,
@@ -40,7 +40,7 @@ public class Driver2 extends Driver{
 				delete();
 				generate();
 			}
-			analyze();
+//			analyze();
 		}
 //			replayer = new AnExperimentReplayer(multiplier, defaultPauseTime);
 //		}
