@@ -13,19 +13,20 @@ public class Driver2 extends Driver{
 //										"C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData",
 //										"D:\\Assignment 4",
 //										"D:\\Assignment 4\\Bruno, Adrian(abruno)\\Submission attachment(s)",
-										"C:\\Users\\yiwk3\\Downloads\\Compressed\\Assignment 1"
+										"F:\\Hermes Data\\533S22\\Assignment 2"
 										};
 	public static String prefix = "Assignment ";
 	public static int[] assignments = {
 //			0
-										1,
-//										2,
+//										1,
+										2,
 //										3,
 //										4,
 //										5,
 //										6
 										};
-	static boolean generate = true;
+//	static boolean generate = true;
+	static boolean generate = false;
 	static String generateFolderName = "Generated";
 	static int generateCommandType = Replayer.LOCALCHECK;
 	
@@ -40,7 +41,7 @@ public class Driver2 extends Driver{
 				delete();
 				generate();
 			}
-//			analyze();
+			analyze();
 		}
 //			replayer = new AnExperimentReplayer(multiplier, defaultPauseTime);
 //		}

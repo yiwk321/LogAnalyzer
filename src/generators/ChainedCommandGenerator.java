@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
+import org.json.JSONObject;
+
 import fluorite.commands.DifficultyCommand;
 import fluorite.commands.EHICommand;
 import fluorite.commands.PauseCommand;
@@ -22,7 +24,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 
 	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
 			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
-			List<String[]> localCheckEvents, File piazzaPostsFile, File zoomChatsFolder) {
+			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder) {
 		replayer = aReplayer;
 		student = aStudent;
 		latch = aLatch;
@@ -33,8 +35,8 @@ public class ChainedCommandGenerator extends CommandGenerator {
 		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
 		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
-		if (piazzaPostsFile != null && piazzaPostsFile.exists()) {
-			commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPostsFile));
+		if (piazzaPosts != null) {
+			commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPosts));
 		}
 		if (zoomChatsFolder != null && zoomChatsFolder.exists()) {
 			commandGenerators.add(new ZoomChatCommandGenerator(replayer, latch, aStudent, aStudentLog, zoomChatsFolder));

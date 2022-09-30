@@ -10,7 +10,9 @@ import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.json.JSONObject;
 
+import analyzer.extension.replayView.FileUtility;
 import fluorite.commands.EHICommand;
 import fluorite.commands.EclipseCommand;
 
@@ -45,18 +47,23 @@ public class AnAssignmentReplayer extends Replayer {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
 		File piazzaPostFile = findPiazzaPostFile(assign);
+		JSONObject piazzaPosts = null;
+		if (piazzaPostFile.exists()) {
+			String piazzaPostsString = FileUtility.readFile(piazzaPostFile).toString();
+			piazzaPosts = new JSONObject(piazzaPostsString);
+		}
 		File zoomChatsFolder = findZoomChatsFolder(assign);
 		for (String student : assignLog.keySet()) {
 //			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
 			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
-					localCheckEvents == null ? null : localCheckEvents.get(student), piazzaPostFile, zoomChatsFolder);
+					localCheckEvents == null ? null : localCheckEvents.get(student), piazzaPosts, zoomChatsFolder);
 
 		}
 	}
 
 	public File findPiazzaPostFile(String assign) {
 		File[] files = new File(assign).listFiles((parent, fileName) -> {
-			return fileName.startsWith("ByAuthorPosts") && fileName.endsWith(".json");
+			return fileName.contains("ByAuthorPosts") && fileName.endsWith(".json");
 		});
 		if (files.length > 0) {
 			return files[files.length - 1];

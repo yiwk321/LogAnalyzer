@@ -2,6 +2,8 @@ package generators;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,17 +32,27 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 	Pattern studentNamePattern = Pattern.compile(".*\\\\(.*), (.*)\\((.*)\\)");
 	
 	public PiazzaCommandGenerator(Replayer replayer, CountDownLatch aLatch, String aStudent, 
-								  Map<String, List<EHICommand>> commandMap, File piazzaPostsFile) {
+								  Map<String, List<EHICommand>> commandMap, JSONObject piazzaPosts) {
 		super(replayer, aLatch, commandMap);
 		student = aStudent;
-		piazzaPosts = new ArrayList<>();
-		String piazzaPostsString = FileUtility.readFile(piazzaPostsFile).toString();
-		JSONObject piazzaPosts = new JSONObject(piazzaPostsString);
+		this.piazzaPosts = new ArrayList<>();
+//		String piazzaPostsString = FileUtility.readFile(piazzaPostsFile).toString();
+//		System.out.println(piazzaPostsString);
+//		JSONObject piazzaPosts = new JSONObject(piazzaPostsString);
 //		studentKey = findKeyMatchingStudent(aStudent, piazzaPosts.keySet());
 		findPiazzaPosts(aStudent, piazzaPosts);
-		this.piazzaPosts.sort((o1, o2)->{
-			return (int)(o1.getLong("time") - o2.getLong("time")); 
-		});
+		try {
+			this.piazzaPosts.sort((o1, o2)->{
+				return Long.compare(o1.getLong("time"), o2.getLong("time")); 
+			});
+		} catch (IllegalArgumentException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			Comparators.verifyTransitivity((o1, o2)->{
+				return (int)(o1.getLong("time") - o2.getLong("time")); 
+			}, this.piazzaPosts);
+			System.out.println("");
+		}
 	}
 	
 //	private String findKeyMatchingStudent(String student, Set<String> keyset) {
@@ -191,4 +203,65 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 		return retVal;
 	}
 
+}
+
+final class Comparators
+{
+    /**
+     * Verify that a comparator is transitive.
+     *
+     * @param <T>        the type being compared
+     * @param comparator the comparator to test
+     * @param elements   the elements to test against
+     * @throws AssertionError if the comparator is not transitive
+     */
+    public static <T> void verifyTransitivity(Comparator<T> comparator, Collection<T> elements)
+    {
+        for (T first: elements)
+        {
+            for (T second: elements)
+            {
+                int result1 = comparator.compare(first, second);
+                int result2 = comparator.compare(second, first);
+                if (result1 != -result2)
+                {
+                    // Uncomment the following line to step through the failed case
+                    //comparator.compare(first, second);
+                    throw new AssertionError("compare(" + first + ", " + second + ") == " + result1 +
+                        " but swapping the parameters returns " + result2);
+                }
+            }
+        }
+        for (T first: elements)
+        {
+            for (T second: elements)
+            {
+                int firstGreaterThanSecond = comparator.compare(first, second);
+                if (firstGreaterThanSecond <= 0)
+                    continue;
+                for (T third: elements)
+                {
+                    int secondGreaterThanThird = comparator.compare(second, third);
+                    if (secondGreaterThanThird <= 0)
+                        continue;
+                    int firstGreaterThanThird = comparator.compare(first, third);
+                    if (firstGreaterThanThird <= 0)
+                    {
+                        // Uncomment the following line to step through the failed case
+                        //comparator.compare(first, third);
+                        throw new AssertionError("compare(" + first + ", " + second + ") > 0, " +
+                            "compare(" + second + ", " + third + ") > 0, but compare(" + first + ", " + third + ") == " +
+                            firstGreaterThanThird);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Prevent construction.
+     */
+    private Comparators()
+    {
+    }
 }
