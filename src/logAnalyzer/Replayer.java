@@ -1,7 +1,5 @@
 package logAnalyzer;
 
-import static org.junit.Assert.fail;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -125,7 +123,7 @@ public abstract class Replayer {
 	SimpleDateFormat df;
 
 //	protected List<CommandGenerator> commandGenerators = new ArrayList();
-
+	
 	public Replayer() {
 		logToWrite = new TreeMap<>();
 		reader = new EHLogReader();
@@ -188,6 +186,10 @@ public abstract class Replayer {
 		}
 		Map<String, List<EHICommand>> logs = new TreeMap<>();
 		for (File logFile : logFiles) {
+			if (logFile.length() == 0) {
+				logFile.delete();
+				continue;
+			}
 			List<EHICommand> ret = readOneLogFile(logFile);
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
@@ -198,8 +200,11 @@ public abstract class Replayer {
 		return logs;
 	}
 
-	public List<EHICommand> readOneLogFileWthoutAppending(File log) {
+	public List<EHICommand> readOneLogFileWthoutAppending(File log, boolean printError) {
 		String path = log.getPath();
+		if (path.contains("Log2021-06-20-20-25-46-388.xml")) {
+			System.out.println("Pausing");
+		}
 		System.out.println("Reading file " + path);
 		if (!log.exists()) {
 			System.err.println("log does not exist:" + path);
@@ -214,17 +219,19 @@ public abstract class Replayer {
 			sortCommands(commands);
 			return commands;
 		} catch (Exception e) {
-			System.err.println("Could not read file" + path + "\n" + e);
-			e.printStackTrace();
+			if (printError) {
+				System.err.println("Could not read file" + path + "\n" + e);
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
 
 	public List<EHICommand> readOneLogFile(File log) {
-		List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
+		List<EHICommand> retVal = readOneLogFileWthoutAppending(log, false);
 		if (retVal == null) {
 			appendEvents(log);
-			return readOneLogFileWthoutAppending(log);
+			return readOneLogFileWthoutAppending(log, true);
 		}
 		return retVal;
 //		String path = log.getPath();
@@ -396,10 +403,10 @@ public abstract class Replayer {
 		return content;
 	}
 
-	public void createExtraCommand(String surfix, int mode) {
+	public void createExtraCommand(String surfix, int mode, boolean appendAllRemainingCommands) {
 		logToWrite.clear();
 		CountDownLatch latch = new CountDownLatch(countStudents());
-		createExtraCommand(latch, surfix, mode);
+		createExtraCommand(latch, surfix, mode, appendAllRemainingCommands);
 		try {
 			latch.await();
 			writeLogs(surfix);
@@ -410,7 +417,7 @@ public abstract class Replayer {
 		}
 	}
 
-	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode);
+	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode, boolean appendAllRemainingCommands);
 
 	public void createExtraCommandStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog,
 			String aStudent, String surfix, int mode, List<String[]> localCheckEvents) {
@@ -438,9 +445,9 @@ public abstract class Replayer {
 
 	public void createChainedExtraCommandsStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog,
 			String aStudent, String aSuffix, int mode, List<String[]> localCheckEvents, JSONObject piazzaPosts,
-			File zoomChatsFolder) {
+			File zoomChatsFolder, HashMap<String, List<Long>> sessionTimeMap, boolean appendAllRemainingCommands) {
 		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents,
-				piazzaPosts, zoomChatsFolder);
+				piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 
 //		latch = aLatch;
 //		student = aStudent;
@@ -540,6 +547,50 @@ public abstract class Replayer {
 
 	public abstract void analyze(CountDownLatch latch);
 
+	public void createSessionTimeMap(String assign, Map<String, List<Long>> sessionTimeMap) {
+		String folder = new File(assign).getParent();
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimesSeconds.txt")))) {
+			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+				if (studentSessions.getValue().size() == 0) {
+					continue;
+				}
+				String student = studentSessions.getKey();
+//				student = student.substring(student.lastIndexOf(File.pathSeparator));
+				bw.write(student + ":" + studentSessions.getValue().size() + System.lineSeparator());
+				long total = 0;
+				for (long sessionTime : studentSessions.getValue()) {
+//					bw.write(convertToHourMinuteSecond(sessionTime) + System.lineSeparator());
+					bw.write((sessionTime / 1000) + System.lineSeparator());
+					total += sessionTime;
+				}
+				bw.write("Total: " + (total / 1000) + System.lineSeparator());
+			}
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimes.txt")))) {
+			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+				if (studentSessions.getValue().size() == 0) {
+					continue;
+				}
+				String student = studentSessions.getKey();
+				long total = 0;
+//				student = student.substring(student.lastIndexOf(File.pathSeparator));
+				bw.write(student + ":" + studentSessions.getValue().size() + System.lineSeparator());
+				for (long sessionTime : studentSessions.getValue()) {
+					bw.write(convertToHourMinuteSecond(sessionTime) + System.lineSeparator());
+//					bw.write((sessionTime / 1000) + System.lineSeparator());
+					total += sessionTime;
+				}
+				bw.write("Total: " + convertToHourMinuteSecond(total) + System.lineSeparator());
+			}
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+	
 	public void createAssignTimeline(String assign, Map<String, List<List<EHICommand>>> data) {
 		notifyNewAssignment(assign, data);
 		for (String key : data.keySet()) {
@@ -577,7 +628,8 @@ public abstract class Replayer {
 			student = student.substring(student.lastIndexOf(File.separator) + 1);
 			List<List<EHICommand>> difficulties = new ArrayList<>();
 			List<EHICommand> difficultySessionCommands = new ArrayList<>();
-
+			boolean hasDifficulty = false;
+			EHICommand currentFile = null;
 			for (List<EHICommand> commands : nestedCommands) {
 				long lastTime = -1;
 				long curTime = -1;
@@ -589,52 +641,125 @@ public abstract class Replayer {
 					if (command != null) {
 						curTime = command.getTimestamp() + command.getStartTimestamp();
 					}
-					if (command instanceof ExceptionCommand || command instanceof CheckStyleCommand
-							|| command instanceof ZoomChatCommand || command instanceof ConsoleOutput
-							|| command instanceof ConsoleInput || command instanceof LocalCheckCommand
-							|| command instanceof PiazzaPostCommand || command instanceof RequestHelpCommand
-							|| command instanceof RunCommand) {
+					if (command instanceof FileOpenCommand) {
+						currentFile = command;
+					}
+					if (hasDifficulty && (command instanceof CheckStyleCommand
+							|| command instanceof ConsoleOutput
+							|| command instanceof ConsoleInput || command instanceof WebCommand
+							|| command instanceof RunCommand || command instanceof FileOpenCommand)) {
+						difficultySessionCommands.add(command);
+					}
+					if (hasDifficulty && command instanceof Insert) {
+						while (++i < commands.size() && commands.get(i) instanceof Insert) {
+							((Insert) command).combine(commands.get(i));
+						}
+						difficultySessionCommands.add(command);
+					}
+					if (hasDifficulty && command instanceof Delete) {
+						while (++i < commands.size() && commands.get(i) instanceof Delete) {
+							((Delete) command).combine(commands.get(i));
+						}
 						difficultySessionCommands.add(command);
 					}
 					if (command instanceof PiazzaPostCommand) {
-						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
-						if (post.getBoolean("is_office_hour_request")) {
-							difficulties.add(difficultySessionCommands);
-							difficultySessionCommands = new ArrayList<>();
+//						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+//						if (post.getBoolean("is_office_hour_request")) {
+//							difficulties.add(difficultySessionCommands);
+//							difficultySessionCommands = new ArrayList<>();
+//						}
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
 						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+//						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+//						if(post.getString("content").contains("Hey I would like to join OHs this morning to solve an issue regarding receiving errors for the wrong w")) {
+//							int a =0;
+//						}
 					}
 
 					if (command instanceof RequestHelpCommand) {
-						difficulties.add(difficultySessionCommands);
-						difficultySessionCommands = new ArrayList<>();
+//						difficulties.add(difficultySessionCommands);
+//						difficultySessionCommands = new ArrayList<>();
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
 					}
-//					if (command instanceof ZoomChatCommand) {
-//					}
+					if (command instanceof ZoomChatCommand) {
+//						if (i + 1 < commands.size() && !(commands.get(i+1) instanceof ZoomChatCommand)) {
+//							difficulties.add(difficultySessionCommands);
+//							difficultySessionCommands = new ArrayList<>();
+//							hasDifficulty = false;
+//						}
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+					}
 //					if (command instanceof PauseCommand) {
 //					}
 //					if (command instanceof WebCommand) {
 //					}
 //					if (command instanceof CheckStyleCommand) {
 //					}
-					if (command instanceof RunCommand && command.getAttributesMap().get("type").equals("Run")) {
+					if (command instanceof ExceptionCommand) {
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+					}
+					if (command instanceof RunCommand
+//							&& command.getAttributesMap().get("type").equals("Run")
+						) {
 						boolean noException = true;
 						int endIdx = i + 10 < commands.size() ? i + 10 : commands.size();
-						for (int j = i + 1; j < endIdx; j++) {
+						int j = i + 1;
+						for (; j < endIdx; j++) {
 							if (commands.get(i) instanceof ExceptionCommand) {
 								noException = false;
+								break;
+							}
+							if (!(command instanceof RunCommand)) {
+								break;
 							}
 						}
 						if (noException) {
-							difficultySessionCommands.clear();
+							if (hasDifficulty) {
+								difficulties.add(difficultySessionCommands);
+								difficultySessionCommands = new ArrayList<>();
+								hasDifficulty = false;
+							} else {
+								difficultySessionCommands.clear();
+							}
+						} else {
+							if (!hasDifficulty && currentFile != null) {
+								difficultySessionCommands.add(currentFile);
+							}
+							hasDifficulty = true;
+							for (int k = 0; k <= j; k++) {
+								difficultySessionCommands.add(commands.get(k));
+							}
 						}
+						i = j + 1;
 					}
 					if (command instanceof LocalCheckCommand) {
 						String type = command.getDataMap().get("type");
-						if (type.equals("fail_decline") || type.equals("fail_growth")) {
+						if (type.equals("fail_decline")|| type.equals("fail_growth")) {
+							if (!hasDifficulty && currentFile != null) {
+								difficultySessionCommands.add(currentFile);
+							}
+							hasDifficulty = true;
+							difficultySessionCommands.add(command);
 							if (i + 1 < commands.size() && !(commands.get(i+1) instanceof LocalCheckCommand)) {
 								for (EHICommand difficultyCommand : difficultySessionCommands) {
-									if (!(difficultyCommand instanceof LocalCheckCommand)) {
+									if (!(difficultyCommand instanceof LocalCheckCommand && hasDifficulty)) {
 										difficulties.add(difficultySessionCommands);
+										hasDifficulty = false;
 										break;
 									}
 								}
@@ -642,7 +767,6 @@ public abstract class Replayer {
 							}
 						}
 					}
-
 				}
 			}
 			StringBuilder sb = new StringBuilder();
@@ -659,11 +783,200 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
+	
+//	public void createPiazzaStats(String assign, Map<String, List<List<EHICommand>>> data) {
+//		df = new SimpleDateFormat("MM/dd/yyyy hh:mma 'ET'");
+//		TimeZone edt = TimeZone.getTimeZone("America/New_York");
+//		df.setTimeZone(edt);
+//		File piazzaStats = new File(student + File.separator + "Timeline.txt");
+//
+//		for (Entry<String, List<List<EHICommand>>> entry : data.entrySet()) {
+//			String student = entry.getKey();
+//			List<List<EHICommand>> nestedCommands = entry.getValue();
+//
+//			try {
+//				if (timeline.exists()) {
+//					timeline.delete();
+//				}
+//				if (!timeline.createNewFile()) {
+//					return;
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			try (FileWriter fw = new FileWriter(timeline)) {
+//				System.out.println("Generating AssignTimeline for student " + student);
+//				student = student.substring(student.lastIndexOf(File.separator) + 1);
+//				List<List<EHICommand>> difficulties = new ArrayList<>();
+//				List<EHICommand> difficultySessionCommands = new ArrayList<>();
+//				boolean hasDifficulty = false;
+//				EHICommand currentFile = null;
+//				for (List<EHICommand> commands : nestedCommands) {
+//					long lastTime = -1;
+//					long curTime = -1;
+//					for (int i = 0; i < commands.size(); i++) {
+//						EHICommand command = commands.get(i);
+//						if (i > 0) {
+//							lastTime = curTime;
+//						}
+//						if (command != null) {
+//							curTime = command.getTimestamp() + command.getStartTimestamp();
+//						}
+//						if (command instanceof FileOpenCommand) {
+//							currentFile = command;
+//						}
+//						if (hasDifficulty && (command instanceof CheckStyleCommand
+//								|| command instanceof ConsoleOutput
+//								|| command instanceof ConsoleInput || command instanceof WebCommand
+//								|| command instanceof RunCommand || command instanceof FileOpenCommand)) {
+//							difficultySessionCommands.add(command);
+//						}
+//						if (hasDifficulty && command instanceof Insert) {
+//							while (++i < commands.size() && commands.get(i) instanceof Insert) {
+//								((Insert) command).combine(commands.get(i));
+//							}
+//							difficultySessionCommands.add(command);
+//						}
+//						if (hasDifficulty && command instanceof Delete) {
+//							while (++i < commands.size() && commands.get(i) instanceof Delete) {
+//								((Delete) command).combine(commands.get(i));
+//							}
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof PiazzaPostCommand) {
+////							JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+////							if (post.getBoolean("is_office_hour_request")) {
+////								difficulties.add(difficultySessionCommands);
+////								difficultySessionCommands = new ArrayList<>();
+////							}
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+////							JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+////							if(post.getString("content").contains("Hey I would like to join OHs this morning to solve an issue regarding receiving errors for the wrong w")) {
+////								int a =0;
+////							}
+//						}
+//
+//						if (command instanceof RequestHelpCommand) {
+////							difficulties.add(difficultySessionCommands);
+////							difficultySessionCommands = new ArrayList<>();
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof ZoomChatCommand) {
+////							if (i + 1 < commands.size() && !(commands.get(i+1) instanceof ZoomChatCommand)) {
+////								difficulties.add(difficultySessionCommands);
+////								difficultySessionCommands = new ArrayList<>();
+////								hasDifficulty = false;
+////							}
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+////						if (command instanceof PauseCommand) {
+////						}
+////						if (command instanceof WebCommand) {
+////						}
+////						if (command instanceof CheckStyleCommand) {
+////						}
+//						if (command instanceof ExceptionCommand) {
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof RunCommand
+////								&& command.getAttributesMap().get("type").equals("Run")
+//							) {
+//							boolean noException = true;
+//							int endIdx = i + 10 < commands.size() ? i + 10 : commands.size();
+//							int j = i + 1;
+//							for (; j < endIdx; j++) {
+//								if (commands.get(i) instanceof ExceptionCommand) {
+//									noException = false;
+//									break;
+//								}
+//								if (!(command instanceof RunCommand)) {
+//									break;
+//								}
+//							}
+//							if (noException) {
+//								if (hasDifficulty) {
+//									difficulties.add(difficultySessionCommands);
+//									difficultySessionCommands = new ArrayList<>();
+//									hasDifficulty = false;
+//								} else {
+//									difficultySessionCommands.clear();
+//								}
+//							} else {
+//								if (!hasDifficulty && currentFile != null) {
+//									difficultySessionCommands.add(currentFile);
+//								}
+//								hasDifficulty = true;
+//								for (int k = 0; k <= j; k++) {
+//									difficultySessionCommands.add(commands.get(k));
+//								}
+//							}
+//							i = j + 1;
+//						}
+//						if (command instanceof LocalCheckCommand) {
+//							String type = command.getDataMap().get("type");
+//							if (type.equals("fail_decline")|| type.equals("fail_growth")) {
+//								if (!hasDifficulty && currentFile != null) {
+//									difficultySessionCommands.add(currentFile);
+//								}
+//								hasDifficulty = true;
+//								difficultySessionCommands.add(command);
+//								if (i + 1 < commands.size() && !(commands.get(i+1) instanceof LocalCheckCommand)) {
+//									for (EHICommand difficultyCommand : difficultySessionCommands) {
+//										if (!(difficultyCommand instanceof LocalCheckCommand && hasDifficulty)) {
+//											difficulties.add(difficultySessionCommands);
+//											hasDifficulty = false;
+//											break;
+//										}
+//									}
+//									difficultySessionCommands = new ArrayList<>();
+//								}
+//							}
+//						}
+//					}
+//				}
+//				StringBuilder sb = new StringBuilder();
+//				for (int i = 0; i < difficulties.size(); i++) {
+//					sb.append("Difficulty " + (i + 1) + System.lineSeparator());
+//					for (EHICommand command : difficulties.get(i)) {
+//						sb.append(getCommandString(command));
+//						sb.append(System.lineSeparator());
+//					}
+//					sb.append(System.lineSeparator());
+//				}
+//				fw.write(sb.toString());
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//	public void createStudentTimeline(String student, List<List<EHICommand>> nestedCommands) {
+//		
+//	}
 
 	public String getCommandString(EHICommand command) {
 		long timestamp = command.getStartTimestamp() + command.getTimestamp();
 		
 		String retVal = df.format(timestamp) + "\t" + command.getName() + ": ";
+		if (df.format(timestamp).equals("05/26/2021 12:33PM ET")) {
+			int a = 0;
+		}
 		Map<String, String> dataMap = command.getDataMap();
 		if (command instanceof ExceptionCommand) {
 			return retVal + dataMap.get(ExceptionCommand.XML_Exception_Tag).trim();
@@ -691,7 +1004,23 @@ public abstract class Replayer {
 			return retVal + dataMap.get("error-type") + "," + dataMap.get("error-message") + "," + dataMap.get("output");
 		}
 		if (command instanceof RunCommand) {
-			return df.format(timestamp) + "\t" + dataMap.get("type") + ": " + dataMap.get("kind"); 
+			dataMap = command.getAttributesMap();
+			return df.format(timestamp) + "\t" + dataMap.get("type") + ": " + dataMap.get("kind") 
+					+ ", projectName: " + dataMap.get("projectName")
+					+ ", className: " + dataMap.get("className"); 
+		}
+		if (command instanceof WebCommand) {
+			return retVal + dataMap.get("keyword") + ", " + dataMap.get("URL");
+		}
+		if (command instanceof Insert || command instanceof Delete) {
+//			return retVal + "offset: " + command.getAttributesMap().get("offset") + ", text: " + dataMap.get("text");
+//		}
+//		if (command instanceof Delete) {
+//			return retVal + "offset: " + command.getAttributesMap().get("offset") + ", text: " + dataMap.get("text");
+			return retVal;
+		}
+		if (command instanceof FileOpenCommand) {
+			return retVal + System.lineSeparator() + dataMap.get("snapshot");
 		}
 		return "";
 	}
@@ -2132,7 +2461,7 @@ public abstract class Replayer {
 		int hour = (int) (timeSpent / 3600000);
 		int minute = (int) (timeSpent % 3600000 / 60000);
 		int second = (int) (timeSpent % 60000 / 1000);
-		return hour + ":" + minute + ":" + second;
+		return hour + ":" + (minute < 10 ? "0" + minute : minute) + ":" + (second < 10 ? "0" + second : second);
 	}
 
 	List<ReplayerListener> replayerListeners = new ArrayList();

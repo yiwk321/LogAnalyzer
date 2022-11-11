@@ -2,6 +2,7 @@ package generators;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,15 +21,17 @@ public class ChainedCommandGenerator extends CommandGenerator {
 	CountDownLatch latch;
 	String student;
 	Map<String, List<EHICommand>> commandMap;
+	boolean appendAllRemainingCommands;
 //	private Map<String, String> logToWrite;
 
 	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
 			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
-			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder) {
+			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder, HashMap<String, List<Long>> map, boolean appendAllRemainingCommands) {
 		replayer = aReplayer;
 		student = aStudent;
 		latch = aLatch;
 		commandMap = aStudentLog;
+		this.appendAllRemainingCommands = appendAllRemainingCommands;
 //		logToWrite = new TreeMap<>();
 
 //		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
@@ -39,7 +42,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPosts));
 		}
 		if (zoomChatsFolder != null && zoomChatsFolder.exists()) {
-			commandGenerators.add(new ZoomChatCommandGenerator(replayer, latch, aStudent, aStudentLog, zoomChatsFolder));
+			commandGenerators.add(new ZoomChatCommandGenerator(replayer, latch, aStudent, aStudentLog, zoomChatsFolder, map));
 		}
 	}
 
@@ -58,6 +61,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			}
 //			for (String fileName : commandMap.keySet()) {
 			String[] keyset = commandMap.keySet().toArray(new String[0]);
+			long lastCommandTime = -1;
 			for (int j = 0; j < commandMap.size(); j++) {
 				String fileName = keyset[j];
 //				List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
@@ -74,7 +78,12 @@ public class ChainedCommandGenerator extends CommandGenerator {
 				}
 				List<EHICommand> newCommands = null;
 				if (j == commandMap.size()-1) {
-					newCommands = addCommands(j, commands, Long.MAX_VALUE);
+					if (lastCommandTime == -1) {
+						List<EHICommand> nextCommands = commandMap.get(keyset[j]);
+						EHICommand command = nextCommands.get(nextCommands.size()-1);
+						lastCommandTime = command.getStartTimestamp() + command.getTimestamp();
+					}
+					newCommands = addCommands(j, commands, appendAllRemainingCommands ? Long.MAX_VALUE : lastCommandTime + 600000);
 				} else {
 					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
 					long nextStartTime = -1;

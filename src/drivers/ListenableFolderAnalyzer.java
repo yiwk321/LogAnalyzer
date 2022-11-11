@@ -44,7 +44,7 @@ public class ListenableFolderAnalyzer extends Driver{
 			}
 			if (generate) {
 				try {
-				generate(); 
+				generate(false); 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -184,7 +184,7 @@ protected List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) {
 	EHICommand aCommand = new CheckStyleCommand(toCSVString(anEvent));
 	List<EHICommand> retVal = new ArrayList<>();
 	retVal.add(aCommand);
-	System.out.println("Adding aCommand " + aCommand + " for " + student);
+//	System.out.println("Adding aCommand " + aCommand + " for " + student);
 	return retVal;
 }
 

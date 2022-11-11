@@ -36,33 +36,40 @@ public class AnAssignmentReplayer extends Replayer {
 		return 1;
 	}
 
-	public void createExtraCommand(CountDownLatch latch, String surfix, int mode) {
-		createExtraCommandAssignment(latch, root.getPath(), allLogs, surfix, mode);
+	public void createExtraCommand(CountDownLatch latch, String surfix, int mode, boolean appendAllRemainingCommands) {
+		createExtraCommandAssignment(latch, root.getPath(), allLogs, surfix, mode, appendAllRemainingCommands);
 	}
 
+	HashMap<String, List<Long>> sessionTimeMap = new HashMap<>();
+
+	
 	public void createExtraCommandAssignment(CountDownLatch latch, String assign,
-			Map<String, Map<String, List<EHICommand>>> assignLog, String surfix, int mode) {
+			Map<String, Map<String, List<EHICommand>>> assignLog, String surfix, int mode, boolean appendAllRemainingCommands) {
 		Map<String, List<String[]>> localCheckEvents = null;
 		if (mode == LOCALCHECK) {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
 		File piazzaPostFile = findPiazzaPostFile(assign);
 		JSONObject piazzaPosts = null;
-		if (piazzaPostFile.exists()) {
+		if (piazzaPostFile != null && piazzaPostFile.exists()) {
 			String piazzaPostsString = FileUtility.readFile(piazzaPostFile).toString();
 			piazzaPosts = new JSONObject(piazzaPostsString);
 		}
 		File zoomChatsFolder = findZoomChatsFolder(assign);
 		for (String student : assignLog.keySet()) {
 //			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
+			List<String[]> studentLocalCheckEvents = localCheckEvents == null ? null : localCheckEvents.get(student);
+			if (studentLocalCheckEvents == null) {
+				studentLocalCheckEvents = new ArrayList<>();
+			}
 			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
-					localCheckEvents == null ? null : localCheckEvents.get(student), piazzaPosts, zoomChatsFolder);
+					studentLocalCheckEvents, piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 
 		}
 	}
 
 	public File findPiazzaPostFile(String assign) {
-		File[] files = new File(assign).listFiles((parent, fileName) -> {
+		File[] files = new File(assign).getParentFile().listFiles((parent, fileName) -> {
 			return fileName.contains("ByAuthorPosts") && fileName.endsWith(".json");
 		});
 		if (files.length > 0) {
@@ -72,7 +79,7 @@ public class AnAssignmentReplayer extends Replayer {
 	}
 
 	public File findZoomChatsFolder(String assign) {
-		File[] files = new File(assign).listFiles((parent, fileName) -> {
+		File[] files = new File(assign).getParentFile().listFiles((parent, fileName) -> {
 			return fileName.equals("ZoomChatsAnon");
 		});
 		if (files.length > 0) {
@@ -143,8 +150,8 @@ public class AnAssignmentReplayer extends Replayer {
 //			createPauseDistribution(assign, commands);
 //			createAssignData(assign, commands);
 //			createEvents(assign, commands);
-			createAssignTimeline(assign, commands);
-
+//			createAssignTimeline(assign, commands);
+			createSessionTimeMap(assign, sessionTimeMap);
 			latch.countDown();
 		}).start();
 	}
