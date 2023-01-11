@@ -391,6 +391,7 @@ public class AnIntervalReplayerWithEdits {
 			return null;
 		}
 		try {
+//			LogPreprocessor.escapeAmpersands(log);
 			List<EHICommand> commands = reader.readAll(path);
 			sortCommands(commands, 0, commands.size()-1);
 			if (log.getName().contains("copy")) {

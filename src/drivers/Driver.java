@@ -63,7 +63,11 @@ public class Driver {
 	public static void generate() {
 		System.out.println("Generating LocalChecks log");
 		String[] args = {path};
+		try {
 		Main.main(args); // Andrew's code
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if (!isRead) read();
 //		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
 //		replayer.createExtraCommand("Generated", Replayer.PAUSE);
@@ -84,7 +88,9 @@ public class Driver {
 		if (new File(path).exists()) {
 			replayer.readLogs(path);
 			isRead = true;
-		} 
+		} else {
+			System.err.println("Path:" + path + " does not exist");
+		}
 	}
 	
 	public static void chooseMode(Scanner scanner) {

@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
@@ -90,7 +91,11 @@ public abstract class Replayer {
 	public static final String XML_START2 = "\" logVersion=\"";
 	public static final String XML_VERSION = "1.0.0.202008151525";
 	public static final String XML_START3 = "\">\r\n";
+//	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
 	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
+	public static final String XML_FILE_ENDING_MATCH = "</Events>"; 
+
+
 	public static final long ONE_SECOND = 1000;
 	public static final long ONE_MIN = 60*1000;
 	public static final long TEN_MIN = 10*ONE_MIN;
@@ -174,13 +179,13 @@ public abstract class Replayer {
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
 			} else {
-				System.err.println("Need to append <Events>");
+				System.err.println("null commands");
 			}
 		}
 		return logs;
 	}
 	
-	public List<EHICommand> readOneLogFileWthoutAppending(File log){
+	public List<EHICommand> readOneLogFileWthoutAppending(File log) throws Exception{
 		String path = log.getPath();
 		System.out.println("Reading file " + path);
 		if (!log.exists()) {
@@ -191,23 +196,76 @@ public abstract class Replayer {
 			System.err.println("log is not in xml format:" + path);
 			return null;
 		}
-		try {
+//		try {
+//			LogPreprocessor.preProcessFileLines(log);
 			List<EHICommand> commands = reader.readAll(path);
 			sortCommands(commands);
 			return commands;
-		} catch (Exception e) {
-			System.err.println("Could not read file" + path + "\n"+ e);
-			e.printStackTrace();
+//		} catch (Exception e) {
+//			String aMessage = e.getMessage();
+//			System.err.println("Could not read file" + path + "\n"+ e);
+//			e.printStackTrace();
+//		}
+//		return null;
+	}
+	Set<File> filesAppendedEvents = new HashSet();
+	Set<File> filesSanitizedWebCommands = new HashSet();
+	Set<File> filesIllegalChars = new HashSet();
+
+
+	private List<EHICommand> handleLogFileException(File log, Exception e) {
+		System.err.println("Handling " + e);
+
+		String aMessage = e.getMessage();
+		if (e.getClass().getName().equals("org.xml.sax.SAXParseException")) {
+			if (aMessage.contains("XML document structures must start and end within the same entity")) {
+				if (filesAppendedEvents.contains(log) ) {
+					
+					System.err.println("Already appended events, cannot handle exception");
+				} else {
+					appendEvents(log);
+					filesAppendedEvents.add(log);
+					return 	readOneLogFile(log);
+				}
+			} else if (aMessage.contains("An invalid XML character (Unicode: 0x0) was found in the CDATA section") ||
+					(aMessage.contains("Invalid byte"))) {
+				if (filesIllegalChars.contains(log)) {
+					System.err.println("Already processed illegal chars, cannot handle exception");
+				} else {
+					LogPreprocessor.removeIllegalChars(log);
+					filesIllegalChars.add(log);
+					return 	readOneLogFile(log);
+				}
+			} else if (aMessage.contains("must end with the ';' ") ||
+					aMessage.contains("The entity name must immediately follow the")) {
+					if (filesSanitizedWebCommands.contains(log)) {
+						System.err.println("Already sanitized web commands, cannot handle exception");
+
+					} else {
+						LogPreprocessor.escapeWebSearch(log);
+						filesSanitizedWebCommands.add(log);
+						return 	readOneLogFile(log);
+
+					}
+			}
 		}
+		System.err.println("Could not handle:" + e);
+		e.printStackTrace();
 		return null;
 	}
 	public List<EHICommand> readOneLogFile(File log){
+		try {
 		List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
-		if (retVal == null) {
-			appendEvents(log);
-			return readOneLogFileWthoutAppending(log);
-		}
 		return retVal;
+		} catch (Exception e) {
+		
+			return handleLogFileException(log, e);
+		}
+//		if (retVal == null) {
+//			appendEvents(log);
+//			return readOneLogFileWthoutAppending(log);
+//		}
+//		return retVal;
 //		String path = log.getPath();
 //		System.out.println("Reading file " + path);
 //		if (!log.exists()) {
@@ -230,11 +288,13 @@ public abstract class Replayer {
 	}
 	
 	static void appendEvents(File logFile) {
+		
 		String aFileText;
 		try {
 			aFileText = Common.readFile(logFile).toString();
+			if (aFileText.contains(XML_FILE_ENDING_MATCH)) {
 
-			if (aFileText.endsWith(XML_FILE_ENDING)) {
+//			if (aFileText.endsWith(XML_FILE_ENDING)) {
 				return; // already done this or some other problem
 			}
 		} catch (IOException e1) {
@@ -243,6 +303,7 @@ public abstract class Replayer {
 		}
 		BufferedWriter writer;
 		try {
+			System.out.println("Appending:" + XML_FILE_ENDING);
 			writer = new BufferedWriter(new FileWriter(logFile, true));
 			writer.write(XML_FILE_ENDING);
 			writer.close();
