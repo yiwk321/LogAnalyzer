@@ -26,11 +26,17 @@ public class ChainedCommandGenerator extends CommandGenerator {
 		latch = aLatch;
 		commandMap = aStudentLog;
 //		logToWrite = new TreeMap<>();
+		if (localCheckEvents == null) {
+			System.err.println("No localcheck logs for" + aStudent + ", not adding to command generator");
+		} else {
+			System.out.println("Found localcheck logs for" + aStudent + ", not adding to command generator");
 
 //		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
 		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
+		
 //		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
+		}
 //
 	}
 

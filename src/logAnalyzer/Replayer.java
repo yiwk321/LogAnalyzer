@@ -159,7 +159,7 @@ public abstract class Replayer {
 			}
 		}
 		if (logFolder == null || !logFolder.exists()) {
-			System.out.println("No logs found for student " + student.getName());
+			System.err.println("No logs found for student " + student.getName());
 			return null;
 		}
 //		refineLogFiles(logFolder);
@@ -170,7 +170,7 @@ public abstract class Replayer {
 			logFiles = logFolder.listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
 		}
 		if (logFiles == null) {
-			System.out.println("No logs found for student " + student.getName());
+			System.err.println("No logs found for student " + student.getName());
 			return null;
 		}
 		Map<String, List<EHICommand>> logs = new TreeMap<>();
@@ -1657,7 +1657,7 @@ public abstract class Replayer {
 			}
 		}
 		if (!logFolder.exists()) {
-			System.out.println("No logs found for student " + student.getName());
+			System.err.println("No logs found for student " + student.getName());
 			return;
 		}
 		File[] generatedLogs = logFolder.listFiles(File::isDirectory);
