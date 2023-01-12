@@ -1317,6 +1317,87 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
+	
+	public void commandCount(String assign, Map<String, List<List<EHICommand>>> data) {
+		File csv = new File(assign + "CommandCount.csv");
+		FileWriter fw;
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			csv.createNewFile();
+			fw = new FileWriter(csv);
+			CSVWriter cw = new CSVWriter(fw);
+			String[] header = { "Student", "Web", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Debug", "LocalChecks"};
+			cw.writeNext(header);
+
+			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
+			for (String student : data.keySet()) {
+				System.out.println("Generating AssignData for student " + student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
+
+				List<String> retVal = new ArrayList<>();
+				retVal.add(student);
+				int[] numCommands = new int[9];
+				List<String> breakdownList = new ArrayList<>();
+				long localcheckTime = 0;
+				for (List<EHICommand> commands : nestedCommands) {
+					for (int i = 0; i < commands.size(); i++) {
+						EHICommand command = commands.get(i);
+
+						if (command instanceof WebCommand) {
+							numCommands[0]++;
+						}
+						if (command instanceof Insert) {
+							numCommands[1] += command.getDataMap().get("text").length();
+						}
+						if (command instanceof Delete) {
+							numCommands[2] += command.getDataMap().get("text").length();
+						}
+						if (command instanceof EclipseCommand && ((EclipseCommand) command).getCommandID()
+								.equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) {
+							numCommands[2]++;
+						}
+						if (command instanceof Replace) {
+							numCommands[3]++;
+						}
+						if (command instanceof CopyCommand) {
+							numCommands[4]++;
+						}
+						if (command instanceof PasteCommand) {
+							numCommands[5]++;
+						}
+						if (command instanceof RunCommand) {
+							if (command.getAttributesMap().get("type").equals("Debug")) {
+								numCommands[7]++;
+							} else {
+								numCommands[6]++;
+							}
+						}
+						if (command instanceof LocalCheckCommand) {
+							long timestamp = command.getTimestamp() + command.getStartTimestamp();
+							if (localcheckTime < timestamp) {
+								numCommands[8]++;
+								localcheckTime = timestamp;
+							}
+						}
+					}
+
+				}
+				retVal.add(student);
+				for (int i = 0; i < numCommands.length; i++) {
+					retVal.add(numCommands[i]+"");
+				}
+				String[] nextLine = retVal.toArray(new String[1]);
+				cw.writeNext(nextLine);
+			}
+			fw.close();
+			cw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void createDistributionData(String assign, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(assign + "Distribution.csv");
