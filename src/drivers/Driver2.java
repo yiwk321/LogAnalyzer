@@ -1,47 +1,82 @@
 package drivers;
 
+import java.io.File;
+
 import logAnalyzer.AContextBasedReplayer;
 import logAnalyzer.ASemesterReplayer;
 import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.AnExperimentReplayer;
+import logAnalyzer.RemoveCopiedLogs;
 import logAnalyzer.Replayer;
 
 public class Driver2 extends Driver{
-	public static String[] folders = {
-//										"E:\\submissions\\533",
-//										"E:\\submissions\\524",
-//										"C:\\Users\\Zhizhou\\OneDrive\\UNC CH\\Junior 1st Sem\\hermes\\git\\Hermes\\Hermes\\data\\ExperimentalData",
-//										"D:\\Assignment 4",
-//										"D:\\Assignment 4\\Bruno, Adrian(abruno)\\Submission attachment(s)",
-										"F:\\Hermes Data\\Assignment 0"
+	public static String[] courses = {
+//										"H:\\CompPaper\\524f21\\Assignment 1",
+//										"H:\\CompPaper\\524f21\\Assignment 2",
+//										"H:\\CompPaper\\524f21\\Assignment 3",
+//										"H:\\CompPaper\\524f21\\Assignment 4",
+//										"H:\\CompPaper\\524f21\\Assignment 5",
+//										"H:\\CompPaper\\524f21\\Assignment 6",
+//										"H:\\CompPaper\\533s22",
+//										"H:\\CompPaper\\401f16",
+//										"H:\\CompPaper\\401f17",
+										"H:\\CompPaper\\401f18",
+//										"H:\\CompPaper\\524f19",
+//										"H:\\CompPaper\\524f20",
+//										"H:\\CompPaper\\533s18",
+//										"H:\\CompPaper\\533s19",
+//										"H:\\CompPaper\\533s20",
+//										"H:\\CompPaper\\533s21",
+//										"H:\\CompPaper\\533s22\\Assignment 2",
+//										"H:\\CompPaper\\533s22\\Assignment 3",
+//										"H:\\CompPaper\\533s22\\Assignment 4",
+//										"H:\\CompPaper\\533s22\\Assignment 5",
+//										"H:\\CompPaper\\533s22\\Assignment 6",
+//										"H:\\CompPaper\\533s22\\Assignment 7",
 										};
 	public static String prefix = "Assignment ";
-	public static int[] assignments = {
-			0
+//	public static int[] assignments = {
+//			0,
 //										1,
 //										2,
 //										3,
 //										4,
 //										5,
-//										6
-										};
+//										6,
+//										7
+//										};
 	static boolean generate = true;
+//	static boolean generate = false;
 	static String generateFolderName = "Generated";
 	static int generateCommandType = Replayer.LOCALCHECK;
 	
 	public static void main(String[] args) {
-		for (String folder: folders) {
-//			replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
-			replayer = new AnAssignmentReplayer();
-
-			path = folder;
-			isRead = false;
-			if (generate) {
-				delete();
-				generate();
+		for (String course : courses) {
+			File courseFolder = new File(course);
+			File[] assigns = courseFolder.listFiles((file)->{
+				return file.isDirectory() && file.getName().startsWith("Assignment ");
+			});
+			String[] folders = new String[assigns.length];
+			for (int i = 0; i < assigns.length; i++) {
+				folders[i] = assigns[i].getPath(); 
 			}
-			analyze();
+			new RemoveCopiedLogs().removeCopiedLogs(folders);
+			for (int i = 0; i < folders.length; i++) {
+				String folder = folders[i];
+//				replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
+				replayer = new AnAssignmentReplayer();
+
+				path = folder;
+				isRead = false;
+				if (generate) {
+					delete();
+					generate(i == folders.length-1);
+//					generate(false);
+				}
+				analyze();
+			}
 		}
+		
 //			replayer = new AnExperimentReplayer(multiplier, defaultPauseTime);
 //		}
 //		for (String folder : folders) {

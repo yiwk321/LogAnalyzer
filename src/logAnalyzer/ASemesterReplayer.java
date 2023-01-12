@@ -33,7 +33,7 @@ public class ASemesterReplayer extends AnAssignmentReplayer {
 
 	public void createExtraCommandSemester(CountDownLatch latch, String surfix, int mode) {
 		for (String assign : allLogs.keySet()) {
-			createExtraCommandAssignment(latch, assign, allLogs.get(assign), surfix, mode);
+			createExtraCommandAssignment(latch, assign, allLogs.get(assign), surfix, mode, false);
 		}
 	}
 	

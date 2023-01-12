@@ -2,10 +2,13 @@ package generators;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
+
+import org.json.JSONObject;
 
 import fluorite.commands.DifficultyCommand;
 import fluorite.commands.EHICommand;
@@ -18,26 +21,34 @@ public class ChainedCommandGenerator extends CommandGenerator {
 	CountDownLatch latch;
 	String student;
 	Map<String, List<EHICommand>> commandMap;
+	boolean appendAllRemainingCommands;
 //	private Map<String, String> logToWrite;
 
-	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, String aStudent, Map<String, List<EHICommand>> aStudentLog, List<String[]> localCheckEvents) {
+	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
+			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
+			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder, HashMap<String, List<Long>> map, boolean appendAllRemainingCommands) {
 		replayer = aReplayer;
 		student = aStudent;
 		latch = aLatch;
 		commandMap = aStudentLog;
+		this.appendAllRemainingCommands = appendAllRemainingCommands;
 //		logToWrite = new TreeMap<>();
 		if (localCheckEvents == null) {
 			System.err.println("No localcheck logs for" + aStudent + ", not adding to command generator");
 		} else {
 			System.out.println("Found localcheck logs for" + aStudent + ", not adding to command generator");
 
-//		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
-		commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
-		
-//		commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
-//		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
+//			commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
+			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
+			commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
+//			commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
+			if (piazzaPosts != null) {
+				commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPosts));
+			}
+			if (zoomChatsFolder != null && zoomChatsFolder.exists()) {
+				commandGenerators.add(new ZoomChatCommandGenerator(replayer, latch, aStudent, aStudentLog, zoomChatsFolder, map));
+			}
 		}
-//
 	}
 
 	@Override
@@ -55,6 +66,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			}
 //			for (String fileName : commandMap.keySet()) {
 			String[] keyset = commandMap.keySet().toArray(new String[0]);
+			long lastCommandTime = -1;
 			for (int j = 0; j < commandMap.size(); j++) {
 				String fileName = keyset[j];
 //				List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
@@ -71,7 +83,12 @@ public class ChainedCommandGenerator extends CommandGenerator {
 				}
 				List<EHICommand> newCommands = null;
 				if (j == commandMap.size()-1) {
-					newCommands = addCommands(j, commands, Long.MAX_VALUE);
+					if (lastCommandTime == -1) {
+						List<EHICommand> nextCommands = commandMap.get(keyset[j]);
+						EHICommand command = nextCommands.get(nextCommands.size()-1);
+						lastCommandTime = command.getStartTimestamp() + command.getTimestamp();
+					}
+					newCommands = addCommands(j, commands, appendAllRemainingCommands ? Long.MAX_VALUE : lastCommandTime + 600000);
 				} else {
 					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
 					long nextStartTime = -1;
