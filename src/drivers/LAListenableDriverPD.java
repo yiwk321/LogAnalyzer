@@ -30,11 +30,8 @@ public class LAListenableDriverPD extends Driver{
 			"D:\\sakaidownloads\\Comp524\\F22\\Assignment 4A\\Assignment  4",
 
 //			"D:\\sakaidownloads\\Comp524\\F22\\Assignment 0A\\Assignment 0",
-//			"C:\\Users\\dewan\\Downloads\\Assignment 3A\\Assignment 3",
-//			"C:\\Users\\dewan\\Downloads\\Assignment 4A\\Assignment 4",
-//			"C:\\Users\\dewan\\Downloads\\Assignment 1_1A\\Assignment 1_1",
-//			"C:\\Users\\dewan\\Downloads\\Assignment 2_1A\\Assignment 2_1"
-										};
+	};
+
 	
 	public static ReplayerListener[] replayerListeners = {
 //			CommandPrinterFactory.getCommandPrinter(),

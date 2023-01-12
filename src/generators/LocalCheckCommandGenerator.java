@@ -57,7 +57,7 @@ protected List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) {
 	 anEvent = studentLC.get(lastAddedExternalIndex);
 	}
 	EHICommand aCommand = new LocalCheckCommand(anEvent[2]);
-	List<EHICommand> retVal = new ArrayList();
+	List<EHICommand> retVal = new ArrayList<>();
 	retVal.add(aCommand);
 	return retVal;
 }

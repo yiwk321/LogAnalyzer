@@ -30,7 +30,7 @@ public class Driver {
 			switch (scanner.nextLine().toLowerCase()) {
 			case "generate":
 			case "g":
-				generate();
+				generate(true);
 				break;
 			case "analyze":
 			case "a":
@@ -60,7 +60,7 @@ public class Driver {
 		System.exit(0);
 	}
 	
-	public static void generate() {
+	public static void generate(boolean appendAllRemainingCommands) {
 		System.out.println("Generating LocalChecks log");
 		String[] args = {path};
 		try {
@@ -71,7 +71,7 @@ public class Driver {
 		if (!isRead) read();
 //		replayer.createExtraCommand("Generated", Replayer.LOCALCHECK);
 //		replayer.createExtraCommand("Generated", Replayer.PAUSE);
-		replayer.createExtraCommand(generateFolderName, generateCommandType);
+		replayer.createExtraCommand(generateFolderName, generateCommandType, appendAllRemainingCommands);
 		isRead = false;
 	}
 	

@@ -27,14 +27,21 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+<<<<<<< HEAD
 import java.util.Set;
+=======
+import java.util.TimeZone;
+>>>>>>> piazza
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import org.json.JSONObject;
 
 import analyzer.extension.replayView.FileUtility;
 import au.com.bytecode.opencsv.CSVReader;
@@ -43,6 +50,7 @@ import dayton.ellwanger.helpbutton.exceptionMatcher.ExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.JavaExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.PrologExceptionMatcher;
 import dayton.ellwanger.helpbutton.exceptionMatcher.SMLExceptionMatcher;
+import fluorite.commands.CheckStyleCommand;
 import fluorite.commands.ConsoleInput;
 import fluorite.commands.ConsoleOutput;
 import fluorite.commands.ConsoleOutputCommand;
@@ -62,9 +70,11 @@ import fluorite.commands.PasteCommand;
 import fluorite.commands.Replace;
 import fluorite.commands.RequestHelpCommand;
 import fluorite.commands.PauseCommand;
+import fluorite.commands.PiazzaPostCommand;
 import fluorite.commands.RunCommand;
 import fluorite.commands.ShellCommand;
 import fluorite.commands.WebCommand;
+import fluorite.commands.ZoomChatCommand;
 import fluorite.util.EHLogReader;
 import generators.ChainedCommandGenerator;
 import generators.CheckstyleCommandGenerator;
@@ -73,6 +83,7 @@ import generators.LocalCheckCommandGenerator;
 import generators.PauseCommandGenerator;
 import generators.SourceCodeOnRunGenerator;
 import generators.WebCommandGenerator;
+import sun.tools.jar.resources.jar;
 import tests.Assignment;
 import tests.Suite;
 import util.misc.Common;
@@ -94,17 +105,17 @@ public abstract class Replayer {
 //	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
 	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
 	public static final String XML_FILE_ENDING_MATCH = "</Events>"; 
-
-
 	public static final long ONE_SECOND = 1000;
-	public static final long ONE_MIN = 60*1000;
-	public static final long TEN_MIN = 10*ONE_MIN;
-	public static final long FIVE_MIN = 5*ONE_MIN;
-	public static final long HALF_MIN = ONE_MIN/2;
-	public static final long TWO_MIN = 2*ONE_MIN;
-	public static final long DAY = 24*60*ONE_MIN;
-	public static final long[] REST = {ONE_SECOND, 2*ONE_SECOND, 5*ONE_SECOND, 10*ONE_SECOND, 15*ONE_SECOND, HALF_MIN, ONE_MIN, TWO_MIN, FIVE_MIN, TEN_MIN, 2*TEN_MIN, 3*TEN_MIN, 9*FIVE_MIN, 6*TEN_MIN};
-	private ExceptionMatcher[] ems = {JavaExceptionMatcher.getInstance(), PrologExceptionMatcher.getInstance(), SMLExceptionMatcher.getInstance()};
+	public static final long ONE_MIN = 60 * 1000;
+	public static final long TEN_MIN = 10 * ONE_MIN;
+	public static final long FIVE_MIN = 5 * ONE_MIN;
+	public static final long HALF_MIN = ONE_MIN / 2;
+	public static final long TWO_MIN = 2 * ONE_MIN;
+	public static final long DAY = 24 * 60 * ONE_MIN;
+	public static final long[] REST = { ONE_SECOND, 2 * ONE_SECOND, 5 * ONE_SECOND, 10 * ONE_SECOND, 15 * ONE_SECOND,
+			HALF_MIN, ONE_MIN, TWO_MIN, FIVE_MIN, TEN_MIN, 2 * TEN_MIN, 3 * TEN_MIN, 9 * FIVE_MIN, 6 * TEN_MIN };
+	private ExceptionMatcher[] ems = { JavaExceptionMatcher.getInstance(), PrologExceptionMatcher.getInstance(),
+			SMLExceptionMatcher.getInstance() };
 	private Map<String, String> logToWrite;
 	private EHLogReader reader;
 	protected File root;
@@ -114,23 +125,24 @@ public abstract class Replayer {
 	static Pattern ecPattern = Pattern.compile("Assignment \\d Extra Credit.*");
 	static Pattern assignSuitePattern = Pattern.compile("[FS]\\d*Assignment\\d*Suite.*");
 	public static final String suite = "E:\\submissions\\524\\Suite Test Mapping.txt";
-	
-//	protected List<CommandGenerator> commandGenerators = new ArrayList();
+	SimpleDateFormat df;
 
+//	protected List<CommandGenerator> commandGenerators = new ArrayList();
+	
 	public Replayer() {
 		logToWrite = new TreeMap<>();
 		reader = new EHLogReader();
 	}
-	
+
 	public abstract void readLogs(String path);
-	
-	public List < List<EHICommand>> readStudentNestedList(File student) {
+
+	public List<List<EHICommand>> readStudentNestedList(File student) {
 		Map<String, List<EHICommand>> aMap = readStudent(student);
-		List < List<EHICommand>> retVal = new ArrayList(aMap.values());
+		List<List<EHICommand>> retVal = new ArrayList(aMap.values());
 		return retVal;
-	
+
 	}
-	
+
 	public Map<String, List<EHICommand>> readStudent(File student) {
 		System.out.println("Reading student " + student);
 		if (!student.exists()) {
@@ -138,15 +150,15 @@ public abstract class Replayer {
 			return null;
 		}
 		File logFolder = null;
-		File submission = new File(student,"Submission attachment(s)");
+		File submission = new File(student, "Submission attachment(s)");
 		if (submission.exists()) {
 			logFolder = getProjectFolder(submission);
 			if (logFolder != null) {
-				logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+				logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
 			} else if (FileUtility.unzip(submission)) {
 				logFolder = getProjectFolder(submission);
 				if (logFolder != null) {
-					logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+					logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
 				}
 			}
 		} else {
@@ -154,7 +166,7 @@ public abstract class Replayer {
 			if (!logFolder.exists()) {
 				logFolder = getProjectFolder(student);
 				if (logFolder != null) {
-					logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+					logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
 				}
 			}
 		}
@@ -165,9 +177,13 @@ public abstract class Replayer {
 //		refineLogFiles(logFolder);
 		File[] logFiles = logFolder.listFiles(File::isDirectory);
 		if (logFiles != null && logFiles.length > 0) {
-			logFiles = logFiles[0].listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
+			logFiles = logFiles[0].listFiles((file) -> {
+				return file.getName().startsWith("Log") && file.getName().endsWith(".xml");
+			});
 		} else {
-			logFiles = logFolder.listFiles((file)->{return file.getName().startsWith("Log") && file.getName().endsWith(".xml");});
+			logFiles = logFolder.listFiles((file) -> {
+				return file.getName().startsWith("Log") && file.getName().endsWith(".xml");
+			});
 		}
 		if (logFiles == null) {
 			System.err.println("No logs found for student " + student.getName());
@@ -175,6 +191,10 @@ public abstract class Replayer {
 		}
 		Map<String, List<EHICommand>> logs = new TreeMap<>();
 		for (File logFile : logFiles) {
+			if (logFile.length() == 0) {
+				logFile.delete();
+				continue;
+			}
 			List<EHICommand> ret = readOneLogFile(logFile);
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
@@ -187,6 +207,9 @@ public abstract class Replayer {
 	
 	public List<EHICommand> readOneLogFileWthoutAppending(File log) throws Exception{
 		String path = log.getPath();
+		if (path.contains("Log2021-06-20-20-25-46-388.xml")) {
+			System.out.println("Pausing");
+		}
 		System.out.println("Reading file " + path);
 		if (!log.exists()) {
 			System.err.println("log does not exist:" + path);
@@ -201,12 +224,6 @@ public abstract class Replayer {
 			List<EHICommand> commands = reader.readAll(path);
 			sortCommands(commands);
 			return commands;
-//		} catch (Exception e) {
-//			String aMessage = e.getMessage();
-//			System.err.println("Could not read file" + path + "\n"+ e);
-//			e.printStackTrace();
-//		}
-//		return null;
 	}
 	Set<File> filesAppendedEvents = new HashSet();
 	Set<File> filesSanitizedWebCommands = new HashSet();
@@ -286,10 +303,9 @@ public abstract class Replayer {
 //		}
 //		return null;
 	}
-	
+
 	static void appendEvents(File logFile) {
-		
-		String aFileText;
+		String aFileText = "";
 		try {
 			aFileText = Common.readFile(logFile).toString();
 			if (aFileText.contains(XML_FILE_ENDING_MATCH)) {
@@ -301,37 +317,38 @@ public abstract class Replayer {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		BufferedWriter writer;
-		try {
-			System.out.println("Appending:" + XML_FILE_ENDING);
-			writer = new BufferedWriter(new FileWriter(logFile, true));
-			writer.write(XML_FILE_ENDING);
-			writer.close();
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))){
+			if (aFileText.endsWith(System.lineSeparator())) {
+				writer.write(XML_FILE_ENDING_MATCH);
+			} else {
+				writer.write(XML_FILE_ENDING);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
-	public void refineLogFile(File logFile){
+
+	public void refineLogFile(File logFile) {
 		try {
-				BufferedReader reader = new BufferedReader(new FileReader(logFile));
-				String lastLine = null;
-				String currentLine = null;
-				while((currentLine = reader.readLine()) != null) {
-					lastLine = currentLine;
-				}
-				if (lastLine != null && !lastLine.endsWith("</Events>")) {
+			BufferedReader reader = new BufferedReader(new FileReader(logFile));
+			String lastLine = null;
+			String currentLine = null;
+			while ((currentLine = reader.readLine()) != null) {
+				lastLine = currentLine;
+			}
+			if (lastLine != null && !lastLine.endsWith("</Events>")) {
 //					BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true));
 //					writer.write(XML_FILE_ENDING);
 //					writer.close();
-					appendEvents(logFile);
-				}	
-				reader.close();
-			
+				appendEvents(logFile);
+			}
+			reader.close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 //	public void refineLogFiles(File logFolder){
 //		try {
@@ -356,7 +373,7 @@ public abstract class Replayer {
 //			e.printStackTrace();
 //		} 
 //	}
-	
+
 	protected Map<String, List<String[]>> readLocalCheckEvents(String assign) {
 		Map<String, List<String[]>> localCheckEvents = new TreeMap<>();
 		Pattern pattern = Pattern.compile("(\\d)+");
@@ -364,11 +381,14 @@ public abstract class Replayer {
 		Matcher eventsMatcher = null;
 		try {
 			File folder = new File(LOCALCHECK_EVENTS);
-			File[] files = folder.listFiles((f)->{return f.getName().endsWith(".csv");});
+			File[] files = folder.listFiles((f) -> {
+				return f.getName().endsWith(".csv");
+			});
 			for (File file : files) {
 				logMatcher = pattern.matcher(assign.substring(assign.lastIndexOf(File.separator)));
 				eventsMatcher = pattern.matcher(file.getName());
-				if (!(logMatcher.find() && eventsMatcher.find() && logMatcher.group(0).equals(eventsMatcher.group(0)))) {
+				if (!(logMatcher.find() && eventsMatcher.find()
+						&& logMatcher.group(0).equals(eventsMatcher.group(0)))) {
 					continue;
 				}
 				System.out.println("Reading LocalChecks file " + file.getPath());
@@ -377,14 +397,14 @@ public abstract class Replayer {
 				List<String[]> studentLC = null;
 				while ((nextLine = cr.readNext()) != null) {
 					String studentFolder = assign + File.separator;
-					for (int i = 0; i < nextLine.length-3; i++) {
-						if (nextLine[i+3].isEmpty()) {
+					for (int i = 0; i < nextLine.length - 3; i++) {
+						if (nextLine[i + 3].isEmpty()) {
 							continue;
 						}
 						if (i > 0) {
 							studentFolder += ",";
 						}
-						studentFolder += nextLine[i+3];
+						studentFolder += nextLine[i + 3];
 					}
 					if (!localCheckEvents.containsKey(studentFolder)) {
 						studentLC = new ArrayList<>();
@@ -401,10 +421,10 @@ public abstract class Replayer {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
-		} 
+		}
 		return localCheckEvents;
 	}
-	
+
 	public String readWebContent(String aURL) {
 		String content = "";
 		Scanner sc = null;
@@ -425,18 +445,18 @@ public abstract class Replayer {
 				sc.close();
 			}
 		}
-		if (content.equals("") && !aURL.substring(0,5).equals("https")) {
+		if (content.equals("") && !aURL.substring(0, 5).equals("https")) {
 			aURL = aURL.replaceFirst("http", "https");
 			return readWebContent(aURL);
 		}
-		
+
 		return content;
 	}
-	
-	public void createExtraCommand(String surfix, int mode) {
+
+	public void createExtraCommand(String surfix, int mode, boolean appendAllRemainingCommands) {
 		logToWrite.clear();
 		CountDownLatch latch = new CountDownLatch(countStudents());
-		createExtraCommand(latch, surfix, mode);
+		createExtraCommand(latch, surfix, mode, appendAllRemainingCommands);
 		try {
 			latch.await();
 			writeLogs(surfix);
@@ -446,10 +466,11 @@ public abstract class Replayer {
 			System.out.println("Done!");
 		}
 	}
-	
-	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode);
 
-	public void createExtraCommandStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog, String aStudent, String surfix, int mode, List<String[]> localCheckEvents) {
+	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode, boolean appendAllRemainingCommands);
+
+	public void createExtraCommandStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog,
+			String aStudent, String surfix, int mode, List<String[]> localCheckEvents) {
 //		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents);
 //		if (mode == LOCALCHECK && localCheckEvents != null) {
 ////			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
@@ -467,12 +488,16 @@ public abstract class Replayer {
 //		}
 //		new Thread(cg).start();
 	}
+
 	protected CountDownLatch latch;
 	Map<String, List<EHICommand>> commandMap;
 	String student;
-	
-	public void createChainedExtraCommandsStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog, String aStudent, String aSuffix, int mode, List<String[]> localCheckEvents) {
-		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents);
+
+	public void createChainedExtraCommandsStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog,
+			String aStudent, String aSuffix, int mode, List<String[]> localCheckEvents, JSONObject piazzaPosts,
+			File zoomChatsFolder, HashMap<String, List<Long>> sessionTimeMap, boolean appendAllRemainingCommands) {
+		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents,
+				piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 
 //		latch = aLatch;
 //		student = aStudent;
@@ -497,25 +522,25 @@ public abstract class Replayer {
 //		}
 		new Thread(cg).start();
 	}
-	
+
 	protected File getLogFolder(File student) {
 		if (!student.exists()) {
 			System.err.println("Folder " + student + " does not exist");
 			return null;
 		}
 		File logFolder = null;
-		File submission = new File(student,"Submission attachment(s)");
+		File submission = new File(student, "Submission attachment(s)");
 		if (submission.exists()) {
 			logFolder = getProjectFolder(submission);
 			if (logFolder != null) {
-				logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+				logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
 			}
 		} else {
 			logFolder = new File(student, "Eclipse");
 			if (!logFolder.exists()) {
 				logFolder = getProjectFolder(student);
 				if (logFolder != null) {
-					logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
+					logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
 				}
 			}
 		}
@@ -525,21 +550,21 @@ public abstract class Replayer {
 		}
 		return logFolder;
 	}
-	
+
 	public abstract int countStudents();
-	
+
 	public abstract int countAssignments();
-	
+
 	public synchronized void updateLogMap(String path, String logContent) {
 		logToWrite.put(path, logContent);
 	}
-	
+
 	private void writeLogs(String surfix) {
 		for (String fileName : logToWrite.keySet()) {
 			try {
 				File file = new File(fileName);
 				if (file.getParentFile().getName().contains("Eclipse")) {
-					file = new File(file.getParent()+File.separator+surfix+File.separator+file.getName());
+					file = new File(file.getParent() + File.separator + surfix + File.separator + file.getName());
 				}
 				System.out.println("Writing to file " + file.getPath());
 				if (file.exists()) {
@@ -557,7 +582,7 @@ public abstract class Replayer {
 		}
 		logToWrite.clear();
 	}
-	
+
 	public void analyze() {
 		CountDownLatch latch = new CountDownLatch(countAssignments());
 		analyze(latch);
@@ -569,15 +594,493 @@ public abstract class Replayer {
 			System.out.println("Done!");
 		}
 	}
-	
+
 	public abstract void analyze(CountDownLatch latch);
+
+	public void createSessionTimeMap(String assign, Map<String, List<Long>> sessionTimeMap) {
+		String folder = new File(assign).getParent();
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimesSeconds.txt")))) {
+			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+				if (studentSessions.getValue().size() == 0) {
+					continue;
+				}
+				String student = studentSessions.getKey();
+//				student = student.substring(student.lastIndexOf(File.pathSeparator));
+				bw.write(student + ":" + studentSessions.getValue().size() + System.lineSeparator());
+				long total = 0;
+				for (long sessionTime : studentSessions.getValue()) {
+//					bw.write(convertToHourMinuteSecond(sessionTime) + System.lineSeparator());
+					bw.write((sessionTime / 1000) + System.lineSeparator());
+					total += sessionTime;
+				}
+				bw.write("Total: " + (total / 1000) + System.lineSeparator());
+			}
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimes.txt")))) {
+			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+				if (studentSessions.getValue().size() == 0) {
+					continue;
+				}
+				String student = studentSessions.getKey();
+				long total = 0;
+//				student = student.substring(student.lastIndexOf(File.pathSeparator));
+				bw.write(student + ":" + studentSessions.getValue().size() + System.lineSeparator());
+				for (long sessionTime : studentSessions.getValue()) {
+					bw.write(convertToHourMinuteSecond(sessionTime) + System.lineSeparator());
+//					bw.write((sessionTime / 1000) + System.lineSeparator());
+					total += sessionTime;
+				}
+				bw.write("Total: " + convertToHourMinuteSecond(total) + System.lineSeparator());
+			}
+		} catch (IOException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
 	
+	public void createAssignTimeline(String assign, Map<String, List<List<EHICommand>>> data) {
+		notifyNewAssignment(assign, data);
+		for (String key : data.keySet()) {
+			System.out.println(key);
+		}
+		df = new SimpleDateFormat("MM/dd/yyyy hh:mma 'ET'");
+		TimeZone edt = TimeZone.getTimeZone("America/New_York");
+		df.setTimeZone(edt);
+//		try {
+//		assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+		for (Entry<String, List<List<EHICommand>>> student : data.entrySet()) {
+
+			createStudentTimeline(student.getKey(), student.getValue());
+		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	}
+
+	public void createStudentTimeline(String student, List<List<EHICommand>> nestedCommands) {
+		File timeline = new File(student + File.separator + "Timeline.txt");
+
+		try {
+			if (timeline.exists()) {
+				timeline.delete();
+			}
+			if (!timeline.createNewFile()) {
+				return;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try (FileWriter fw = new FileWriter(timeline)) {
+			System.out.println("Generating AssignTimeline for student " + student);
+			student = student.substring(student.lastIndexOf(File.separator) + 1);
+			List<List<EHICommand>> difficulties = new ArrayList<>();
+			List<EHICommand> difficultySessionCommands = new ArrayList<>();
+			boolean hasDifficulty = false;
+			EHICommand currentFile = null;
+			for (List<EHICommand> commands : nestedCommands) {
+				long lastTime = -1;
+				long curTime = -1;
+				for (int i = 0; i < commands.size(); i++) {
+					EHICommand command = commands.get(i);
+					if (i > 0) {
+						lastTime = curTime;
+					}
+					if (command != null) {
+						curTime = command.getTimestamp() + command.getStartTimestamp();
+					}
+					if (command instanceof FileOpenCommand) {
+						currentFile = command;
+					}
+					if (hasDifficulty && (command instanceof CheckStyleCommand
+							|| command instanceof ConsoleOutput
+							|| command instanceof ConsoleInput || command instanceof WebCommand
+							|| command instanceof RunCommand || command instanceof FileOpenCommand)) {
+						difficultySessionCommands.add(command);
+					}
+					if (hasDifficulty && command instanceof Insert) {
+						while (++i < commands.size() && commands.get(i) instanceof Insert) {
+							((Insert) command).combine(commands.get(i));
+						}
+						difficultySessionCommands.add(command);
+					}
+					if (hasDifficulty && command instanceof Delete) {
+						while (++i < commands.size() && commands.get(i) instanceof Delete) {
+							((Delete) command).combine(commands.get(i));
+						}
+						difficultySessionCommands.add(command);
+					}
+					if (command instanceof PiazzaPostCommand) {
+//						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+//						if (post.getBoolean("is_office_hour_request")) {
+//							difficulties.add(difficultySessionCommands);
+//							difficultySessionCommands = new ArrayList<>();
+//						}
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+//						JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+//						if(post.getString("content").contains("Hey I would like to join OHs this morning to solve an issue regarding receiving errors for the wrong w")) {
+//							int a =0;
+//						}
+					}
+
+					if (command instanceof RequestHelpCommand) {
+//						difficulties.add(difficultySessionCommands);
+//						difficultySessionCommands = new ArrayList<>();
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+					}
+					if (command instanceof ZoomChatCommand) {
+//						if (i + 1 < commands.size() && !(commands.get(i+1) instanceof ZoomChatCommand)) {
+//							difficulties.add(difficultySessionCommands);
+//							difficultySessionCommands = new ArrayList<>();
+//							hasDifficulty = false;
+//						}
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+					}
+//					if (command instanceof PauseCommand) {
+//					}
+//					if (command instanceof WebCommand) {
+//					}
+//					if (command instanceof CheckStyleCommand) {
+//					}
+					if (command instanceof ExceptionCommand) {
+						if (!hasDifficulty && currentFile != null) {
+							difficultySessionCommands.add(currentFile);
+						}
+						hasDifficulty = true;
+						difficultySessionCommands.add(command);
+					}
+					if (command instanceof RunCommand
+//							&& command.getAttributesMap().get("type").equals("Run")
+						) {
+						boolean noException = true;
+						int endIdx = i + 10 < commands.size() ? i + 10 : commands.size();
+						int j = i + 1;
+						for (; j < endIdx; j++) {
+							if (commands.get(i) instanceof ExceptionCommand) {
+								noException = false;
+								break;
+							}
+							if (!(command instanceof RunCommand)) {
+								break;
+							}
+						}
+						if (noException) {
+							if (hasDifficulty) {
+								difficulties.add(difficultySessionCommands);
+								difficultySessionCommands = new ArrayList<>();
+								hasDifficulty = false;
+							} else {
+								difficultySessionCommands.clear();
+							}
+						} else {
+							if (!hasDifficulty && currentFile != null) {
+								difficultySessionCommands.add(currentFile);
+							}
+							hasDifficulty = true;
+							for (int k = 0; k <= j; k++) {
+								difficultySessionCommands.add(commands.get(k));
+							}
+						}
+						i = j + 1;
+					}
+					if (command instanceof LocalCheckCommand) {
+						String type = command.getDataMap().get("type");
+						if (type.equals("fail_decline")|| type.equals("fail_growth")) {
+							if (!hasDifficulty && currentFile != null) {
+								difficultySessionCommands.add(currentFile);
+							}
+							hasDifficulty = true;
+							difficultySessionCommands.add(command);
+							if (i + 1 < commands.size() && !(commands.get(i+1) instanceof LocalCheckCommand)) {
+								for (EHICommand difficultyCommand : difficultySessionCommands) {
+									if (!(difficultyCommand instanceof LocalCheckCommand && hasDifficulty)) {
+										difficulties.add(difficultySessionCommands);
+										hasDifficulty = false;
+										break;
+									}
+								}
+								difficultySessionCommands = new ArrayList<>();
+							}
+						}
+					}
+				}
+			}
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < difficulties.size(); i++) {
+				sb.append("Difficulty " + (i + 1) + System.lineSeparator());
+				for (EHICommand command : difficulties.get(i)) {
+					sb.append(getCommandString(command));
+					sb.append(System.lineSeparator());
+				}
+				sb.append(System.lineSeparator());
+			}
+			fw.write(sb.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+//	public void createPiazzaStats(String assign, Map<String, List<List<EHICommand>>> data) {
+//		df = new SimpleDateFormat("MM/dd/yyyy hh:mma 'ET'");
+//		TimeZone edt = TimeZone.getTimeZone("America/New_York");
+//		df.setTimeZone(edt);
+//		File piazzaStats = new File(student + File.separator + "Timeline.txt");
+//
+//		for (Entry<String, List<List<EHICommand>>> entry : data.entrySet()) {
+//			String student = entry.getKey();
+//			List<List<EHICommand>> nestedCommands = entry.getValue();
+//
+//			try {
+//				if (timeline.exists()) {
+//					timeline.delete();
+//				}
+//				if (!timeline.createNewFile()) {
+//					return;
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			try (FileWriter fw = new FileWriter(timeline)) {
+//				System.out.println("Generating AssignTimeline for student " + student);
+//				student = student.substring(student.lastIndexOf(File.separator) + 1);
+//				List<List<EHICommand>> difficulties = new ArrayList<>();
+//				List<EHICommand> difficultySessionCommands = new ArrayList<>();
+//				boolean hasDifficulty = false;
+//				EHICommand currentFile = null;
+//				for (List<EHICommand> commands : nestedCommands) {
+//					long lastTime = -1;
+//					long curTime = -1;
+//					for (int i = 0; i < commands.size(); i++) {
+//						EHICommand command = commands.get(i);
+//						if (i > 0) {
+//							lastTime = curTime;
+//						}
+//						if (command != null) {
+//							curTime = command.getTimestamp() + command.getStartTimestamp();
+//						}
+//						if (command instanceof FileOpenCommand) {
+//							currentFile = command;
+//						}
+//						if (hasDifficulty && (command instanceof CheckStyleCommand
+//								|| command instanceof ConsoleOutput
+//								|| command instanceof ConsoleInput || command instanceof WebCommand
+//								|| command instanceof RunCommand || command instanceof FileOpenCommand)) {
+//							difficultySessionCommands.add(command);
+//						}
+//						if (hasDifficulty && command instanceof Insert) {
+//							while (++i < commands.size() && commands.get(i) instanceof Insert) {
+//								((Insert) command).combine(commands.get(i));
+//							}
+//							difficultySessionCommands.add(command);
+//						}
+//						if (hasDifficulty && command instanceof Delete) {
+//							while (++i < commands.size() && commands.get(i) instanceof Delete) {
+//								((Delete) command).combine(commands.get(i));
+//							}
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof PiazzaPostCommand) {
+////							JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+////							if (post.getBoolean("is_office_hour_request")) {
+////								difficulties.add(difficultySessionCommands);
+////								difficultySessionCommands = new ArrayList<>();
+////							}
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+////							JSONObject post = new JSONObject(command.getDataMap().get("piazza_post"));
+////							if(post.getString("content").contains("Hey I would like to join OHs this morning to solve an issue regarding receiving errors for the wrong w")) {
+////								int a =0;
+////							}
+//						}
+//
+//						if (command instanceof RequestHelpCommand) {
+////							difficulties.add(difficultySessionCommands);
+////							difficultySessionCommands = new ArrayList<>();
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof ZoomChatCommand) {
+////							if (i + 1 < commands.size() && !(commands.get(i+1) instanceof ZoomChatCommand)) {
+////								difficulties.add(difficultySessionCommands);
+////								difficultySessionCommands = new ArrayList<>();
+////								hasDifficulty = false;
+////							}
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+////						if (command instanceof PauseCommand) {
+////						}
+////						if (command instanceof WebCommand) {
+////						}
+////						if (command instanceof CheckStyleCommand) {
+////						}
+//						if (command instanceof ExceptionCommand) {
+//							if (!hasDifficulty && currentFile != null) {
+//								difficultySessionCommands.add(currentFile);
+//							}
+//							hasDifficulty = true;
+//							difficultySessionCommands.add(command);
+//						}
+//						if (command instanceof RunCommand
+////								&& command.getAttributesMap().get("type").equals("Run")
+//							) {
+//							boolean noException = true;
+//							int endIdx = i + 10 < commands.size() ? i + 10 : commands.size();
+//							int j = i + 1;
+//							for (; j < endIdx; j++) {
+//								if (commands.get(i) instanceof ExceptionCommand) {
+//									noException = false;
+//									break;
+//								}
+//								if (!(command instanceof RunCommand)) {
+//									break;
+//								}
+//							}
+//							if (noException) {
+//								if (hasDifficulty) {
+//									difficulties.add(difficultySessionCommands);
+//									difficultySessionCommands = new ArrayList<>();
+//									hasDifficulty = false;
+//								} else {
+//									difficultySessionCommands.clear();
+//								}
+//							} else {
+//								if (!hasDifficulty && currentFile != null) {
+//									difficultySessionCommands.add(currentFile);
+//								}
+//								hasDifficulty = true;
+//								for (int k = 0; k <= j; k++) {
+//									difficultySessionCommands.add(commands.get(k));
+//								}
+//							}
+//							i = j + 1;
+//						}
+//						if (command instanceof LocalCheckCommand) {
+//							String type = command.getDataMap().get("type");
+//							if (type.equals("fail_decline")|| type.equals("fail_growth")) {
+//								if (!hasDifficulty && currentFile != null) {
+//									difficultySessionCommands.add(currentFile);
+//								}
+//								hasDifficulty = true;
+//								difficultySessionCommands.add(command);
+//								if (i + 1 < commands.size() && !(commands.get(i+1) instanceof LocalCheckCommand)) {
+//									for (EHICommand difficultyCommand : difficultySessionCommands) {
+//										if (!(difficultyCommand instanceof LocalCheckCommand && hasDifficulty)) {
+//											difficulties.add(difficultySessionCommands);
+//											hasDifficulty = false;
+//											break;
+//										}
+//									}
+//									difficultySessionCommands = new ArrayList<>();
+//								}
+//							}
+//						}
+//					}
+//				}
+//				StringBuilder sb = new StringBuilder();
+//				for (int i = 0; i < difficulties.size(); i++) {
+//					sb.append("Difficulty " + (i + 1) + System.lineSeparator());
+//					for (EHICommand command : difficulties.get(i)) {
+//						sb.append(getCommandString(command));
+//						sb.append(System.lineSeparator());
+//					}
+//					sb.append(System.lineSeparator());
+//				}
+//				fw.write(sb.toString());
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//	public void createStudentTimeline(String student, List<List<EHICommand>> nestedCommands) {
+//		
+//	}
+
+	public String getCommandString(EHICommand command) {
+		long timestamp = command.getStartTimestamp() + command.getTimestamp();
+		
+		String retVal = df.format(timestamp) + "\t" + command.getName() + ": ";
+		if (df.format(timestamp).equals("05/26/2021 12:33PM ET")) {
+			int a = 0;
+		}
+		Map<String, String> dataMap = command.getDataMap();
+		if (command instanceof ExceptionCommand) {
+			return retVal + dataMap.get(ExceptionCommand.XML_Exception_Tag).trim();
+		}
+		if (command instanceof CheckStyleCommand) {
+			return retVal + dataMap.get("CSVRow");
+		}
+		if (command instanceof ZoomChatCommand) {
+			return retVal + dataMap.get("chat");
+		}
+		if (command instanceof ConsoleOutput) {
+			return retVal + dataMap.get(ConsoleOutput.XML_Output_Tag).replaceAll("[\r\n]+", "\r\n").trim();
+		}
+		if (command instanceof ConsoleInput) {
+			return retVal + dataMap.get(ConsoleInput.XML_Output_Tag).trim();
+		}
+		if (command instanceof LocalCheckCommand) {
+			return retVal + dataMap.get("testcase") + "," + dataMap.get("type");
+		}
+		if (command instanceof PiazzaPostCommand) {
+			JSONObject post = new JSONObject(dataMap.get("piazza_post"));
+			return retVal + post.getString("subject") + "," + post.getString("content");
+		}
+		if (command instanceof RequestHelpCommand) {
+			return retVal + dataMap.get("error-type") + "," + dataMap.get("error-message") + "," + dataMap.get("output");
+		}
+		if (command instanceof RunCommand) {
+			dataMap = command.getAttributesMap();
+			return df.format(timestamp) + "\t" + dataMap.get("type") + ": " + dataMap.get("kind") 
+					+ ", projectName: " + dataMap.get("projectName")
+					+ ", className: " + dataMap.get("className"); 
+		}
+		if (command instanceof WebCommand) {
+			return retVal + dataMap.get("keyword") + ", " + dataMap.get("URL");
+		}
+		if (command instanceof Insert || command instanceof Delete) {
+//			return retVal + "offset: " + command.getAttributesMap().get("offset") + ", text: " + dataMap.get("text");
+//		}
+//		if (command instanceof Delete) {
+//			return retVal + "offset: " + command.getAttributesMap().get("offset") + ", text: " + dataMap.get("text");
+			return retVal;
+		}
+		if (command instanceof FileOpenCommand) {
+			return retVal + System.lineSeparator() + dataMap.get("snapshot");
+		}
+		return "";
+	}
+
 	public void createAssignData(String assign, Map<String, List<List<EHICommand>>> data) {
 		notifyNewAssignment(assign, data);
-		
-		File csv = new File(assign+".csv");
+
+		File csv = new File(assign + ".csv");
 		FileWriter fw;
-		File csv2 = new File(assign+"Event.csv");
+		File csv2 = new File(assign + "Event.csv");
 		FileWriter fw2;
 		int[] sum = new int[11];
 		try {
@@ -587,12 +1090,11 @@ public abstract class Replayer {
 			csv.createNewFile();
 			fw = new FileWriter(csv);
 			CSVWriter cw = new CSVWriter(fw);
-			String[] header = {"Student", "Total Time Spent", "Active Time", 
-							   "Rest Time", "Wall Clock Time", "Pause", "Web", 
-							   "Insert", "Delete", "Replace", "Copy", "Paste", 
-							   "Run", "Exception", "LocalChecks", "Exception Breakdown"};
+			String[] header = { "Student", "Total Time Spent", "Active Time", "Rest Time", "Wall Clock Time", "Pause",
+					"Web", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Exception", "LocalChecks",
+					"Exception Breakdown" };
 			cw.writeNext(header);
-			
+
 			if (csv2.exists()) {
 				csv2.delete();
 			}
@@ -600,14 +1102,14 @@ public abstract class Replayer {
 			fw2 = new FileWriter(csv2);
 			CSVWriter cw2 = new CSVWriter(fw2);
 			List<String[]> output = new ArrayList<>();
-			String[] header2 = {"case_id", "timestamp", "activity", "user"};
+			String[] header2 = { "case_id", "timestamp", "activity", "user" };
 			cw2.writeNext(header2);
-			assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
 			for (String student : data.keySet()) {
 				System.out.println("Generating AssignData for student " + student);
 				List<List<EHICommand>> nestedCommands = data.get(student);
-				student = student.substring(student.lastIndexOf(File.separator)+1);
-				
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
+
 				List<String> retVal = new ArrayList<>();
 				retVal.add(student);
 				long totalTime = totalTimeSpent(nestedCommands);
@@ -631,8 +1133,8 @@ public abstract class Replayer {
 					aSessionNumber++;
 					notifyNewSession(aSessionNumber);
 					for (int i = 0; i < commands.size(); i++) {
-						int aStartCommandIndex = i;						
-						String aRestType= null;
+						int aStartCommandIndex = i;
+						String aRestType = null;
 						EHICommand command = commands.get(i);
 						EHICommand aStartCommand = command;
 						boolean aRestInSession = false;
@@ -640,8 +1142,7 @@ public abstract class Replayer {
 						String aCommandTypeChar = "";
 						String anEventTypeString = "";
 						String aText = null;
-						
-						
+
 						if (i > 0) {
 							lastTime = curTime;
 						}
@@ -653,18 +1154,24 @@ public abstract class Replayer {
 							aRestInSession = true;
 							aRestKind = REST_INSESSION;
 						}
-						if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
+						if (command instanceof ShellCommand
+								&& ((ShellCommand) command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
 							addOneLine(output, assign, curTime, REST_LOSEFOCUS, student);
 							aRestKind = REST_LOSEFOCUS;
-						} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
+						} else if (command instanceof ShellCommand
+								&& ((ShellCommand) command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
 							addOneLine(output, assign, curTime, REST_ENDSESSION, student);
 							aRestKind = REST_ENDSESSION;
-						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand ||
-								command instanceof Delete || command instanceof Insert || (command instanceof EclipseCommand && ((EclipseCommand)command).getCommandID().equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) ||
-								command instanceof Replace || command instanceof PasteCommand || command instanceof ExceptionCommand ||
-								command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
-								command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof LocalCheckCommand) {
-							
+						} else if (command instanceof InsertStringCommand || command instanceof CopyCommand
+								|| command instanceof Delete || command instanceof Insert
+								|| (command instanceof EclipseCommand && ((EclipseCommand) command).getCommandID()
+										.equals("eventLogger.styledTextCommand.DELETE_PREVIOUS"))
+								|| command instanceof Replace || command instanceof PasteCommand
+								|| command instanceof ExceptionCommand || command instanceof RunCommand
+								|| command instanceof ConsoleOutputCommand || command instanceof ConsoleInput
+								|| command instanceof RequestHelpCommand || command instanceof GetHelpCommand
+								|| command instanceof LocalCheckCommand) {
+
 							anEventTypeString = getEventType(command).toString();
 //							addOneLine(output, assign, curTime, getEventType(command), student);
 							addOneLine(output, assign, curTime, anEventTypeString, student);
@@ -698,7 +1205,8 @@ public abstract class Replayer {
 							list.append(aCommandTypeChar);
 //							list.append("D");
 						}
-						if (command instanceof EclipseCommand && ((EclipseCommand)command).getCommandID().equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) {
+						if (command instanceof EclipseCommand && ((EclipseCommand) command).getCommandID()
+								.equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) {
 							numCommands[3]++;
 						}
 						if (command instanceof Replace) {
@@ -732,30 +1240,34 @@ public abstract class Replayer {
 //							list.append("L");
 						}
 						if (command instanceof ExceptionCommand || command instanceof EHExceptionCommand) {
-							if(isException(command)) {
+							if (isException(command)) {
 								if (command instanceof EHExceptionCommand) {
-									ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
+									ExceptionCommand ex = new ExceptionCommand(
+											command.getDataMap().get("exceptionString"), "");
 									ex.setTimestamp(command.getTimestamp());
 									ex.setStartTimestamp(command.getStartTimestamp());
- 									 aStartCommand = ex;
+									aStartCommand = ex;
 								}
 								numCommands[8]++;
 								aCommandTypeChar = "E";
 								list.append(aCommandTypeChar);
 //								list.append("E");
-  								if (i < commands.size()-1) {
-									command = commands.get(i+1);
+								if (i < commands.size() - 1) {
+									command = commands.get(i + 1);
 								} else {
 									continue;
 								}
-								while(!(command instanceof InsertStringCommand || command instanceof Replace 
-										|| command instanceof Delete 
-										|| command instanceof CopyCommand || command instanceof PasteCommand)) {
-									if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput ||
-										command instanceof RequestHelpCommand || command instanceof GetHelpCommand || command instanceof ExceptionCommand ||
-										(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_LOST_FOCUS")) ||
-										(command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals("ECLIPSE_CLOSED")) ||
-										command instanceof LocalCheckCommand) {
+								while (!(command instanceof InsertStringCommand || command instanceof Replace
+										|| command instanceof Delete || command instanceof CopyCommand
+										|| command instanceof PasteCommand)) {
+									if (command instanceof RunCommand || command instanceof ConsoleOutputCommand
+											|| command instanceof ConsoleInput || command instanceof RequestHelpCommand
+											|| command instanceof GetHelpCommand || command instanceof ExceptionCommand
+											|| (command instanceof ShellCommand && ((ShellCommand) command)
+													.getAttributesMap().get("type").equals("ECLIPSE_LOST_FOCUS"))
+											|| (command instanceof ShellCommand && ((ShellCommand) command)
+													.getAttributesMap().get("type").equals("ECLIPSE_CLOSED"))
+											|| command instanceof LocalCheckCommand) {
 										if (i > 0) {
 											lastTime = curTime;
 										}
@@ -763,17 +1275,22 @@ public abstract class Replayer {
 										if (lastTime - curTime > FIVE_MIN) {
 											addOneLine(output, assign, lastTime, REST_INSESSION, student);
 										}
-										if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
+										if (command instanceof ShellCommand && ((ShellCommand) command)
+												.getAttributesMap().get("type").equals(ECLIPSE_LOST_FOCUS)) {
 											addOneLine(output, assign, curTime, REST_LOSEFOCUS, student);
-										} else if (command instanceof ShellCommand && ((ShellCommand)command).getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
+										} else if (command instanceof ShellCommand && ((ShellCommand) command)
+												.getAttributesMap().get("type").equals(ECLIPSE_CLOSED)) {
 											addOneLine(output, assign, curTime, REST_ENDSESSION, student);
 										} else {
-											addOneLine(output, assign, curTime, getEventType(command).toString(), student);
+											addOneLine(output, assign, curTime, getEventType(command).toString(),
+													student);
 										}
 									}
-									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand) && isException(command)) {
+									if ((command instanceof ExceptionCommand || command instanceof EHExceptionCommand)
+											&& isException(command)) {
 										if (command instanceof EHExceptionCommand) {
-											ExceptionCommand ex = new ExceptionCommand(command.getDataMap().get("exceptionString"),"");
+											ExceptionCommand ex = new ExceptionCommand(
+													command.getDataMap().get("exceptionString"), "");
 											ex.setTimestamp(command.getTimestamp());
 											ex.setStartTimestamp(command.getStartTimestamp());
 											if (i > 0) {
@@ -791,16 +1308,16 @@ public abstract class Replayer {
 //										list.append("E");
 									}
 									i++;
-									if (i+1 < commands.size()) {
-										command = commands.get(i+1);
+									if (i + 1 < commands.size()) {
+										command = commands.get(i + 1);
 									} else {
 										break;
 									}
-									
+
 								}
 								breakdownList.add(countConsecutiveCommands(list));
 								list = new StringBuffer();
-							
+
 //								notifyNewCommandInSession(
 //										aSessionNumber, 
 //										i, 
@@ -810,30 +1327,21 @@ public abstract class Replayer {
 //										aText);
 							}
 						}
-						notifyNewCommandInSession(
-								aStartCommandIndex, 
-								curTime, 
-								aStartCommand, 
-								aCommandTypeChar, 
-								anEventTypeString, 
-								aRestInSession, 
-								aRestType, 
-								aText,
-								i,
-								command);
+						notifyNewCommandInSession(aStartCommandIndex, curTime, aStartCommand, aCommandTypeChar,
+								anEventTypeString, aRestInSession, aRestType, aText, i, command);
 					}
-					
+
 				}
 				if (list.length() != 0) {
 					breakdownList.add(countConsecutiveCommands(list));
 				}
-				for(int i = 0; i < numCommands.length; i++) {
-					retVal.add(i+5, numCommands[i]+"");
+				for (int i = 0; i < numCommands.length; i++) {
+					retVal.add(i + 5, numCommands[i] + "");
 					sum[i] += numCommands[i];
 					sum[numCommands.length] += numCommands[i];
 				}
-				for(int i = 0; i < breakdownList.size(); i++) {
-					retVal.add(i+5+numCommands.length, breakdownList.get(i));
+				for (int i = 0; i < breakdownList.size(); i++) {
+					retVal.add(i + 5 + numCommands.length, breakdownList.get(i));
 				}
 				String[] nextLine = retVal.toArray(new String[1]);
 				cw.writeNext(nextLine);
@@ -845,14 +1353,14 @@ public abstract class Replayer {
 			retVal.add("");
 			retVal.add("");
 			for (int i = 0; i < sum.length; i++) {
-				retVal.add(sum[i]+"");
+				retVal.add(sum[i] + "");
 			}
 			String[] nextLine = retVal.toArray(new String[1]);
 			cw.writeNext(nextLine);
 			cw2.writeAll(output);
 			fw.close();
 			cw.close();
-			
+
 			fw2.close();
 			cw2.close();
 		} catch (IOException e) {
@@ -860,8 +1368,89 @@ public abstract class Replayer {
 		}
 	}
 	
+	public void commandCount(String assign, Map<String, List<List<EHICommand>>> data) {
+		File csv = new File(assign + "CommandCount.csv");
+		FileWriter fw;
+		try {
+			if (csv.exists()) {
+				csv.delete();
+			}
+			csv.createNewFile();
+			fw = new FileWriter(csv);
+			CSVWriter cw = new CSVWriter(fw);
+			String[] header = { "Student", "Web", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Debug", "LocalChecks"};
+			cw.writeNext(header);
+
+			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
+			for (String student : data.keySet()) {
+				System.out.println("Generating AssignData for student " + student);
+				List<List<EHICommand>> nestedCommands = data.get(student);
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
+
+				List<String> retVal = new ArrayList<>();
+				retVal.add(student);
+				int[] numCommands = new int[9];
+				List<String> breakdownList = new ArrayList<>();
+				long localcheckTime = 0;
+				for (List<EHICommand> commands : nestedCommands) {
+					for (int i = 0; i < commands.size(); i++) {
+						EHICommand command = commands.get(i);
+
+						if (command instanceof WebCommand) {
+							numCommands[0]++;
+						}
+						if (command instanceof Insert) {
+							numCommands[1] += command.getDataMap().get("text").length();
+						}
+						if (command instanceof Delete) {
+							numCommands[2] += command.getDataMap().get("text").length();
+						}
+						if (command instanceof EclipseCommand && ((EclipseCommand) command).getCommandID()
+								.equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")) {
+							numCommands[2]++;
+						}
+						if (command instanceof Replace) {
+							numCommands[3]++;
+						}
+						if (command instanceof CopyCommand) {
+							numCommands[4]++;
+						}
+						if (command instanceof PasteCommand) {
+							numCommands[5]++;
+						}
+						if (command instanceof RunCommand) {
+							if (command.getAttributesMap().get("type").equals("Debug")) {
+								numCommands[7]++;
+							} else {
+								numCommands[6]++;
+							}
+						}
+						if (command instanceof LocalCheckCommand) {
+							long timestamp = command.getTimestamp() + command.getStartTimestamp();
+							if (localcheckTime < timestamp) {
+								numCommands[8]++;
+								localcheckTime = timestamp;
+							}
+						}
+					}
+
+				}
+				retVal.add(student);
+				for (int i = 0; i < numCommands.length; i++) {
+					retVal.add(numCommands[i]+"");
+				}
+				String[] nextLine = retVal.toArray(new String[1]);
+				cw.writeNext(nextLine);
+			}
+			fw.close();
+			cw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void createDistributionData(String assign, Map<String, List<List<EHICommand>>> data) {
-		File csv = new File(assign+"Distribution.csv");
+		File csv = new File(assign + "Distribution.csv");
 		FileWriter fw;
 		try {
 			if (csv.exists()) {
@@ -872,7 +1461,7 @@ public abstract class Replayer {
 			CSVWriter cw = new CSVWriter(fw);
 			String[] header = getHeader();
 			cw.writeNext(header);
-			
+
 			String[] sum = new String[header.length];
 			sum[0] = "Sum";
 			int[] restSum = new int[REST.length];
@@ -880,11 +1469,11 @@ public abstract class Replayer {
 			for (int i = 1; i < sum.length; i++) {
 				sum[i] = "";
 			}
-			assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
 			for (String student : data.keySet()) {
 				System.out.println("Generating DistributionData for student " + student);
 				List<List<EHICommand>> nestedCommands = data.get(student);
-				student = student.substring(student.lastIndexOf(File.separator)+1);
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
 				List<String> retVal = new ArrayList<>();
 				retVal.add(student);
 				long totalTime = totalTimeSpent(nestedCommands);
@@ -895,48 +1484,48 @@ public abstract class Replayer {
 				retVal.add(format(totalTime));
 				retVal.add(format(wallClockTime));
 
-				long[] restTime = {0,0};
+				long[] restTime = { 0, 0 };
 				for (int i = 0; i < REST.length; i++) {
-					if (i < REST.length-1) {
-						restTime = restTime(nestedCommands, REST[i], REST[i+1]);
+					if (i < REST.length - 1) {
+						restTime = restTime(nestedCommands, REST[i], REST[i + 1]);
 					} else {
 						restTime = restTime(nestedCommands, REST[i], Long.MAX_VALUE);
 					}
 					retVal.add(format(totalTime - restTime[0]));
 					retVal.add(format(restTime[0]));
-					retVal.add(restTime[1]+"");
-					retVal.add(getTime(restTime[1] == 0? 0:1.0*restTime[2]/restTime[1]));
+					retVal.add(restTime[1] + "");
+					retVal.add(getTime(restTime[1] == 0 ? 0 : 1.0 * restTime[2] / restTime[1]));
 					restSum[i] += restTime[1];
 					restTimeSum[i] += restTime[2];
 				}
-				
+
 				String[] days = daysSpent(nestedCommands);
 				if (days != null) {
 					for (int i = 0; i < days.length; i++) {
 						retVal.add(days[i]);
 					}
 				}
-				
+
 				String[] nextLine = retVal.toArray(new String[1]);
 				cw.writeNext(nextLine);
 			}
 			int sum2 = 0;
 			for (int i = 0; i < restSum.length; i++) {
-				sum[4*i+5] = restSum[i]+"";
+				sum[4 * i + 5] = restSum[i] + "";
 				sum2 += restSum[i];
-				sum[4*i+6] = getTime(restSum[i] == 0? 0:1.0*restTimeSum[i]/restSum[i]);
+				sum[4 * i + 6] = getTime(restSum[i] == 0 ? 0 : 1.0 * restTimeSum[i] / restSum[i]);
 			}
-			sum[1] = sum2+"";
+			sum[1] = sum2 + "";
 			cw.writeNext(sum);
 			fw.close();
 			cw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	public void createPauseDistribution(String assign, Map<String, List<List<EHICommand>>> data) {
-		File csv = new File(assign+"PauseDistribution.csv");
+		File csv = new File(assign + "PauseDistribution.csv");
 		System.out.println("Generating Pause Distribution for Assignment " + assign);
 		FileWriter fw;
 		try {
@@ -946,7 +1535,7 @@ public abstract class Replayer {
 			csv.createNewFile();
 			fw = new FileWriter(csv);
 			CSVWriter cw = new CSVWriter(fw);
-			String[] prev = {"Prev"};
+			String[] prev = { "Prev" };
 			cw.writeNext(prev);
 			String[] header = getPauseHeader();
 			cw.writeNext(header);
@@ -954,11 +1543,12 @@ public abstract class Replayer {
 			String[] nextLine = new String[header.length];
 			int[] sum = new int[PauseCommand.TYPES.length];
 			long[] sumPause = new long[sum.length];
-			assign = assign.substring(assign.lastIndexOf(File.separator)+1);
+			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
 			for (String student : data.keySet()) {
 				List<List<EHICommand>> nestedCommands = data.get(student);
-				if (nestedCommands.size() == 0) continue;
-				student = student.substring(student.lastIndexOf(File.separator)+1);
+				if (nestedCommands.size() == 0)
+					continue;
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
 				long[] pauseTimes = new long[sum.length];
@@ -981,7 +1571,7 @@ public abstract class Replayer {
 									pauseTimes[i] += pause;
 									if (min[i] == 0 || min[i] > pause) {
 										min[i] = pause;
-									} 
+									}
 									if (max[i] < pause) {
 										max[i] = pause;
 									}
@@ -992,17 +1582,17 @@ public abstract class Replayer {
 					}
 				}
 				for (int i = 0; i < sum.length; i++) {
-					retVal.add(numCommmands[i]+"");
+					retVal.add(numCommmands[i] + "");
 					if (numCommmands[i] == 0) {
 						retVal.add("0");
 					} else {
-						mean[i] = 1.0*pauseTimes[i]/numCommmands[i];
-						retVal.add(mean[i]+"");
+						mean[i] = 1.0 * pauseTimes[i] / numCommmands[i];
+						retVal.add(mean[i] + "");
 					}
-					retVal.add(min[i]+"");
-					retVal.add(max[i]+"");
-					retVal.add(std(pauses.get(i),mean[i])+"");
-					
+					retVal.add(min[i] + "");
+					retVal.add(max[i] + "");
+					retVal.add(std(pauses.get(i), mean[i]) + "");
+
 					sum[i] += numCommmands[i];
 					sumPause[i] += pauseTimes[i];
 				}
@@ -1012,27 +1602,28 @@ public abstract class Replayer {
 			nextLine = new String[header.length];
 			nextLine[0] = "Sum";
 			for (int i = 0; i < sum.length; i++) {
-				nextLine[1+i*5] = sum[i]+"";
+				nextLine[1 + i * 5] = sum[i] + "";
 				if (sum[i] == 0) {
-					nextLine[2+i*5] = 0+"";
+					nextLine[2 + i * 5] = 0 + "";
 				} else {
-					nextLine[2+i*5] = sumPause[i]/sum[i]+"";
+					nextLine[2 + i * 5] = sumPause[i] / sum[i] + "";
 				}
 			}
 			cw.writeNext(nextLine);
-			
+
 			String[] empty = {};
 			cw.writeNext(empty);
-			String[] next = {"next"};
+			String[] next = { "next" };
 			cw.writeNext(next);
 			sum = new int[PauseCommand.TYPES.length];
-			
+
 			sumPause = new long[sum.length];
-			
+
 			for (String student : data.keySet()) {
 				List<List<EHICommand>> nestedCommands = data.get(student);
-				if (nestedCommands.size() == 0) continue;
-				student = student.substring(student.lastIndexOf(File.separator)+1);
+				if (nestedCommands.size() == 0)
+					continue;
+				student = student.substring(student.lastIndexOf(File.separator) + 1);
 				List<String> retVal = new ArrayList<>();
 				int[] numCommmands = new int[sum.length];
 				long[] pauseTimes = new long[sum.length];
@@ -1044,7 +1635,7 @@ public abstract class Replayer {
 					pauses.add(new ArrayList<>());
 				}
 				retVal.add(student);
-				
+
 				for (List<EHICommand> commands : nestedCommands) {
 					for (EHICommand command : commands) {
 						if (command instanceof PauseCommand) {
@@ -1056,7 +1647,7 @@ public abstract class Replayer {
 									pauseTimes[i] += pause;
 									if (min[i] == 0 || min[i] > pause) {
 										min[i] = pause;
-									} 
+									}
 									if (max[i] < pause) {
 										max[i] = pause;
 									}
@@ -1067,16 +1658,16 @@ public abstract class Replayer {
 					}
 				}
 				for (int i = 0; i < sum.length; i++) {
-					retVal.add(numCommmands[i]+"");
+					retVal.add(numCommmands[i] + "");
 					if (numCommmands[i] == 0) {
 						retVal.add("0");
 					} else {
-						mean[i] = 1.0*pauseTimes[i]/numCommmands[i];
-						retVal.add(mean[i]+"");
+						mean[i] = 1.0 * pauseTimes[i] / numCommmands[i];
+						retVal.add(mean[i] + "");
 					}
-					retVal.add(min[i]+"");
-					retVal.add(max[i]+"");
-					retVal.add(std(pauses.get(i),mean[i])+"");
+					retVal.add(min[i] + "");
+					retVal.add(max[i] + "");
+					retVal.add(std(pauses.get(i), mean[i]) + "");
 					sum[i] += numCommmands[i];
 					sumPause[i] += pauseTimes[i];
 				}
@@ -1086,26 +1677,26 @@ public abstract class Replayer {
 			nextLine = new String[header.length];
 			nextLine[0] = "Sum";
 			for (int i = 0; i < sum.length; i++) {
-				nextLine[1+i*5] = sum[i]+"";
+				nextLine[1 + i * 5] = sum[i] + "";
 				if (sum[i] == 0) {
-					nextLine[2+i*5] = 0+"";
+					nextLine[2 + i * 5] = 0 + "";
 				} else {
-					nextLine[2+i*5] = sumPause[i]/sum[i]+"";
+					nextLine[2 + i * 5] = sumPause[i] / sum[i] + "";
 				}
 			}
 			cw.writeNext(nextLine);
-			
+
 			fw.close();
 			cw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	public void createWebStats(String assign, File folder, Map<String, List<List<EHICommand>>> data) {
-		File csv = new File(folder,assign+"WebStats.csv");
+		File csv = new File(folder, assign + "WebStats.csv");
 		FileWriter fw;
-		File csv2 = new File(folder,assign+"WebSearches.csv");
+		File csv2 = new File(folder, assign + "WebSearches.csv");
 		FileWriter fw2;
 		try {
 			if (csv.exists()) {
@@ -1120,9 +1711,9 @@ public abstract class Replayer {
 			fw2 = new FileWriter(csv2);
 			CSVWriter cw = new CSVWriter(fw);
 			CSVWriter cw2 = new CSVWriter(fw2);
-			String[] header = {"Title", "URL", "# of Visits", "Provided?"};
+			String[] header = { "Title", "URL", "# of Visits", "Provided?" };
 //			String[] header2 = {"ID", "Search Word", "Title", "URL", "Sequence", "Last Page of the Search?", "Pasted Text"};
-			String[] header2 = {"Search Word"};
+			String[] header2 = { "Search Word" };
 			cw.writeNext(header);
 			cw2.writeNext(header2);
 
@@ -1144,8 +1735,9 @@ public abstract class Replayer {
 								if (!searches.containsKey(lastSearch.getDataMap().get("keyword"))) {
 									searches.put(lastSearch.getDataMap().get("keyword"), new ArrayList<>());
 								}
-							} 
-							if (command.getAttributesMap().get("type").equals("Search Result") || command.getAttributesMap().get("type").equals("Stack Overflow")) {
+							}
+							if (command.getAttributesMap().get("type").equals("Search Result")
+									|| command.getAttributesMap().get("type").equals("Stack Overflow")) {
 								String searchWord = "null";
 								if (lastSearch != null) {
 									searchWord = lastSearch.getDataMap().get("keyword");
@@ -1179,8 +1771,7 @@ public abstract class Replayer {
 							titles.put(url, command.getDataMap().get("keyword"));
 						}
 						if (command instanceof PasteCommand) {
-							outer:
-							for (int j = i-1; j >= 0 && j > i-20; j--) {
+							outer: for (int j = i - 1; j >= 0 && j > i - 20; j--) {
 								EHICommand command2 = commands.get(j);
 								String pastedText = "";
 								if (command2 instanceof InsertStringCommand || command2 instanceof Replace) {
@@ -1195,7 +1786,7 @@ public abstract class Replayer {
 											String pastedText2 = pastedText.replaceAll("\\s", "");
 											if (list.get(0).contains(pastedText2)) {
 												for (int k = 1; k < list.size(); k++) {
-													if (list.get(k).replaceAll("\\s",  "").equals(pastedText2)) {
+													if (list.get(k).replaceAll("\\s", "").equals(pastedText2)) {
 														break outer;
 													}
 												}
@@ -1213,8 +1804,8 @@ public abstract class Replayer {
 					List<String> nextLine = new ArrayList<>();
 //					nextLine.add(student);
 					if (s.contains(" - Google Search")) {
-						s = s.substring(0,s.indexOf(" - Google Search"));
-					} 
+						s = s.substring(0, s.indexOf(" - Google Search"));
+					}
 					nextLine.add(s);
 					cw2.writeNext(nextLine.toArray(new String[1]));
 
@@ -1244,31 +1835,32 @@ public abstract class Replayer {
 				searches.clear();
 			}
 			Map<String, Integer> sortedMap = new LinkedHashMap<>();
-			urls.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
+			urls.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+					.forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
 			for (String s : sortedMap.keySet()) {
-				String[] nextLine = {titles.get(s), s, sortedMap.get(s)+"", isProvided(s)? "Provided":""};
+				String[] nextLine = { titles.get(s), s, sortedMap.get(s) + "", isProvided(s) ? "Provided" : "" };
 				cw.writeNext(nextLine);
 			}
 			fw.close();
 			cw.close();
-			
+
 			fw2.close();
 			cw2.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	public double std(List<Long> pauses, double mean) {
 		double sum = 0;
 		for (Long l : pauses) {
-			sum += Math.pow((double)l - mean,2);
+			sum += Math.pow((double) l - mean, 2);
 		}
-		return Math.sqrt(sum/pauses.size());
+		return Math.sqrt(sum / pauses.size());
 	}
-	
+
 	public void addOneLine(List<String[]> output, String assign, long time, String type, String pid) {
-		String[] nextLine = new String[4]; 
+		String[] nextLine = new String[4];
 		nextLine[0] = assign + " " + pid;
 		Date date = new Date(time);
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -1279,9 +1871,9 @@ public abstract class Replayer {
 			output.add(nextLine);
 		}
 	}
-	
+
 	public void addOneLine(List<String[]> output, String assign, long time, String type, String pid, long duration) {
-		String[] nextLine = new String[5]; 
+		String[] nextLine = new String[5];
 		nextLine[0] = assign + " " + pid;
 		Date date = new Date(time);
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -1293,9 +1885,10 @@ public abstract class Replayer {
 			output.add(nextLine);
 		}
 	}
-	
-	public void addOneLine(List<String[]> output, String pid, long runTime, long runDuration, long debugTime, long debugDuration) {
-		String[] nextLine = new String[5]; 
+
+	public void addOneLine(List<String[]> output, String pid, long runTime, long runDuration, long debugTime,
+			long debugDuration) {
+		String[] nextLine = new String[5];
 		nextLine[0] = pid;
 		Date date = new Date(runTime);
 		Date date2 = new Date(debugTime);
@@ -1308,7 +1901,7 @@ public abstract class Replayer {
 			output.add(nextLine);
 		}
 	}
-	
+
 	public String countConsecutiveCommands(StringBuffer list) {
 		char lastChar = ' ';
 		char curChar = ' ';
@@ -1319,18 +1912,18 @@ public abstract class Replayer {
 				lastChar = curChar;
 			}
 			curChar = list.charAt(i);
-			if (curChar == lastChar){
+			if (curChar == lastChar) {
 				count++;
-			} else if (i != 0){
+			} else if (i != 0) {
 				retVal.append(lastChar + "" + count);
 				count = 1;
 			}
 		}
-		retVal.append(curChar + " "+ count);
+		retVal.append(curChar + " " + count);
 		return retVal.toString();
 	}
-	
-	public void sortNestedCommands(List<List<EHICommand>> nestedCommands){
+
+	public void sortNestedCommands(List<List<EHICommand>> nestedCommands) {
 		for (int i = 0; i < nestedCommands.size(); i++) {
 			List<EHICommand> commands = nestedCommands.get(i);
 			if (commands == null || commands.size() < 2) {
@@ -1341,9 +1934,9 @@ public abstract class Replayer {
 			}
 		}
 	}
-	
-	public void sortCommands(List<EHICommand> commands){
-		for(int i = 0; i < commands.size(); i++) {
+
+	public void sortCommands(List<EHICommand> commands) {
+		for (int i = 0; i < commands.size(); i++) {
 			if (commands.get(i) == null) {
 				commands.remove(i);
 				i--;
@@ -1351,20 +1944,20 @@ public abstract class Replayer {
 		}
 		EHICommand command = null;
 		long cur = 0;
-		for(int i = 0; i < commands.size(); i++) {
+		for (int i = 0; i < commands.size(); i++) {
 			command = commands.get(i);
-			cur = command.getStartTimestamp()+command.getTimestamp();
-			int j = i-1;
-			while (j >= 0){
+			cur = command.getStartTimestamp() + command.getTimestamp();
+			int j = i - 1;
+			while (j >= 0) {
 				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
 					j--;
 				} else {
 					break;
 				}
 			}
-			if (j < i-1) {
+			if (j < i - 1) {
 				commands.remove(i);
-				commands.add(j+1, command);
+				commands.add(j + 1, command);
 			}
 		}
 	}
@@ -1378,7 +1971,7 @@ public abstract class Replayer {
 			return 0;
 		}
 	}
-	
+
 	public String[] getPauseHeader() {
 		List<String> retVal = new ArrayList<>();
 		retVal.add("ID");
@@ -1391,17 +1984,16 @@ public abstract class Replayer {
 		}
 		return retVal.toArray(new String[1]);
 	}
-	
+
 	public static EventType getEventType(EHICommand command) {
-		if (command instanceof InsertStringCommand || 
-			command instanceof CopyCommand ||
-			command instanceof Delete ||
-			command instanceof Replace || command instanceof PasteCommand) {
+		if (command instanceof InsertStringCommand || command instanceof CopyCommand || command instanceof Delete
+				|| command instanceof Replace || command instanceof PasteCommand) {
 //			return "Edit";
 			return EventType.Edit;
 
 		}
-		if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput || command instanceof EHExceptionCommand) {
+		if (command instanceof RunCommand || command instanceof ConsoleOutputCommand || command instanceof ConsoleInput
+				|| command instanceof EHExceptionCommand) {
 //			return "IO";
 			return EventType.IO;
 		}
@@ -1411,7 +2003,7 @@ public abstract class Replayer {
 		}
 		if (command instanceof RequestHelpCommand || command instanceof GetHelpCommand) {
 //		        	return "Request";
-			return EventType.Request  ;
+			return EventType.Request;
 
 		}
 		if (command instanceof LocalCheckCommand) {
@@ -1423,12 +2015,12 @@ public abstract class Replayer {
 		return EventType.Other;
 
 	}
-	
+
 	public File getProjectFolder(File folder) {
 		for (File file : folder.listFiles(File::isDirectory)) {
 			if (file.getName().equals("src")) {
 				return folder;
-			} 
+			}
 		}
 		for (File file : folder.listFiles(File::isDirectory)) {
 			if ((file = getProjectFolder(file)) != null) {
@@ -1437,24 +2029,24 @@ public abstract class Replayer {
 		}
 		return null;
 	}
-	
+
 	protected String[] getHeader() {
-		String[] header = new String[4*REST.length+5];
+		String[] header = new String[4 * REST.length + 5];
 		header[0] = "Student";
 		header[1] = "Total Time Spent";
 		header[2] = "Wall Clock Time";
 		for (int i = 0; i < REST.length; i++) {
 			String t = getTime(REST[i]);
-			header[3+i*4] = "Active Time(" + t + ")";
-			header[4+i*4] = "Rest Time(" + t + ")";
-			header[5+i*4] = "# of Rests(" + t + ")";
-			header[6+i*4] = "Avg. Rest Time(" + t + ")";
+			header[3 + i * 4] = "Active Time(" + t + ")";
+			header[4 + i * 4] = "Rest Time(" + t + ")";
+			header[5 + i * 4] = "# of Rests(" + t + ")";
+			header[6 + i * 4] = "Avg. Rest Time(" + t + ")";
 		}
-		header[header.length-2] = "# of Days";
-		header[header.length-1] = "Time Spent Each Day";
+		header[header.length - 2] = "# of Days";
+		header[header.length - 1] = "Time Spent Each Day";
 		return header;
 	}
-	
+
 	protected String getTime(long t) {
 		long ret = t / ONE_SECOND;
 		if (ret < 60) {
@@ -1467,7 +2059,7 @@ public abstract class Replayer {
 		double ret2 = ret / 60.0;
 		return ret2 + "h";
 	}
-	
+
 	protected String getTime(double t) {
 		double ret = t / ONE_SECOND;
 		DecimalFormat df = new DecimalFormat("#.###");
@@ -1482,15 +2074,15 @@ public abstract class Replayer {
 		return df.format(ret);
 	}
 
-	protected long totalTimeSpent(List<List<EHICommand>> nestedCommands){
+	protected long totalTimeSpent(List<List<EHICommand>> nestedCommands) {
 		long projectTime = 0;
-		for(int k = 0; k < nestedCommands.size(); k++) {
+		for (int k = 0; k < nestedCommands.size(); k++) {
 			List<EHICommand> commands = nestedCommands.get(k);
 			if (commands.isEmpty()) {
 				continue;
 			}
 			int j = 0;
-			for(; j < commands.size(); j++) {
+			for (; j < commands.size(); j++) {
 				if (commands.get(j).getStartTimestamp() > 0 || commands.get(j).getTimestamp() > 0) {
 					break;
 				}
@@ -1499,15 +2091,15 @@ public abstract class Replayer {
 				j--;
 			}
 			long timestamp1 = commands.get(j).getTimestamp() + commands.get(j).getStartTimestamp();
-			EHICommand command2 = commands.get(commands.size()-1);
+			EHICommand command2 = commands.get(commands.size() - 1);
 			long timestamp2 = command2.getStartTimestamp() + command2.getTimestamp();
 			projectTime += timestamp2 - timestamp1;
 		}
 		return projectTime;
 	}
-	
+
 	protected long[] restTime(List<List<EHICommand>> nestedCommands, long time, long time2) {
-		long[] restTime = {0,0,0};
+		long[] restTime = { 0, 0, 0 };
 		for (List<EHICommand> commands : nestedCommands) {
 			for (EHICommand command : commands) {
 				if (command instanceof PauseCommand) {
@@ -1524,7 +2116,7 @@ public abstract class Replayer {
 		}
 		return restTime;
 	}
-	
+
 	protected long wallClockTime(List<List<EHICommand>> nestedCommands) {
 		long wallClockTime = 0;
 		EHICommand c1 = null;
@@ -1541,11 +2133,12 @@ public abstract class Replayer {
 		if (c1 == null) {
 			return 0;
 		}
-		c2 = nestedCommands.get(nestedCommands.size()-1).get(nestedCommands.get(nestedCommands.size()-1).size()-1);
-		wallClockTime = c2.getStartTimestamp()+c2.getTimestamp()-c1.getStartTimestamp()-c1.getTimestamp();
+		c2 = nestedCommands.get(nestedCommands.size() - 1)
+				.get(nestedCommands.get(nestedCommands.size() - 1).size() - 1);
+		wallClockTime = c2.getStartTimestamp() + c2.getTimestamp() - c1.getStartTimestamp() - c1.getTimestamp();
 		return wallClockTime;
 	}
-	
+
 	protected String[] daysSpent(List<List<EHICommand>> nestedCommands) {
 		List<String> retVal = new ArrayList<>();
 		int days = 1;
@@ -1563,7 +2156,7 @@ public abstract class Replayer {
 		}
 		startTime = command.getStartTimestamp();
 		startTime -= startTime % DAY;
-		commands = nestedCommands.get(nestedCommands.size()-1);
+		commands = nestedCommands.get(nestedCommands.size() - 1);
 		endTime = command.getStartTimestamp() + command.getTimestamp();
 		endTime = endTime - endTime % DAY + DAY;
 		long timeStamp = 0;
@@ -1573,13 +2166,13 @@ public abstract class Replayer {
 			nestedCommands2.add(commands2);
 			for (int j = 0; j < commands.size(); j++) {
 				command = commands.get(j);
-				timeStamp = command.getStartTimestamp()+command.getTimestamp();
+				timeStamp = command.getStartTimestamp() + command.getTimestamp();
 				if (timeStamp == 0) {
 					continue;
 				}
-				if (timeStamp > startTime && timeStamp < (startTime+DAY)) {
+				if (timeStamp > startTime && timeStamp < (startTime + DAY)) {
 					commands2.add(command);
-				} else if (timeStamp >= (startTime+DAY)){
+				} else if (timeStamp >= (startTime + DAY)) {
 					days++;
 					startTime = timeStamp - timeStamp % DAY;
 					if (nestedCommands2.size() > 0 && nestedCommands2.get(0).size() > 0) {
@@ -1595,11 +2188,11 @@ public abstract class Replayer {
 		if (nestedCommands2.size() > 0 && nestedCommands2.get(0).size() > 0) {
 			retVal.add(format(totalTimeSpent(nestedCommands2)));
 		}
-		retVal.add(0,days+"");
+		retVal.add(0, days + "");
 		return retVal.toArray(new String[1]);
 	}
 
-	protected String format(long timeSpent){
+	protected String format(long timeSpent) {
 		boolean negative = false;
 		if (timeSpent < 0) {
 			negative = true;
@@ -1608,7 +2201,7 @@ public abstract class Replayer {
 		long hour = timeSpent / 3600000;
 		long minute = timeSpent % 3600000 / 60000;
 		long second = timeSpent % 60000 / 1000;
-		return (negative?"-":"") + String.format("%d:%02d:%02d", hour, minute, second);
+		return (negative ? "-" : "") + String.format("%d:%02d:%02d", hour, minute, second);
 //		return negative?"-":"" + hour + ":" + (minute>9?minute:"0"+minute) + ":" + (second>9?second:("0"+second));
 	}
 
@@ -1628,7 +2221,7 @@ public abstract class Replayer {
 		}
 		return false;
 	}
-	
+
 	public boolean isProvided(String s) {
 		for (String url : WebCommand.PROVIDED_URL) {
 			if (s.equals(url)) {
@@ -1639,7 +2232,7 @@ public abstract class Replayer {
 	}
 
 	public abstract void delete(String path);
-	
+
 	public void deleteStudent(File student) {
 		System.out.println("Deleting student " + student);
 		if (!student.exists()) {
@@ -1647,13 +2240,13 @@ public abstract class Replayer {
 			return;
 		}
 		File logFolder = null;
-		File submission = new File(student,"Submission attachment(s)");
+		File submission = new File(student, "Submission attachment(s)");
 		if (submission.exists()) {
-			logFolder = new File(getProjectFolder(submission), "Logs"+File.separator+"Eclipse");
+			logFolder = new File(getProjectFolder(submission), "Logs" + File.separator + "Eclipse");
 		} else {
 			logFolder = new File(student, "Eclipse");
 			if (!logFolder.exists()) {
-				logFolder = new File(getProjectFolder(student), "Logs"+File.separator+"Eclipse");
+				logFolder = new File(getProjectFolder(student), "Logs" + File.separator + "Eclipse");
 			}
 		}
 		if (!logFolder.exists()) {
@@ -1676,13 +2269,14 @@ public abstract class Replayer {
 			Assignment assign = null;
 			Matcher matcher = null;
 			while ((line = br.readLine()) != null) {
-				if (ecPattern.matcher(line).matches()){
+				if (ecPattern.matcher(line).matches()) {
 					if ((line = br.readLine()) != null) {
 						for (String test : line.split(", ")) {
 							if (assign != null) {
 								assign.addEC(test);
 							}
-						};
+						}
+						;
 					}
 				} else if (assignPattern.matcher(line).matches()) {
 					if (!assignMap.containsKey(line)) {
@@ -1694,7 +2288,8 @@ public abstract class Replayer {
 				} else if ((matcher = suitePattern.matcher(line)).matches()) {
 //					Matcher matcher = suitePattern.matcher(line);
 //					matcher.matches();
-					Suite suite = new Suite(matcher.group(1), new HashSet<String>(Arrays.asList(matcher.group(2).split(", "))));
+					Suite suite = new Suite(matcher.group(1),
+							new HashSet<String>(Arrays.asList(matcher.group(2).split(", "))));
 					if (assign != null) {
 						assign.addSuite(suite);
 					}
@@ -1707,9 +2302,9 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void createEvents(String assign, Map<String, List<List<EHICommand>>> data) {
-		File csv = new File(assign+"Event.csv");
+		File csv = new File(assign + "Event.csv");
 		FileWriter fw;
 		List<String[]> output = new ArrayList<>();
 		try {
@@ -1721,7 +2316,7 @@ public abstract class Replayer {
 			CSVWriter cw = new CSVWriter(fw);
 //			String[] header = {"case_id", "timestamp", "activity", "user"};
 //			String[] header = {"case_id", "timestamp", "activity", "duration", "user"};
-			String[] header = {"student", "First Run", "Run Duration", "First Debug", "Debug Duration"};
+			String[] header = { "student", "First Run", "Run Duration", "First Debug", "Debug Duration" };
 			cw.writeNext(header);
 			for (String student : data.keySet()) {
 				System.out.println("Writing " + assign + " student " + student + "to " + csv.getName());
@@ -1757,7 +2352,8 @@ public abstract class Replayer {
 //						}
 //						addOneLine(output, "",  command.getTime(), command.getType(), student.substring(student.lastIndexOf(File.separator)+1));
 					}
-					addOneLine(output, student.substring(student.lastIndexOf(File.separator)+1), firstRunTime, firstRunDuration, firstDebugTime, firstDebugDuration);
+					addOneLine(output, student.substring(student.lastIndexOf(File.separator) + 1), firstRunTime,
+							firstRunDuration, firstDebugTime, firstDebugDuration);
 				}
 			}
 			cw.writeAll(output);
@@ -1767,8 +2363,8 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
-	
-	public List<List<Command>> fixBreakdown(List<List<EHICommand>> nestedCommands){
+
+	public List<List<Command>> fixBreakdown(List<List<EHICommand>> nestedCommands) {
 		List<List<Command>> exceptionToFixList = new ArrayList<>();
 		List<Command> commandList = null;
 //		boolean fixing = false;
@@ -1777,7 +2373,7 @@ public abstract class Replayer {
 //		long exceptionTime = -1;
 //		long skipException = -1;
 //		long skipRun = -1;
-		for(int i = 0; i < nestedCommands.size(); i++) {
+		for (int i = 0; i < nestedCommands.size(); i++) {
 			boolean fixing = false;
 			int fixOffset = -1;
 			int range = 200;
@@ -1785,7 +2381,7 @@ public abstract class Replayer {
 			long skipException = -1;
 			long skipRun = -1;
 			List<EHICommand> commands = nestedCommands.get(i);
-			for(int j = 0; j < commands.size(); j++) {
+			for (int j = 0; j < commands.size(); j++) {
 				EHICommand command = commands.get(j);
 				long time = command.getStartTimestamp() + command.getTimestamp();
 				if (command instanceof ExceptionCommand) {
@@ -1799,7 +2395,7 @@ public abstract class Replayer {
 						skipException = time + 10000;
 //						exceptionTime = time;
 					}
-				} 
+				}
 				if (command instanceof Insert || command instanceof Replace || command instanceof Delete) {
 					if (fixing && commandList != null) {
 						int offset = Integer.parseInt(command.getAttributesMap().get("offset"));
@@ -1824,11 +2420,12 @@ public abstract class Replayer {
 					fixing = false;
 					fixOffset = -1;
 				}
-				if (commandList != null && command instanceof PauseCommand && Long.parseLong(command.getDataMap().get("pause")) > 5*60*1000) {
+				if (commandList != null && command instanceof PauseCommand
+						&& Long.parseLong(command.getDataMap().get("pause")) > 5 * 60 * 1000) {
 //					if (fixing && fixOffset == -1 && !commandList.isEmpty() && !commandList.get(commandList.size()-1).getType().equals("Pause")) {
 //						commandList.add(new Command("Fixing", exceptionTime+1000));
 //					}
-					
+
 					Command aCommand = new Command("Break", time);
 					aCommand.setDuration(Long.parseLong(command.getDataMap().get("pause")));
 					commandList.add(aCommand);
@@ -1859,7 +2456,8 @@ public abstract class Replayer {
 				}
 			}
 			if (commandList != null && !commandList.isEmpty()) {
-				commandList.add(new Command("EndSession", commands.get(commands.size()-1).getStartTimestamp() + commands.get(commands.size()-1).getTimestamp()));
+				commandList.add(new Command("EndSession", commands.get(commands.size() - 1).getStartTimestamp()
+						+ commands.get(commands.size() - 1).getTimestamp()));
 				removeExceptionRunFixed(commandList);
 				if (!commandList.isEmpty()) {
 					exceptionToFixList.add(commandList);
@@ -1869,18 +2467,18 @@ public abstract class Replayer {
 		}
 		return exceptionToFixList;
 	}
-	
-	public List<List<Command>> runs(List<List<EHICommand>> nestedCommands){
+
+	public List<List<Command>> runs(List<List<EHICommand>> nestedCommands) {
 		List<List<Command>> exceptionToFixList = new ArrayList<>();
 		List<Command> commandList = new ArrayList<>();
 		exceptionToFixList.add(commandList);
 		long lastRunTime = -1;
 		boolean isDebug = false;
-		for(int i = 0; i < nestedCommands.size(); i++) {
+		for (int i = 0; i < nestedCommands.size(); i++) {
 //			long skipRun = -1;
 			boolean skipRun = false;
 			List<EHICommand> commands = nestedCommands.get(i);
-			for(int j = 0; j < commands.size(); j++) {
+			for (int j = 0; j < commands.size(); j++) {
 				EHICommand command = commands.get(j);
 				long time = command.getStartTimestamp() + command.getTimestamp();
 				if (command instanceof RunCommand) {
@@ -1898,11 +2496,16 @@ public abstract class Replayer {
 						skipRun = true;
 					}
 				}
-				if (command instanceof Insert || command instanceof Replace || command instanceof Delete ||
-					(command instanceof EclipseCommand && (((EclipseCommand)command).getCommandID().equals("eventLogger.styledTextCommand.DELETE_PREVIOUS") || ((EclipseCommand)command).getCommandID().equals("org.eclipse.ui.edit.text.deletePreviousWord")) || 
-					(command instanceof PauseCommand && Long.parseLong(command.getDataMap().get("pause")) > 5 * 60000))) {
+				if (command instanceof Insert || command instanceof Replace || command instanceof Delete
+						|| (command instanceof EclipseCommand
+								&& (((EclipseCommand) command).getCommandID()
+										.equals("eventLogger.styledTextCommand.DELETE_PREVIOUS")
+										|| ((EclipseCommand) command).getCommandID()
+												.equals("org.eclipse.ui.edit.text.deletePreviousWord"))
+								|| (command instanceof PauseCommand
+										&& Long.parseLong(command.getDataMap().get("pause")) > 5 * 60000))) {
 					if (skipRun && !commandList.isEmpty()) {
-						Command command2 = commandList.get(commandList.size()-1);
+						Command command2 = commandList.get(commandList.size() - 1);
 						command2.setDuration(lastRunTime - command2.getTime());
 						if (isDebug) {
 							command2.setType("Debug");
@@ -1918,122 +2521,115 @@ public abstract class Replayer {
 		}
 		return exceptionToFixList;
 	}
-	
+
 	public void removeExceptionRunFixed(List<Command> list) {
-		for (int i = 0; i < list.size()-2; i++) {
-			if (isExcptionRunFixed(list.get(i), list.get(i+1), list.get(i+2))) {
-				list.remove(i+2);
-				list.remove(i+1);
+		for (int i = 0; i < list.size() - 2; i++) {
+			if (isExcptionRunFixed(list.get(i), list.get(i + 1), list.get(i + 2))) {
+				list.remove(i + 2);
+				list.remove(i + 1);
 				list.remove(i);
 				i--;
 			}
 		}
-		for (int i = 0; i < list.size()-1; i++) {
-			if (isExcptionFixed(list.get(i), list.get(i+1))) {
-				list.remove(i+1);
+		for (int i = 0; i < list.size() - 1; i++) {
+			if (isExcptionFixed(list.get(i), list.get(i + 1))) {
+				list.remove(i + 1);
 				list.remove(i);
 				i--;
 			}
 		}
-		for (int i = 0; i < list.size()-1; i++) {
-			if (isBreakFixing(list.get(i), list.get(i+1)) && list.get(i+1).getTime() < list.get(i).getTime()+list.get(i).getDuration()-10000) {
-				list.remove(i+1);
+		for (int i = 0; i < list.size() - 1; i++) {
+			if (isBreakFixing(list.get(i), list.get(i + 1))
+					&& list.get(i + 1).getTime() < list.get(i).getTime() + list.get(i).getDuration() - 10000) {
+				list.remove(i + 1);
 			}
 		}
 		sortCommand(list);
-		for (int i = 0; i < list.size()-1; i++) {
+		for (int i = 0; i < list.size() - 1; i++) {
 			Command command = list.get(i);
-			if (!command.getType().equals("EndSession") && !command.getType().equals("Exception") && !command.getType().equals("Break") && !command.getType().equals("Debug") && !command.getType().equals("Run")) {
-				command.setDuration(list.get(i+1).getTime() - command.getTime());
+			if (!command.getType().equals("EndSession") && !command.getType().equals("Exception")
+					&& !command.getType().equals("Break") && !command.getType().equals("Debug")
+					&& !command.getType().equals("Run")) {
+				command.setDuration(list.get(i + 1).getTime() - command.getTime());
 			}
 		}
 	}
-	
-	public void sortCommand(List<Command> commands){
+
+	public void sortCommand(List<Command> commands) {
 		Command command = null;
 		long cur = 0;
-		for(int i = 0; i < commands.size(); i++) {
+		for (int i = 0; i < commands.size(); i++) {
 			command = commands.get(i);
 			cur = command.getTime();
-			int j = i-1;
-			while (j >= 0){
+			int j = i - 1;
+			while (j >= 0) {
 				if (commands.get(j).getTime() > cur) {
 					j--;
 				} else {
 					break;
 				}
 			}
-			if (j < i-1) {
+			if (j < i - 1) {
 				commands.remove(i);
-				commands.add(j+1, command);
+				commands.add(j + 1, command);
 			}
 		}
 	}
-	
+
 	public boolean isExcptionRunFixed(Command c1, Command c2, Command c3) {
 		return c1.getType().equals("Exception") && c2.getType().equals("Run") && c3.getType().equals("Fixed");
 	}
-	
+
 	public boolean isExcptionFixed(Command c1, Command c2) {
 		return c1.getType().equals("Exception") && c2.getType().equals("Fixed");
 	}
-	
+
 	public boolean isBreakFixing(Command c1, Command c2) {
 		return c1.getType().equals("Break") && c2.getType().equals("Fixing");
 	}
 
-	protected String convertToHourMinuteSecond(long timeSpent){
+	protected String convertToHourMinuteSecond(long timeSpent) {
 		int hour = (int) (timeSpent / 3600000);
 		int minute = (int) (timeSpent % 3600000 / 60000);
 		int second = (int) (timeSpent % 60000 / 1000);
-		return hour + ":" + minute + ":" + second;
+		return hour + ":" + (minute < 10 ? "0" + minute : minute) + ":" + (second < 10 ? "0" + second : second);
 	}
-	
+
 	List<ReplayerListener> replayerListeners = new ArrayList();
+
 	public void addReplayerListener(ReplayerListener aListener) {
 		replayerListeners.add(aListener);
 	}
-	 void notifyNewStudent( 
-				String aStudent,
-				List<List<EHICommand>> aNestedCommandList,
-				long aTotalTimeSpent,
-				long aWallClockTime,
-				long[] aRestTimes) {
-		 for (ReplayerListener aListener:replayerListeners) {
-			 aListener.newStudent( aStudent, aNestedCommandList, aTotalTimeSpent, aWallClockTime, aRestTimes);
-		 }
+
+	void notifyNewStudent(String aStudent, List<List<EHICommand>> aNestedCommandList, long aTotalTimeSpent,
+			long aWallClockTime, long[] aRestTimes) {
+		for (ReplayerListener aListener : replayerListeners) {
+			aListener.newStudent(aStudent, aNestedCommandList, aTotalTimeSpent, aWallClockTime, aRestTimes);
+		}
 	}
-	 void notifyNewAssignment(
-			 String anAssignment,
-			 Map<String, List<List<EHICommand>>> anAssignmentData) {
-		 for (ReplayerListener aListener:replayerListeners) {
-			 aListener.newAssignment(anAssignment, anAssignmentData);
-		 }
+
+	void notifyNewAssignment(String anAssignment, Map<String, List<List<EHICommand>>> anAssignmentData) {
+		for (ReplayerListener aListener : replayerListeners) {
+			aListener.newAssignment(anAssignment, anAssignmentData);
+		}
 	}
-	 void notifyNewSession(
-			 int aSessionNumber) {
-		 for (ReplayerListener aListener:replayerListeners) {
-			 aListener.newSession(aSessionNumber);
-		 }
+
+	void notifyNewSession(int aSessionNumber) {
+		for (ReplayerListener aListener : replayerListeners) {
+			aListener.newSession(aSessionNumber);
+		}
 	}
-	 
-	 void notifyNewCommandInSession (
-				int aStartCommandIndex,
-				long aCommandTime,
-				EHICommand aStartCommand,
-				String aStartCommandTypeChar,
-				String anEventTypeString,
-				boolean anInSession,
-				String aRestType,
-				String aText,
-				int anEndCommandIndex,
-				EHICommand anEndCommand) {
-		 for (ReplayerListener aListener:replayerListeners) {
+
+	void notifyNewCommandInSession(int aStartCommandIndex, long aCommandTime, EHICommand aStartCommand,
+			String aStartCommandTypeChar, String anEventTypeString, boolean anInSession, String aRestType, String aText,
+			int anEndCommandIndex, EHICommand anEndCommand) {
+		for (ReplayerListener aListener : replayerListeners) {
 //		  
 //			 aListener.newCommandInSession(aSession, aCommandIndex, aCommand, aCommandTypeChar, aRestType, aText);
-			 aListener.newCommandInSession(aStartCommandIndex, aCommandTime, aStartCommand, aStartCommandTypeChar, anEventTypeString, anInSession, aRestType, aText, anEndCommandIndex, anEndCommand);
-		 }
-	 }
+			aListener.newCommandInSession(aStartCommandIndex, aCommandTime, aStartCommand, aStartCommandTypeChar,
+					anEventTypeString, anInSession, aRestType, aText, anEndCommandIndex, anEndCommand);
+		}
+	}
 //		protected  List<EHICommand> addCommands(int aSessionIndex, List<EHICommand> commands, long nextStartTime) {
 //			for (CommandGenerator aCommandGenerator:commandGenerators) {
 //				commands = aCommandGenerator.addCommands(aSessionIndex, commands, nextStartTime);
@@ -2108,24 +2704,23 @@ public abstract class Replayer {
 //				}
 //			}
 //		} 
-	 
-}
 
+}
 
 class Command {
 	String type;
 	long time;
 	long duration;
-	
+
 	public Command(String type, long time) {
 		this.type = type;
 		this.time = time;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public long getTime() {
 		return time;
 	}
@@ -2133,7 +2728,7 @@ class Command {
 	public long getDuration() {
 		return duration;
 	}
-	
+
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
@@ -2141,5 +2736,5 @@ class Command {
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 }
