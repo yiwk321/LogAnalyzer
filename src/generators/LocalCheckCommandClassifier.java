@@ -45,7 +45,7 @@ public class LocalCheckCommandClassifier extends CommandGenerator{
 	
 	public static boolean isDifficultyPhase (
 			
-			List<EHICommand> aCommands, int aStartInde, int aStopIndex ) {
+			List<EHICommand> aCommands, int aStartInden, int aStopIndex ) {
 		// TO-DO
 		
 		return false;
