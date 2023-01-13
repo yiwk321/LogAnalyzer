@@ -40,7 +40,7 @@ public class LADriverPD extends Driver{
 			if (generate) {
 				delete();
 				try {
-				generate(); 
+				generate(false); 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
