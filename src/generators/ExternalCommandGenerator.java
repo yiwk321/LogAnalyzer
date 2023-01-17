@@ -48,32 +48,37 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 	long aStartTimeStamp = commands.get(0).getTimestamp2();
 	boolean aHasPauseCommand = hasPauseCommand(commands);
 //	if (lastAddedExternalIndex < studentLC.size()) {
+	Date aDate = new Date(aStartTimeStamp);
+//	System.out.println("Next start time:"+ aDate );
 	if (hasNextExternalEvent()) {
 
 		List<EHICommand> newCommands = new ArrayList<>();
 		EHICommand last = null;
 		EHICommand cur = null;
 //		String[] event = null;
-		long timestamp = 0;
-		// ignore events before the initial command
+		long nextExternalEventTimestamp = 0;
+		// ignore events before the initial command and initialize time stamp of next external command
 		while (true) {
 //			event = studentLC.get(lastAddedExternalIndex);
 			try {
 //				timestamp = df.parse(event[1]).getTime();
-				timestamp = getNextExternalEventTimeStamp();
+				nextExternalEventTimestamp = getNextExternalEventTimeStamp();
 
-				Date aLastEventDate = new Date(timestamp);
-				Date aDate2 = new Date(aStartTimeStamp);
+				// these are not referenced
+//				Date aLastEventDate = new Date(timestamp);
+//				Date aDate2 = new Date(aStartTimeStamp);
 				
-				if (timestamp > aStartTimeStamp) {
+				if (nextExternalEventTimestamp > aStartTimeStamp) {
 					break;
 				}
+				 aDate = new Date(nextExternalEventTimestamp);
+				 System.out.println("Ignoring command at timestamp:" + aDate);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			lastAddedExternalIndex++;
 //			if (lastAddedExternalIndex >= studentLC.size()) {
-			if (!hasNextExternalEvent()) {
+			if (!hasNextExternalEvent()) { // all external events occurred too early
 
 				break;
 			}
@@ -81,47 +86,56 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 	
 		
 //		for (EHICommand command : commands) {
-		for (int aCommandIndex = 0; aCommandIndex < commands.size(); aCommandIndex++) {
+  		for (int aCommandIndex = 0; aCommandIndex < commands.size(); aCommandIndex++) {
 			
 			EHICommand command = commands.get(aCommandIndex);
-			if (cur == null) {
+			if (cur == null) { // first command
 				cur = command;
-				newCommands.add(command);
+				newCommands.add(command); // add the first command
 			} else {
 				last = cur;
 				cur = command;
-				if (aCommandIndex == commands.size()-1 && timestamp < nextStartTime) {
+				if (aCommandIndex == commands.size()-1 && nextExternalEventTimestamp < nextStartTime) {
+					// we are at the end of the internal command list
 //					LocalCheckCommand command2 = new LocalCheckCommand(event[2]);
-					List<EHICommand> command2List = createExternalCommands(true); // why here?
-
-					while (timestamp < nextStartTime && 
+					//use the commands associated with nextExternalEventTimestamp
+					List<EHICommand> externalCommandList = createExternalCommands(true); // why here?
+					// get all the other external commands before the nextStartTime
+					while (nextExternalEventTimestamp < nextStartTime && 
 							hasNextExternalEvent()
 //							lastAddedExternalIndex < studentLC.size()
 							) {
 					//	command2 = new LocalCheckCommand(event[2]); 
-						command2List = createExternalCommands(); 
+						// why are we losing the original list
+						// we are not losing as we have not incremented index
+						externalCommandList = createExternalCommands(); // same as passing false
 						
-						if (last.getStartTimestamp() == 0) {
+						if (last.getStartTimestamp() == 0) { // first command, no last
 //							command2.setStartTimestamp(cur.getStartTimestamp());								
 //							command2.setTimestamp(timestamp-cur.getStartTimestamp());
-							for (EHICommand command2:command2List) {
-							command2.setStartTimestamp(cur.getStartTimestamp());								
-							command2.setTimestamp(timestamp-cur.getStartTimestamp());
+							for (EHICommand anExternalCommand:externalCommandList) {
+							anExternalCommand.setStartTimestamp(cur.getStartTimestamp());								
+							anExternalCommand.setTimestamp(nextExternalEventTimestamp-cur.getStartTimestamp());
 							}
 
 							
-						} else {
-							for (EHICommand command2:command2List) {
+						} else { // not first command, so there is last
+							for (EHICommand anExternalCommand:externalCommandList) {
 
-							command2.setStartTimestamp(last.getStartTimestamp());
-							command2.setTimestamp(timestamp-last.getStartTimestamp());
+							anExternalCommand.setStartTimestamp(last.getStartTimestamp());
+							anExternalCommand.setTimestamp(nextExternalEventTimestamp-last.getStartTimestamp());
 							}
 						}
-						for (EHICommand command2:command2List) {
-
-						newCommands.add(command2);
+						if (externalCommandList.size() > 1) {
+							System.err.println("Size of external commmads:" + externalCommandList.size() );
 						}
-						lastAddedExternalIndex++;
+						for (EHICommand anExternalCommand:externalCommandList) {
+
+						newCommands.add(anExternalCommand); 
+//						System.out.println ("Adding command:" + System.identityHashCode(anExternalCommand));
+
+						}
+						lastAddedExternalIndex++; // why not inside loop
 //						if (lastAddedExternalIndex >= studentLC.size()) {
 						if (!hasNextExternalEvent()) {
 							break;
@@ -132,34 +146,35 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 //						} catch (ParseException e) {
 //							e.printStackTrace();
 //						}
-						timestamp = getNextExternalEventTimeStamp();
+						nextExternalEventTimestamp = getNextExternalEventTimeStamp();
 					}
-				} else if (timestamp >= last.getStartTimestamp()+last.getTimestamp() && timestamp < cur.getStartTimestamp() + cur.getTimestamp()) {
+				} else if (nextExternalEventTimestamp >= last.getStartTimestamp()+last.getTimestamp() && nextExternalEventTimestamp < cur.getStartTimestamp() + cur.getTimestamp()) {
 //					LocalCheckCommand command2 = new LocalCheckCommand(event[2]);
-					List<EHICommand> command2List = createExternalCommands(true);
+					List<EHICommand> anExternalCommandList = createExternalCommands(true);
 
-					while (timestamp < cur.getStartTimestamp() + cur.getTimestamp() && 
+					while (nextExternalEventTimestamp < cur.getStartTimestamp() + cur.getTimestamp() && 
 //							lastAddedExternalIndex < studentLC.size()
 							hasNextExternalEvent()
 							) {
 //						command2 = new LocalCheckCommand(event[2]);
-						command2List = createExternalCommands();
+						anExternalCommandList = createExternalCommands();
 						if (last.getStartTimestamp() == 0) {
-							for (EHICommand command2:command2List) {
+							for (EHICommand anExternalCommand:anExternalCommandList) {
 
-							command2.setStartTimestamp(cur.getStartTimestamp());
-							command2.setTimestamp(timestamp-cur.getStartTimestamp());
+							anExternalCommand.setStartTimestamp(cur.getStartTimestamp());
+							anExternalCommand.setTimestamp(nextExternalEventTimestamp-cur.getStartTimestamp());
 							}
 						} else {
-							for (EHICommand command2:command2List) {
+							for (EHICommand anExtenalCommand:anExternalCommandList) {
 
-							command2.setStartTimestamp(last.getStartTimestamp());
-							command2.setTimestamp(timestamp-last.getStartTimestamp());
+							anExtenalCommand.setStartTimestamp(last.getStartTimestamp());
+							anExtenalCommand.setTimestamp(nextExternalEventTimestamp-last.getStartTimestamp());
 							}
 						}
-						for (EHICommand command2:command2List) {
+						for (EHICommand anExternalCommand:anExternalCommandList) {
 
-						newCommands.add(command2);
+						newCommands.add(anExternalCommand);
+//						System.out.println ("Adding command:" + System.identityHashCode(anExternalCommand));
 						}
 						lastAddedExternalIndex++;
 //						if (lastAddedExternalIndex >= studentLC.size()) {
@@ -173,10 +188,10 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 //						} catch (ParseException e) {
 //							e.printStackTrace();
 //						}
-						timestamp = getNextExternalEventTimeStamp();
+						nextExternalEventTimestamp = getNextExternalEventTimeStamp();
 					}
 					if (!aHasPauseCommand) {
-						for (EHICommand command2:command2List) {
+						for (EHICommand command2:anExternalCommandList) {
 					maybeAddPauseCommand(newCommands, command2, cur);
 						}
 					}
@@ -189,6 +204,18 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 	} else {
 		return super.addCommands(aSession, commands, nextStartTime);
 	}
+}
+public static String toCSVString (String[] aStrings) {
+	if (aStrings.length == 0) {
+		return "";
+	}
+	StringBuilder stringBuilder = new StringBuilder();
+	stringBuilder.append(aStrings[0]);
+	for (int anArrayIndex = 1; anArrayIndex < aStrings.length; anArrayIndex++) {
+		stringBuilder.append(',');
+		stringBuilder.append(aStrings[anArrayIndex]);
+	}
+	return stringBuilder.toString();
 }
 //public List<EHICommand> addCommandsNonModular(int aSession, List<EHICommand> commands, long nextStartTime) {
 ////if (student.contains("Beier")) {

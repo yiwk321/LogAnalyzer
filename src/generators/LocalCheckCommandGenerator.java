@@ -42,6 +42,7 @@ protected String[] previousEvent;
 protected long getNextExternalEventTimeStamp() {
 	String[] event = studentLC.get(lastAddedExternalIndex);
 	previousEvent = event;
+//	System.out.println("Previous event:" + System.identityHashCode(previousEvent) + event[2]);
 	try {
 		return df.parse(event[1]).getTime();
 	} catch (ParseException e) {
@@ -57,6 +58,7 @@ protected List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) {
 	 anEvent = studentLC.get(lastAddedExternalIndex);
 	}
 	EHICommand aCommand = new LocalCheckCommand(anEvent[2]);
+//	System.out.println("Local check command  " + System.identityHashCode(aCommand) + " for " + anEvent[2]);
 	List<EHICommand> retVal = new ArrayList<>();
 	retVal.add(aCommand);
 	return retVal;

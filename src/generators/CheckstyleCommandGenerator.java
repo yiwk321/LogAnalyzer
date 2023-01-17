@@ -80,18 +80,18 @@ public class CheckstyleCommandGenerator extends ExternalCommandGenerator {
 		
 	}
 	
-	public static String toCSVString (String[] aStrings) {
-		if (aStrings.length == 0) {
-			return "";
-		}
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(aStrings[0]);
-		for (int anArrayIndex = 1; anArrayIndex < aStrings.length; anArrayIndex++) {
-			stringBuilder.append(',');
-			stringBuilder.append(aStrings[anArrayIndex]);
-		}
-		return stringBuilder.toString();
-	}
+//	public static String toCSVString (String[] aStrings) {
+//		if (aStrings.length == 0) {
+//			return "";
+//		}
+//		StringBuilder stringBuilder = new StringBuilder();
+//		stringBuilder.append(aStrings[0]);
+//		for (int anArrayIndex = 1; anArrayIndex < aStrings.length; anArrayIndex++) {
+//			stringBuilder.append(',');
+//			stringBuilder.append(aStrings[anArrayIndex]);
+//		}
+//		return stringBuilder.toString();
+//	}
 	List<String[]> checkStyleEvents = new ArrayList();
 //	public static File findLocalChecksFolder (String aStudent) {
 //		File aStudentFile = new File(aStudent);

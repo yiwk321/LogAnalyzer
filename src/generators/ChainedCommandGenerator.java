@@ -42,6 +42,8 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
 			commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //			commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
+			commandGenerators.add(new LocalChecksRawBatchCommandGenerator(replayer, latch, aStudent, aStudentLog));
+
 			if (piazzaPosts != null) {
 				commandGenerators.add(new PiazzaCommandGenerator(replayer, latch, aStudent, aStudentLog, piazzaPosts));
 			}
