@@ -393,7 +393,8 @@ public class AnIntervalReplayerWithEdits {
 		try {
 //			LogPreprocessor.escapeAmpersands(log);
 			List<EHICommand> commands = reader.readAll(path);
-			sortCommands(commands, 0, commands.size()-1);
+//			sortCommands(commands, 0, commands.size()-1);
+			commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
 			if (log.getName().contains("copy")) {
 				log.delete();
 			}
@@ -430,32 +431,32 @@ public class AnIntervalReplayerWithEdits {
 		} 
 	}
 
-	protected void sortCommands(List<EHICommand> commands, int start, int end){
-		for(int i = 0; i < commands.size(); i++) {
-			if (commands.get(i) == null) {
-				commands.remove(i);
-				i--;
-			}
-		}
-		EHICommand command = null;
-		long cur = 0;
-		for(int i = 0; i < commands.size(); i++) {
-			command = commands.get(i);
-			cur = command.getStartTimestamp()+command.getTimestamp();
-			int j = i-1;
-			while (j >= 0){
-				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
-					j--;
-				} else {
-					break;
-				}
-			}
-			if (j < i-1) {
-				commands.remove(i);
-				commands.add(j+1, command);
-			}
-		}
-	}
+//	protected void sortCommands(List<EHICommand> commands, int start, int end){
+//		for(int i = 0; i < commands.size(); i++) {
+//			if (commands.get(i) == null) {
+//				commands.remove(i);
+//				i--;
+//			}
+//		}
+//		EHICommand command = null;
+//		long cur = 0;
+//		for(int i = 0; i < commands.size(); i++) {
+//			command = commands.get(i);
+//			cur = command.getStartTimestamp()+command.getTimestamp();
+//			int j = i-1;
+//			while (j >= 0){
+//				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
+//					j--;
+//				} else {
+//					break;
+//				}
+//			}
+//			if (j < i-1) {
+//				commands.remove(i);
+//				commands.add(j+1, command);
+//			}
+//		}
+//	}
 
 	public File getProjectFolder(File folder) {
 		for (File file : folder.listFiles(File::isDirectory)) {
