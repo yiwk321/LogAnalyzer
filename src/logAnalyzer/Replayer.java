@@ -222,7 +222,8 @@ public abstract class Replayer {
 //		try {
 //			LogPreprocessor.preProcessFileLines(log);
 			List<EHICommand> commands = reader.readAll(path);
-			sortCommands(commands);
+//			sortCommands(commands);
+			commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
 			return commands;
 	}
 	Set<File> filesAppendedEvents = new HashSet();
@@ -1931,37 +1932,38 @@ public abstract class Replayer {
 				nestedCommands.remove(i);
 				i--;
 			} else if (commands.size() > 2) {
-				sortCommands(commands);
+//				sortCommands(commands);
+				commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
 			}
 		}
 	}
 
-	public void sortCommands(List<EHICommand> commands) {
-		for (int i = 0; i < commands.size(); i++) {
-			if (commands.get(i) == null) {
-				commands.remove(i);
-				i--;
-			}
-		}
-		EHICommand command = null;
-		long cur = 0;
-		for (int i = 0; i < commands.size(); i++) {
-			command = commands.get(i);
-			cur = command.getStartTimestamp() + command.getTimestamp();
-			int j = i - 1;
-			while (j >= 0) {
-				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
-					j--;
-				} else {
-					break;
-				}
-			}
-			if (j < i - 1) {
-				commands.remove(i);
-				commands.add(j + 1, command);
-			}
-		}
-	}
+//	public void sortCommands(List<EHICommand> commands) {
+//		for (int i = 0; i < commands.size(); i++) {
+//			if (commands.get(i) == null) {
+//				commands.remove(i);
+//				i--;
+//			}
+//		}
+//		EHICommand command = null;
+//		long cur = 0;
+//		for (int i = 0; i < commands.size(); i++) {
+//			command = commands.get(i);
+//			cur = command.getStartTimestamp() + command.getTimestamp();
+//			int j = i - 1;
+//			while (j >= 0) {
+//				if (commands.get(j).getStartTimestamp() + commands.get(j).getTimestamp() > cur) {
+//					j--;
+//				} else {
+//					break;
+//				}
+//			}
+//			if (j < i - 1) {
+//				commands.remove(i);
+//				commands.add(j + 1, command);
+//			}
+//		}
+//	}
 
 	protected long getLogFileCreationTime(File file) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
