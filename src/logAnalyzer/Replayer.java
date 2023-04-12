@@ -142,6 +142,9 @@ public abstract class Replayer {
 
 	public Map<String, List<EHICommand>> readStudent(File student) {
 		System.out.println("Reading student " + student);
+		if (student.getName().contains("Mark")) {
+			System.out.println("Found target student ");
+		}
 		if (!student.exists()) {
 			System.out.println("Folder " + student + " does not exist");
 			return null;
@@ -192,7 +195,7 @@ public abstract class Replayer {
 				logFile.delete();
 				continue;
 			}
-			List<EHICommand> ret = readOneLogFile(logFile);
+			List<EHICommand> ret = LogPreprocessor.removeDuplicateLocalCheckCommands(readOneLogFile(logFile));
 			if (ret != null) {
 				logs.put(logFile.getPath(), ret);
 			} else {
@@ -269,6 +272,7 @@ public abstract class Replayer {
 	}
 	public List<EHICommand> readOneLogFile(File log){
 		try {
+//			LogPreprocessor.removeDuplicateLocalChecksLines(log);
 		List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
 		return retVal;
 		} catch (Exception e) {

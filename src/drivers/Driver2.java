@@ -46,9 +46,16 @@ public class Driver2 extends Driver{
 //										7
 //										};
 	static boolean generate = true;
+	static boolean analyze = true;
 //	static boolean generate = false;
 	static String generateFolderName = "Generated";
 	static int generateCommandType = Replayer.LOCALCHECK;
+	public static void setCourses(String[] aCourses) {
+		courses = aCourses;
+	}
+	public static void setAnalyze(boolean newVal) {
+		analyze =  newVal;
+	}
 	
 	public static void main(String[] args) {
 		for (String course : courses) {
@@ -73,7 +80,9 @@ public class Driver2 extends Driver{
 					generate(i == folders.length-1);
 //					generate(false);
 				}
+				if (analyze) {
 				analyze();
+				}
 			}
 		}
 		

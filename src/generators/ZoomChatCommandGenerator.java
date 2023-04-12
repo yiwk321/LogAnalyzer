@@ -45,9 +45,16 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		zoomChats = new ArrayList<>();
 		sessionTimes = new ArrayList<>();
 		this.sessionTimeMap = sessionTimeMap;
+		
 		findZoomChats(aStudent, zoomChatsFolder);
 		if (zoomChats.size() > 0) {
 			sessionTimeMap.put(student, sessionTimes);
+//			if (aStudent.contains("Marks")) {
+//				System.out.println("found Marks");
+//				for (ZoomChatCommand aCommand:zoomChats) {
+//					System.out.println("Chat command:" + aCommand.persist());
+//				}
+//			}
 		}
 		File[] files = new File(student).listFiles((file)->{
 			return !file.isDirectory() && file.getName().endsWith("ZoomSession");
@@ -75,7 +82,10 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		for (File chat : zoomChatFolder.listFiles()) {
 			Date sessionStartTime = new Date();
 			try {
-				sessionStartTime = df2.parse(chat.getName().substring(0, 18));
+				String sessionStartTimeString = chat.getName().substring(0, 18);
+//				sessionStartTime = df2.parse(chat.getName().substring(0, 18));
+				sessionStartTime = df2.parse(sessionStartTimeString);
+
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -202,7 +212,13 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 	protected long getNextExternalEventTimeStamp() {
 		// TODO Auto-generated method stub
 		previousEvent = zoomChats.get(lastAddedExternalIndex);
-		return previousEvent.getStartTimestamp() + previousEvent.getTimestamp();
+//		return previousEvent.getStartTimestamp() + previousEvent.getTimestamp();
+		long retVal = previousEvent.getStartTimestamp() + previousEvent.getTimestamp();
+//		if (student.contains("Marks")) {
+//			Date date = new Date(retVal);
+//			System.out.println ("Next event:" + date);
+//		}
+		return retVal;
 	}
 	
 	@Override

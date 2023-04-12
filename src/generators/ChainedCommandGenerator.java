@@ -22,6 +22,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 	String student;
 	Map<String, List<EHICommand>> commandMap;
 	boolean appendAllRemainingCommands;
+	protected boolean foundTracedStudent = false;
 //	private Map<String, String> logToWrite;
 
 	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
@@ -29,6 +30,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder, HashMap<String, List<Long>> map, boolean appendAllRemainingCommands) {
 		replayer = aReplayer;
 		student = aStudent;
+		if (student.contains("Mark")) {
+			foundTracedStudent = true;
+		}
 		latch = aLatch;
 		commandMap = aStudentLog;
 		this.appendAllRemainingCommands = appendAllRemainingCommands;
@@ -39,7 +43,7 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			System.out.println("Found localcheck logs for" + aStudent + ", not adding to command generator");
 
 //			commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
-			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
+//			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
 			commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //			commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
 			commandGenerators.add(new LocalChecksRawBatchCommandGenerator(replayer, latch, aStudent, aStudentLog));
@@ -66,11 +70,15 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			if (latch != null) {
 				System.out.println(Thread.currentThread().getName() + " started");
 			}
+			if (foundTracedStudent) {
+				System.out.println("found traced student");
+			}
 //			for (String fileName : commandMap.keySet()) {
 			String[] keyset = commandMap.keySet().toArray(new String[0]);
 			long lastCommandTime = -1;
 			for (int j = 0; j < commandMap.size(); j++) {
 				String fileName = keyset[j];
+				System.out.println("Processing file:" + fileName);
 //				List<EHICommand> commands = removePauseCommands(commandMap.get(fileName));
 				List<EHICommand> commands = commandMap.get(fileName);
 				File file = new File(fileName);
@@ -79,6 +87,8 @@ public class ChainedCommandGenerator extends CommandGenerator {
 				}
 				long startTimestamp = getLogFileCreationTime(file);
 				if (commands.get(commands.size()-1).getStartTimestamp() == 0) {
+					System.out.println("Resetting start time stamp to:" + startTimestamp);
+
 					for (EHICommand command : commands) {
 						command.setStartTimestamp(startTimestamp);
 					}

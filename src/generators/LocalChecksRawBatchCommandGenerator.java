@@ -115,7 +115,14 @@ public class LocalChecksRawBatchCommandGenerator extends ExternalCommandGenerato
 		setAssignmentWithNumber(aStudent);
 //		checkStyleEvents = readCheckstyleEvents(aStudent);
 //		student = aStudent;
-		File[]  aLocalChecksRawFiles = FileUtility.getLocalChecksRawsLogFiles(aStudent );
+		File[]  aLocalChecksRawFiles = null;
+		try {
+		aLocalChecksRawFiles = FileUtility.getLocalChecksRawsLogFiles(aStudent );
+		} catch (Exception e) {
+			System.err.println("Could not find local checks raw logs files");
+			e.printStackTrace();
+			
+		}
 		File aTargetLocalChecksRawFile = null;
 		
 		if (aLocalChecksRawFiles != null && assignmentWithNumber != null) {

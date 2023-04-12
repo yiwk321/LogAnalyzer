@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import fluorite.commands.EHICommand;
+import fluorite.commands.LocalChecksRawCommand;
 import util.misc.Common;
 
 public class LogPreprocessor {
@@ -177,6 +181,46 @@ public class LogPreprocessor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+//		String anOriginal = Common.toText(aFile);
+//		if (anOriginal.contains(ESCAPED_AMPERSAND)) {
+//			return; // we have already preprocessed
+//		}
+//		String aNew = anOriginal.replace("&", ESCAPED_AMPERSAND);
+//		int anIndex = anOriginal.indexOf("&");
+//		if (aNew.equals(anOriginal)) {;
+//			return;
+//		}
+//		Common.writeText(aFile, aNew);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+
+	}
+	public static List<EHICommand>  removeDuplicateLocalCheckCommands(List<EHICommand> aCommands) {
+		if (aCommands == null) {
+			return null;
+		}
+		List<EHICommand> aPossiblyModifiedCommands = new ArrayList();
+		LocalChecksRawCommand aPrevious = null, aNew = null;
+		boolean aChanged = false;
+
+		for(EHICommand aCommand:aCommands) {
+			if (aCommand instanceof LocalChecksRawCommand) {
+				aNew = (LocalChecksRawCommand) aCommand;
+			     if (aPrevious != null) {
+					if (aNew.getCSVRow().equals(aPrevious.getCSVRow())) { 
+						aChanged = true;
+//						System.out.println(" duplicate\n" + aNew.getCSVRow()+ " of \n" + aPrevious.getCSVRow());
+						continue;
+					}
+				}
+				aPrevious = aNew;
+			}
+			aPossiblyModifiedCommands.add(aCommand);
+		}
+		return aPossiblyModifiedCommands;
+			
 
 //		String anOriginal = Common.toText(aFile);
 //		if (anOriginal.contains(ESCAPED_AMPERSAND)) {

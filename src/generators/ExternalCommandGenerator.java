@@ -46,6 +46,8 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 //		System.out.println("found student");
 //	}
 	long aStartTimeStamp = commands.get(0).getTimestamp2();
+	Date aStartDate = new Date(aStartTimeStamp);
+//	System.out.println("Adding commands for start time:" + aStartDate);
 	boolean aHasPauseCommand = hasPauseCommand(commands);
 //	if (lastAddedExternalIndex < studentLC.size()) {
 	Date aDate = new Date(aStartTimeStamp);
@@ -72,7 +74,8 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 					break;
 				}
 				 aDate = new Date(nextExternalEventTimestamp);
-				 System.out.println("Ignoring command at timestamp:" + aDate);
+				 
+//				 System.out.println("Ignoring command at timestamp:" + aDate + "as it is greater than start date:" + aStartDate + "(" + this + ")");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -195,7 +198,7 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 					maybeAddPauseCommand(newCommands, command2, cur);
 						}
 					}
-				} else {
+				} else { // need to advance current command to find next sandwiched command
 					newCommands.add(command);
 				}
 			}

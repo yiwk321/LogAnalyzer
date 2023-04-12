@@ -18,9 +18,18 @@ public class ListenableFolderAnalyzer extends Driver{
 ////										5,
 ////										6
 //										};
-	
 	public static void analyzeFolder(
 			String aFolder, 
+			boolean isGenerate,
+			boolean isDelete,
+			ReplayerListener[] aReplayerListeners) {
+		analyzeFolder(aFolder, null, null, isGenerate, isDelete, aReplayerListeners);
+		
+	}
+	public static void analyzeFolder(
+			String aFolder, 
+			String aPIazzaPostsFolder,
+			String aZoomChatFolder,
 			boolean isGenerate,
 			boolean isDelete,
 			ReplayerListener[] aReplayerListeners) {

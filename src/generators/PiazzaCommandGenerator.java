@@ -48,7 +48,12 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 			return;
 		}
 		String onyen = matcher.group(3);
-		String author = onyen+ "(" + onyen + "@live.unc.edu)";
+//		if (student.contains("Neville")) {
+//			System.out.println("found author");
+//		}
+//		String author = onyen+ "(" + onyen + "@live.unc.edu)";
+		String author = onyen;
+
 		if (!piazzaPostsJson.has(author)) {
 			return;
 		}
