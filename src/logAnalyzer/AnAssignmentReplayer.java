@@ -1,10 +1,14 @@
 package logAnalyzer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -15,9 +19,22 @@ import org.json.JSONObject;
 import analyzer.extension.replayView.FileUtility;
 import fluorite.commands.EHICommand;
 import fluorite.commands.EclipseCommand;
+import generators.PiazzaCommandGenerator;
+import generators.ZoomChatCommandGenerator;
 
 public class AnAssignmentReplayer extends Replayer {
 	protected Map<String, Map<String, List<EHICommand>>> allLogs;
+	protected Set<String> zoomChatters;
+	protected Set<String> piazzaPosters;
+	protected Set<String> assignmentSubmitters;
+	protected Set<String> nonAssignmentSubmitters;
+//	protected Set<String> piazzaNonAssignmentSubmitters;
+//	protected Set<String> zoomNonAssignmentSubmitters;
+
+	protected JSONObject piazzaPosts;
+	protected File piazzaPostFile;
+	protected String piazzaPostsString;
+	protected File zoomChatsFolder;
 
 	public AnAssignmentReplayer() {
 		System.setProperty("user.timezone", "America/New_York");
@@ -42,29 +59,89 @@ public class AnAssignmentReplayer extends Replayer {
 
 	HashMap<String, List<Long>> sessionTimeMap = new HashMap<>();
 
+	public  void findAllAssignmentSubmitters(Map<String, Map<String, List<EHICommand>>> assignLog) {
+		Set<String> retVal = new HashSet();
+		for (String student : assignLog.keySet()) {
+			int aLeftParenIndex = student.indexOf("(");
+			String aStudentName = student.substring(aLeftParenIndex+1, student.length() - 1);
+			String aNormalizedStudentName = normalizeName(aStudentName);
+			retVal.add(aNormalizedStudentName);
+		}
+
+		assignmentSubmitters = retVal;
+	}
 	
+	public static String normalizeName(String aName) {
+		String[] aNameComponents = aName.split("\\[");
+		return aNameComponents[0];
+	}
+	public void findAllNonAssignmentSubmitters( ) {
+		Set<String> retVal = new HashSet();
+		retVal.addAll(piazzaPosters);
+		retVal.addAll(zoomChatters);
+		retVal.removeAll(assignmentSubmitters);
+		nonAssignmentSubmitters = retVal;
+//		System.out.println("Submitters :" + assignmentSubmitters );
+//		System.out.println("Non submitters: " + nonAssignmentSubmitters);
+		
+	}
+
+	public void findAllPiazzaAndZoomStudents(String assign) {
+		piazzaPostFile = findPiazzaPostFile(assign);
+		piazzaPosts = null;
+		if (piazzaPostFile != null && piazzaPostFile.exists()) {
+			piazzaPostsString = FileUtility.readFile(piazzaPostFile).toString();
+			piazzaPosts = new JSONObject(piazzaPostsString);
+			piazzaPosters = PiazzaCommandGenerator.findAllPiazzaPosters(piazzaPosts);
+
+		}
+		zoomChatsFolder = findZoomChatsFolder(assign);
+		zoomChatters = ZoomChatCommandGenerator.findAllZoomChatters(zoomChatsFolder);
+	}
+	
+	protected boolean isSynthesized(File aStudent) {
+		if (synthesizedStudents == null) {
+			return false;
+		}
+		for (File aSynthesizedStudent:synthesizedStudents) {
+			if (aStudent.equals(aSynthesizedStudent)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void createExtraCommandAssignment(CountDownLatch latch, String assign,
-			Map<String, Map<String, List<EHICommand>>> assignLog, String surfix, int mode, boolean appendAllRemainingCommands) {
+			Map<String, Map<String, List<EHICommand>>> assignLog, String surfix, int mode,
+			boolean appendAllRemainingCommands) {
 		Map<String, List<String[]>> localCheckEvents = null;
 		if (mode == LOCALCHECK) {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
-		File piazzaPostFile = findPiazzaPostFile(assign);
-		JSONObject piazzaPosts = null;
-		if (piazzaPostFile != null && piazzaPostFile.exists()) {
-			String piazzaPostsString = FileUtility.readFile(piazzaPostFile).toString();
-			piazzaPosts = new JSONObject(piazzaPostsString);
-		}
-		File zoomChatsFolder = findZoomChatsFolder(assign);
+//		 piazzaPostFile = findPiazzaPostFile(assign);
+//		 piazzaPosts = null;
+//		if (piazzaPostFile != null && piazzaPostFile.exists()) {
+//			piazzaPostsString = FileUtility.readFile(piazzaPostFile).toString();
+//			piazzaPosts = new JSONObject(piazzaPostsString);
+//			piazzaPosters = PiazzaCommandGenerator.findAllPiazzaPosters(piazzaPosts);
+//
+//		}
+//		 zoomChatsFolder = findZoomChatsFolder(assign);
+//		zoomChatters = ZoomChatCommandGenerator.findAllZoomChatters(zoomChatsFolder);
 		for (String student : assignLog.keySet()) {
+			File aStudentFile = new File(student);
 //			createExtraCommandStudent(latch, assignLog.get(student), student, surfix, mode, localCheckEvents == null ? null : localCheckEvents.get(student));
 			List<String[]> studentLocalCheckEvents = localCheckEvents == null ? null : localCheckEvents.get(student);
 			if (studentLocalCheckEvents == null) {
 				studentLocalCheckEvents = new ArrayList<>();
 			}
+			boolean modifiedAppendRemaniningCommands = appendAllRemainingCommands || isSynthesized(new File(student));
+//			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
+//					studentLocalCheckEvents, piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
-					studentLocalCheckEvents, piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
+					studentLocalCheckEvents, piazzaPosts, zoomChatsFolder, sessionTimeMap, modifiedAppendRemaniningCommands);
 
+		
 		}
 	}
 
@@ -88,6 +165,71 @@ public class AnAssignmentReplayer extends Replayer {
 		return null;
 	}
 
+//	protected List<EHICommand> createEmptyLog() {
+//		List<EHICommand> emptyLog = new ArrayList<>();
+//		EclipseCommand command = new EclipseCommand("", 0);
+//		command.setTimestamp(0);
+//		command.setStartTimestamp(0);
+//		emptyLog.add(command);
+//		emptyLog.add(command);
+//		emptyLog.add(command);
+//		return emptyLog;
+//	}
+//
+//	protected File createEmptyLogFile(File student, List<EHICommand> log) {
+//		File logFolder = null;
+//		File submission = new File(student, "Submission attachment(s)");
+//		if (submission.exists()) {
+//			logFolder = getProjectFolder(submission);
+//			if (logFolder != null) {
+//				logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
+//			}
+//		}
+//		if (logFolder == null) {
+//			return null;
+//		}
+//		logFolder.mkdirs();
+//		File emptyLogFile = new File(logFolder, "Log2010-01-01-00-00-00-000.xml");
+////		emptyLogFile.createNewFile();
+//		return emptyLogFile;
+////		Map<String, List<EHICommand>> emptyMap = new HashMap<>();
+////
+////		emptyMap.put(emptyLogFile.getPath(), log);
+////		logs.put(student.getPath(), emptyMap);
+//	}
+	
+	public static File createEmptySubmission(File assign, String aStudent) {
+		String[] aNames = aStudent.split(" ");
+		String aSrcLogFileName
+		=  aNames[1] + ", " + aNames[0] + "(" + aStudent + ")" +
+		 "/Submission attachment(s)/Synthesized/src";
+		File aSrcFile = new File (assign, aSrcLogFileName);
+		aSrcFile.mkdirs();
+		File aStudentSubmission = aSrcFile.getParentFile().getParentFile().getParentFile();
+//		String aLogFileName
+//			=  aNames[1] + "," + aNames[0] + "(" + aStudent + ")" +
+//			 "/Submission attachment(s)/Synthesized/Logs/Eclipse";
+//		
+//		
+//		File aLogFile = new File(assign, aLogFileName);
+		
+//		return aLogFile;
+		return aStudentSubmission;
+		
+	}
+	
+	public static List<File> createEmptySubmissions(File assign, Collection<String> aStudents) {
+		List<File> retVal = new ArrayList();
+		for (String aStudent:aStudents) {
+			File aFile = createEmptySubmission(assign, aStudent);
+			retVal.add(aFile);
+		}
+		return retVal;
+	}
+	
+	
+
+
 	public Map<String, Map<String, List<EHICommand>>> readAssignment(File assign) {
 		System.out.println("Reading assignment " + assign);
 		if (!assign.exists()) {
@@ -95,42 +237,43 @@ public class AnAssignmentReplayer extends Replayer {
 			return null;
 		}
 		Map<String, Map<String, List<EHICommand>>> logs = new TreeMap<>();
-		for (File student : assign.listFiles((parent, fileName)->{
+		for (File student : assign.listFiles((parent, fileName) -> {
 			return fileName.contains(",") && fileName.contains("(");
 		})) {
-			Map<String, List<EHICommand>> ret = readStudent(student);
-			if (ret != null && !ret.isEmpty()) {
-				logs.put(student.getPath(), ret);
-			} else {
-				Map<String, List<EHICommand>> emptyMap = new HashMap<>();
-				List<EHICommand> emptyLog = new ArrayList<>();
-				EclipseCommand command = new EclipseCommand("", 0);
-				command.setTimestamp(0);
-				command.setStartTimestamp(0);
-				emptyLog.add(command);
-				emptyLog.add(command);
-				emptyLog.add(command);
-
-				File logFolder = null;
-				File submission = new File(student,"Submission attachment(s)");
-				if (submission.exists()) {
-					logFolder = getProjectFolder(submission);
-					if (logFolder != null) {
-						logFolder = new File(logFolder, "Logs"+File.separator+"Eclipse");
-					}
-				}
-				if (logFolder == null) {
-					continue;
-				}
-				logFolder.mkdirs();
-				File emptyLogFile = new File(logFolder, "Log2010-01-01-00-00-00-000.xml");
-//				emptyLogFile.createNewFile();
-				
-				emptyMap.put(emptyLogFile.getPath(), emptyLog);
-				logs.put(student.getPath(), emptyMap);
-
+			Map<String, List<EHICommand>> ret = readStudentCreatingPossiblyEmptyLog(student);
+			if (ret == null) {
+				continue;
 			}
+			logs.put(student.getPath(), ret);
+			
+//			Map<String, List<EHICommand>> ret = readStudent(student);
+//			if (ret != null && !ret.isEmpty()) {
+//				logs.put(student.getPath(), ret);
+//			} else {
+//
+//				List<EHICommand> emptyLog = createEmptyLog();
+//				File emptyLogFile = createEmptyLogFile(student, emptyLog);
+//				if (emptyLogFile == null) {
+//					continue;
+//				}
+//				Map<String, List<EHICommand>> emptyMap = new HashMap<>();
+//				emptyMap.put(emptyLogFile.getPath(), emptyLog);
+//				logs.put(student.getPath(), emptyMap);
+//
+//			}
 		}
+		findAllAssignmentSubmitters(logs);
+		findAllPiazzaAndZoomStudents(assign.getPath());
+		findAllNonAssignmentSubmitters();
+		List<File> anEmptySumbissions = createEmptySubmissions(assign, nonAssignmentSubmitters);
+		for (File anEmptySubmission:anEmptySumbissions) {
+			Map<String, List<EHICommand>> ret = readStudentCreatingPossiblyEmptyLog(anEmptySubmission);
+			if (ret == null) {
+				continue;
+			}
+			logs.put(anEmptySubmission.getPath(), ret);
+		}
+		
 		return logs;
 	}
 

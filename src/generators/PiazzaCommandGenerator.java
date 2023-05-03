@@ -3,8 +3,10 @@ package generators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +16,7 @@ import org.json.JSONObject;
 
 import fluorite.commands.EHICommand;
 import fluorite.commands.PiazzaPostCommand;
+import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.Replayer;
 
 public class PiazzaCommandGenerator extends ExternalCommandGenerator {
@@ -40,6 +43,17 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 			}, this.piazzaPosts);
 			System.out.println("");
 		}
+	}
+	
+	public static Set<String> findAllPiazzaPosters(JSONObject piazzaPostsJson) {
+		Set<String> retVal = new HashSet();
+		for (String aKey: piazzaPostsJson.keySet()) {
+			if (aKey.contains("nstructor") || aKey.contains("nonymous")) {
+				continue;
+			}
+			retVal.add(AnAssignmentReplayer.normalizeName(aKey));
+		}
+		return retVal;
 	}
 	
 	private void findPiazzaPosts(String student, JSONObject piazzaPostsJson) {

@@ -203,7 +203,7 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 				}
 			}
 		}
-		return super.addCommands(aSession, newCommands, nextStartTime);
+  		return super.addCommands(aSession, newCommands, nextStartTime);
 	} else {
 		return super.addCommands(aSession, commands, nextStartTime);
 	}

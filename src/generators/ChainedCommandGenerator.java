@@ -30,9 +30,18 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			List<String[]> localCheckEvents, JSONObject piazzaPosts, File zoomChatsFolder, HashMap<String, List<Long>> map, boolean appendAllRemainingCommands) {
 		replayer = aReplayer;
 		student = aStudent;
-		if (student.contains("Mark")) {
-			foundTracedStudent = true;
+		System.out.println("Student:" + aStudent);
+		if (aStudent.contains("Genaro")) {
+			System.out.println("Found Genaro");
 		}
+//		boolean isSynthesized = aStudent.contains("Synthesized");
+//		if (isSynthesized) {
+//			System.out.println("Processing sythesized assignment");
+//		}
+		
+//		if (student.contains("Mark")) {
+//			foundTracedStudent = true;
+//		}
 		latch = aLatch;
 		commandMap = aStudentLog;
 		this.appendAllRemainingCommands = appendAllRemainingCommands;
@@ -100,7 +109,10 @@ public class ChainedCommandGenerator extends CommandGenerator {
 						EHICommand command = nextCommands.get(nextCommands.size()-1);
 						lastCommandTime = command.getStartTimestamp() + command.getTimestamp();
 					}
-					newCommands = addCommands(j, commands, appendAllRemainingCommands ? Long.MAX_VALUE : lastCommandTime + 600000);
+					newCommands = addCommands(j, commands, 
+							appendAllRemainingCommands ? 
+									Long.MAX_VALUE : 
+										lastCommandTime + 600000);
 				} else {
 					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
 					long nextStartTime = -1;

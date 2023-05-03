@@ -61,7 +61,7 @@ public class Driver {
 	}
 	
 	public static void generate(boolean appendAllRemainingCommands) {
-		System.out.println("Generating LocalChecks log");
+		System.out.println("Generating LocalChecks log, appending remaining commands:" + appendAllRemainingCommands);
 		String[] args = {path};
 		try {
 		Main.main(args); // Andrew's code

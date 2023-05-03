@@ -123,6 +123,7 @@ public abstract class Replayer {
 	static Pattern assignSuitePattern = Pattern.compile("[FS]\\d*Assignment\\d*Suite.*");
 	public static final String suite = "E:\\submissions\\524\\Suite Test Mapping.txt";
 	SimpleDateFormat df;
+	protected Set<File> synthesizedStudents = new HashSet();
 
 //	protected List<CommandGenerator> commandGenerators = new ArrayList();
 	
@@ -139,12 +140,64 @@ public abstract class Replayer {
 		return retVal;
 
 	}
+	protected List<EHICommand> createEmptyLog() {
+		List<EHICommand> emptyLog = new ArrayList<>();
+		EclipseCommand command = new EclipseCommand("", 0);
+		command.setTimestamp(0);
+		command.setStartTimestamp(0);
+		emptyLog.add(command);
+		emptyLog.add(command);
+		emptyLog.add(command);
+		return emptyLog;
+	}
+
+	protected File createEmptyLogFile(File student, List<EHICommand> log) {
+		File logFolder = null;
+		File submission = new File(student, "Submission attachment(s)");
+		if (submission.exists()) {
+			logFolder = getProjectFolder(submission);
+			if (logFolder != null) {
+				logFolder = new File(logFolder, "Logs" + File.separator + "Eclipse");
+			}
+		}
+		if (logFolder == null) {
+			return null;
+		}
+		logFolder.mkdirs();
+		File emptyLogFile = new File(logFolder, "Log2010-01-01-00-00-00-000.xml");
+//		emptyLogFile.createNewFile();
+		return emptyLogFile;
+//		Map<String, List<EHICommand>> emptyMap = new HashMap<>();
+//
+//		emptyMap.put(emptyLogFile.getPath(), log);
+//		logs.put(student.getPath(), emptyMap);
+	}
+	
+	public Map<String, List<EHICommand>> readStudentCreatingPossiblyEmptyLog(File student) {
+		Map<String, List<EHICommand>>  ret = readStudent(student);
+		
+		if (ret != null && !ret.isEmpty()) {
+			return ret;
+		} else {
+
+			List<EHICommand> emptyLog = createEmptyLog();
+			File emptyLogFile = createEmptyLogFile(student, emptyLog);
+			if (emptyLogFile == null) {
+				return null;
+			}
+			Map<String, List<EHICommand>> emptyMap = new HashMap<>();
+			emptyMap.put(emptyLogFile.getPath(), emptyLog);
+			return emptyMap;
+
+		}
+	
+	}
 
 	public Map<String, List<EHICommand>> readStudent(File student) {
 		System.out.println("Reading student " + student);
-		if (student.getName().contains("Mark")) {
-			System.out.println("Found target student ");
-		}
+//		if (student.getName().contains("Mark")) {
+//			System.out.println("Found target student ");
+//		}
 		if (!student.exists()) {
 			System.out.println("Folder " + student + " does not exist");
 			return null;
@@ -170,10 +223,16 @@ public abstract class Replayer {
 				}
 			}
 		}
+		if (logFolder.getPath().contains("Synthesized")) {
+			synthesizedStudents.add(student);
+		}
 		if (logFolder == null || !logFolder.exists()) {
 			System.err.println("No logs found for student " + student.getName());
 			return null;
 		}
+//		if (logFolder.getPath().contains("Synthesized")) {
+//			synthesizedStudents.add(student);
+//		}
 //		refineLogFiles(logFolder);
 		File[] logFiles = logFolder.listFiles(File::isDirectory);
 		if (logFiles != null && logFiles.length > 0) {
@@ -501,27 +560,6 @@ public abstract class Replayer {
 		CommandGenerator cg = new ChainedCommandGenerator(this, aLatch, aStudent, aStudentLog, localCheckEvents,
 				piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 
-//		latch = aLatch;
-//		student = aStudent;
-//		commandMap = aStudentLog;
-////		commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
-//		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, aStudent, aStudentLog, localCheckEvents));
-//		commandGenerators.add(new CheckstyleCommandGenerator(this, latch, aStudent, aStudentLog));
-//		commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
-//
-//		CommandGenerator cg;
-//		if (mode == LOCALCHECK && localCheckEvents != null) {
-////			cg = new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents);
-////			cg = new SourceCodeOnRunGenerator(this, latch, student, studentLog, localCheckEvents);
-//			cg = new CheckstyleCommandGenerator(this, aLatch, student, studentLog, localCheckEvents);
-//			commandGenerators.add(cg);
-//
-//
-//		} else if (mode == WEB) {
-//			cg = new WebCommandGenerator(this, aLatch, studentLog, getLogFolder(new File(student)).getParentFile());
-//		} else {
-//			cg = new PauseCommandGenerator(this, aLatch, studentLog);
-//		}
 		new Thread(cg).start();
 	}
 
@@ -567,6 +605,9 @@ public abstract class Replayer {
 				File file = new File(fileName);
 				if (file.getParentFile().getName().contains("Eclipse")) {
 					file = new File(file.getParent() + File.separator + surfix + File.separator + file.getName());
+				}
+				if (fileName.contains("Genaro")) {
+					System.out.println("Found student");
 				}
 				System.out.println("Writing to file " + file.getPath());
 				if (file.exists()) {
@@ -2018,6 +2059,8 @@ public abstract class Replayer {
 		return EventType.Other;
 
 	}
+	
+	protected Set<String> sythesizedAssignments = new HashSet();
 
 	public File getProjectFolder(File folder) {
 		for (File file : folder.listFiles(File::isDirectory)) {

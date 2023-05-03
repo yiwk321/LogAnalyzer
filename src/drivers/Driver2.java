@@ -9,7 +9,7 @@ import logAnalyzer.AnExperimentReplayer;
 import logAnalyzer.RemoveCopiedLogs;
 import logAnalyzer.Replayer;
 
-public class Driver2 extends Driver{
+public class Driver2 extends Driver{ 
 	public static String[] courses = {
 //										"H:\\CompPaper\\524f21\\Assignment 1",
 //										"H:\\CompPaper\\524f21\\Assignment 2",
@@ -46,6 +46,9 @@ public class Driver2 extends Driver{
 //										7
 //										};
 	static boolean generate = true;
+	static boolean isLastAssignment = false;
+	
+
 	static boolean analyze = true;
 //	static boolean generate = false;
 	static String generateFolderName = "Generated";
@@ -55,6 +58,9 @@ public class Driver2 extends Driver{
 	}
 	public static void setAnalyze(boolean newVal) {
 		analyze =  newVal;
+	}
+	public static void setLastAssignment(boolean isLastAssignment) {
+		Driver2.isLastAssignment = isLastAssignment;
 	}
 	
 	public static void main(String[] args) {
@@ -77,7 +83,7 @@ public class Driver2 extends Driver{
 				isRead = false;
 				if (generate) {
 					delete();
-					generate(i == folders.length-1);
+					generate(i == folders.length-1 && isLastAssignment);
 //					generate(false);
 				}
 				if (analyze) {
