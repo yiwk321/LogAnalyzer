@@ -119,7 +119,7 @@ public class LocalChecksRawBatchCommandGenerator extends ExternalCommandGenerato
 		try {
 		aLocalChecksRawFiles = FileUtility.getLocalChecksRawsLogFiles(aStudent );
 		} catch (Exception e) {
-			System.err.println("Could not find local checks raw logs files");
+			System.err.println("Could not find local checks raw logs files for " + aStudent);
 			e.printStackTrace();
 			
 		}

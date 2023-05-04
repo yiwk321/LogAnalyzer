@@ -31,9 +31,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 		replayer = aReplayer;
 		student = aStudent;
 		System.out.println("Student:" + aStudent);
-		if (aStudent.contains("Genaro")) {
-			System.out.println("Found Genaro");
-		}
+//		if (aStudent.contains("Genaro")) {
+//			System.out.println("Found Genaro");
+//		}
 //		boolean isSynthesized = aStudent.contains("Synthesized");
 //		if (isSynthesized) {
 //			System.out.println("Processing sythesized assignment");

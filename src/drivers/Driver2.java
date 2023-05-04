@@ -59,7 +59,7 @@ public class Driver2 extends Driver{
 	public static void setAnalyze(boolean newVal) {
 		analyze =  newVal;
 	}
-	public static void setLastAssignment(boolean isLastAssignment) {
+	public static void hasLastAssignment(boolean isLastAssignment) {
 		Driver2.isLastAssignment = isLastAssignment;
 	}
 	

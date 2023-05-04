@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -65,15 +67,33 @@ public class AnAssignmentReplayer extends Replayer {
 			int aLeftParenIndex = student.indexOf("(");
 			String aStudentName = student.substring(aLeftParenIndex+1, student.length() - 1);
 			String aNormalizedStudentName = normalizeName(aStudentName);
-			retVal.add(aNormalizedStudentName);
+			if (aNormalizedStudentName != null) {
+				retVal.add(aNormalizedStudentName);
+			} else {
+				System.err.println("Illegal name:" + aStudentName);
+			}
+//			retVal.add(aNormalizedStudentName);
 		}
 
 		assignmentSubmitters = retVal;
 	}
-	
+//	static Pattern fakeNamePattern = Pattern.compile("([a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]*)");
+	static String fakeNameExpression = "[a-zA-Z]+ [a-zA-Z']+";
+
 	public static String normalizeName(String aName) {
-		String[] aNameComponents = aName.split("\\[");
-		return aNameComponents[0];
+		String aNameStringComponents[] = aName.split(":");
+//		if (aNameStringComponents.length > 1) {
+//			System.out.println("Name has :" + aName);
+//		}
+		String[] aNameComponents = aNameStringComponents[0].split("\\[");
+		String retVal = aNameComponents[0].trim();
+		if (!retVal.matches(fakeNameExpression)) {
+			return null;
+		}
+		if (retVal.contains(":") || retVal.contains("Uh")) {
+			System.out.println("Midified Name has :" + aName);
+		}
+		return retVal;
 	}
 	public void findAllNonAssignmentSubmitters( ) {
 		Set<String> retVal = new HashSet();

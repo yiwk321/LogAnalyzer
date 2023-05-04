@@ -32,6 +32,7 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 	Pattern firstOrLastNamePattern = Pattern.compile("\\s*(\\S+).*");
 	static Pattern vttPattern = Pattern.compile("(?m)^(\\d{2}:\\d{2}:\\d{2}\\.\\d+) +--> +(\\d{2}:\\d{2}:\\d{2}\\.\\d+).*[\\r\\n]+\\s*(?s)((?:(?!\\r?\\n\\r?\\n).)*)");
 	static Pattern chatPattern = Pattern.compile("(.*): (.*)");
+
 	Pattern txtPattern = Pattern.compile("(?m)^(\\d{2}:\\d{2}:\\d{2})\\s*(?s)((?:(?!(\\d{2}:\\d{2}:\\d{2})).)*)");
 	SimpleDateFormat df2 = new SimpleDateFormat("zzzyyyyMMdd-HHmmss");
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz");
@@ -105,7 +106,12 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 //					continue;
 //				}
 				String aNormalizedName = AnAssignmentReplayer.normalizeName(speaker);
-				retVal.add(aNormalizedName);				
+				if (aNormalizedName != null) {
+					retVal.add(aNormalizedName);
+				} else {
+					System.err.println("Illegal name:" + speaker);
+				}
+//				retVal.add(aNormalizedName);				
 			}
 		}	
 	}
@@ -114,9 +120,9 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 
 	private void findZoomChats(String student, File zoomChatFolder) {
 		Matcher matcher = studentNamePattern.matcher(student);
-		if (student.contains("Genaro")) {
-			System.out.println("found student find zoom chats");
-		}
+//		if (student.contains("Genaro")) {
+//			System.out.println("found student find zoom chats");
+//		}
 		if (!matcher.matches()) {
 			return;
 		}
@@ -270,16 +276,16 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		return retVal;
 	}
 	public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, long nextStartTime) {
-		if (student.contains("Genaro")) {
-			System.out.println("Found student");
-		}
-		if (nextStartTime == Long.MAX_VALUE) {
-			System.out.println(" add external commands");
-			if (zoomChats.size() > 0) {
-				System.out.println(" zoom chats > 0 for synthesized student:" + student );
-
-			}
-		}
+//		if (student.contains("Genaro")) {
+//			System.out.println("Found student");
+//		}
+//		if (nextStartTime == Long.MAX_VALUE) {
+////			System.out.println(" add external commands");
+//			if (zoomChats.size() > 0) {
+//				System.out.println(" zoom chats > 0 for synthesized student:" + student );
+//
+//			}
+//		}
 		return super.addCommands(aSession, commands, nextStartTime);
 	}
 	

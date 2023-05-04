@@ -51,7 +51,13 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 			if (aKey.contains("nstructor") || aKey.contains("nonymous")) {
 				continue;
 			}
-			retVal.add(AnAssignmentReplayer.normalizeName(aKey));
+			String aName = AnAssignmentReplayer.normalizeName(aKey);
+			if (aName != null) {
+				retVal.add(aName);
+			} else {
+				System.out.println("Illegal name " + aKey);
+			}
+
 		}
 		return retVal;
 	}
