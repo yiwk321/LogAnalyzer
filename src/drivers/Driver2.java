@@ -1,6 +1,8 @@
 package drivers;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import logAnalyzer.AContextBasedReplayer;
 import logAnalyzer.ASemesterReplayer;
@@ -46,7 +48,7 @@ public class Driver2 extends Driver{
 //										7
 //										};
 	static boolean generate = true;
-	static boolean isLastAssignment = false;
+	static boolean hasLastAssignment = false;
 	
 
 	static boolean analyze = true;
@@ -59,9 +61,31 @@ public class Driver2 extends Driver{
 	public static void setAnalyze(boolean newVal) {
 		analyze =  newVal;
 	}
-	public static void hasLastAssignment(boolean isLastAssignment) {
-		Driver2.isLastAssignment = isLastAssignment;
+	public static void setHasLastAssignment(boolean newVal) {
+		Driver2.hasLastAssignment = newVal;
 	}
+	public static boolean hasLastAssignment() {
+		return hasLastAssignment;
+	}
+	
+	static Map<String, Integer> lastAssignmentMissing = new HashMap();
+	static int currentAssignmentNumber = 0;
+	public static void missingCurrentAssignment(String aStudent) {
+		lastAssignmentMissing.put(aStudent, currentAssignmentNumber);
+	}
+	
+	static int numAssignments;
+	public static boolean isMissingPreviousAssignment(String aStudent) {
+		Integer aPreviousAssignmentNumber = 
+				lastAssignmentMissing.get(aStudent);
+		return (aPreviousAssignmentNumber != null) &&
+				(aPreviousAssignmentNumber == currentAssignmentNumber - 1);
+	}
+	
+	public static boolean isLastAssignment() {
+		return (currentAssignmentNumber == (numAssignments - 1)) && hasLastAssignment();
+	}
+	
 	
 	public static void main(String[] args) {
 		for (String course : courses) {
@@ -70,11 +94,14 @@ public class Driver2 extends Driver{
 				return file.isDirectory() && file.getName().startsWith("Assignment ");
 			});
 			String[] folders = new String[assigns.length];
+			numAssignments = assigns.length;
+
 			for (int i = 0; i < assigns.length; i++) {
 				folders[i] = assigns[i].getPath(); 
 			}
 			new RemoveCopiedLogs().removeCopiedLogs(folders);
 			for (int i = 0; i < folders.length; i++) {
+				currentAssignmentNumber = i;
 				String folder = folders[i];
 //				replayer = new AContextBasedReplayer(multiplier, defaultPauseTime);
 				replayer = new AnAssignmentReplayer();
@@ -83,7 +110,7 @@ public class Driver2 extends Driver{
 				isRead = false;
 				if (generate) {
 					delete();
-					generate(i == folders.length-1 && isLastAssignment);
+					generate(i == folders.length-1 && hasLastAssignment);
 //					generate(false);
 				}
 				if (analyze) {

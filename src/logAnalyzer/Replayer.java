@@ -123,7 +123,7 @@ public abstract class Replayer {
 	static Pattern assignSuitePattern = Pattern.compile("[FS]\\d*Assignment\\d*Suite.*");
 	public static final String suite = "E:\\submissions\\524\\Suite Test Mapping.txt";
 	SimpleDateFormat df;
-	protected Set<File> synthesizedStudents = new HashSet();
+	protected static Set<File> synthesizedStudents = new HashSet();
 
 //	protected List<CommandGenerator> commandGenerators = new ArrayList();
 	
@@ -223,7 +223,7 @@ public abstract class Replayer {
 				}
 			}
 		}
-		if (logFolder.getPath().contains("Synthesized")) {
+		if (logFolder != null && logFolder.getPath().contains("Synthesized")) {
 			synthesizedStudents.add(student);
 		}
 		if (logFolder == null || !logFolder.exists()) {
@@ -304,12 +304,15 @@ public abstract class Replayer {
 					filesAppendedEvents.add(log);
 					return 	readOneLogFile(log);
 				}
-			} else if (aMessage.contains("An invalid XML character (Unicode: 0x0) was found in the CDATA section") ||
+			} else if (
+//					aMessage.contains("An invalid XML character (Unicode: 0x0) was found in the CDATA section") ||
+					aMessage.contains("An invalid XML character") ||
+	
 					(aMessage.contains("Invalid byte"))) {
 				if (filesIllegalChars.contains(log)) {
 					System.err.println("Already processed illegal chars, cannot handle exception");
 				} else {
-					LogPreprocessor.removeIllegalChars(log);
+					LogPreprocessor.removeIllegalChars(log, aMessage);
 					filesIllegalChars.add(log);
 					return 	readOneLogFile(log);
 				}

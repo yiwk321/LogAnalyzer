@@ -79,6 +79,10 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 	
 	public static Set<String> findAllZoomChatters (File zoomChatFolder) {
 		Set<String> retVal= new HashSet();
+		if (zoomChatFolder == null) {
+			System.err.println("Null zoom chat foler");
+			return retVal;
+		}
 		for (File chat : zoomChatFolder.listFiles()) {			
 			findAllZoomChattersOneFile(retVal, chat);
 		}
@@ -120,7 +124,7 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 
 	private void findZoomChats(String student, File zoomChatFolder) {
 		Matcher matcher = studentNamePattern.matcher(student);
-//		if (student.contains("Genaro")) {
+//		if (student.contains("Walker")) {
 //			System.out.println("found student find zoom chats");
 //		}
 		if (!matcher.matches()) {

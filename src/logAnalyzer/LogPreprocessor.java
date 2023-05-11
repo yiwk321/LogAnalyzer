@@ -69,10 +69,37 @@ public class LogPreprocessor {
 		return Character.UnicodeBlock.of(aChar) != Character.UnicodeBlock.BASIC_LATIN ;
 
 	}
-	public static String removeIllegalChars(String anOriginal) {
+	//Handling org.xml.sax.SAXParseException; lineNumber: 42395; columnNumber: 108; An invalid XML character (Unicode: 0x11) was found in the CDATA section.
+
+	public static int[] getRowAndColumnNumber (String aMessage) {
+		int[] aCellNumber = {-1, -1};
+		return aCellNumber;
+		
+	}
+//  <exceptionString><![CDATA[Exception in thread "main" java.nio.file.InvalidPathException: Illegal char <"> at index 37: C:\Users\hello\21workspace\524a5Java\"fake.lisp"
+	static String markerString = "Illegal char <";
+
+	public static String removeExceptionStringIllegalCharacter(String anOriginal) {
+		int aLeftIndex = anOriginal.indexOf(markerString);
+		if (aLeftIndex < 0) {
+			return anOriginal;
+		}
+		int aRightIndex = anOriginal.indexOf('>', aLeftIndex);
+		if (aRightIndex < 0) {
+			return anOriginal;
+		}
+		return anOriginal.substring(0, aLeftIndex) + markerString +  ILLEGAL_MARKER + ">";
+				
+
+	}
+	public static String removeIllegalChars(String anOriginal, int aColumnNumber) {
 //		if (!anOriginal.contains(",")) {
 //			return anOriginal;
 //		}
+		String aRemoveException = removeExceptionStringIllegalCharacter(anOriginal);
+		if (aRemoveException != anOriginal) {
+			return aRemoveException;
+		}
 		lineStringBuilder.setLength(0);
 		for (int i = 0; i < anOriginal.length(); i++) {
 			char aChar = anOriginal.charAt(i);
@@ -82,11 +109,11 @@ public class LogPreprocessor {
 //				System.out.println("Found non latin at " + i + " in:" + anOriginal);
 				lineStringBuilder.append(ILLEGAL_MARKER);
 			} 
-			else	
-				if (aChar == 0x0) {
-				System.out.println("Found null in:" + anOriginal);
+			else if (aChar == 0x0 || aChar == 0x11 || aChar == 0xc || aChar == 0x7) {
+//				System.out.println("Found null in:" + anOriginal);
 				lineStringBuilder.append(NULL_MARKER);
-			} else {
+			} 
+			else {
 				lineStringBuilder.append(aChar);
 
 
@@ -153,22 +180,27 @@ public class LogPreprocessor {
 //		}
 
 	}
-	public static final void removeIllegalChars(File aFile) {
+	//Handling org.xml.sax.SAXParseException; lineNumber: 42395; columnNumber: 108; An invalid XML character (Unicode: 0x11) was found in the CDATA section.
+//   <exceptionString><![CDATA[Exception in thread "main" java.nio.file.InvalidPathException: Illegal char <"> at index 37: C:\Users\hello\21workspace\524a5Java\"fake.lisp"
+//I***@25150325951300 {Selecting Thread}(SocketChannelFullMessageRead) EvtSrc(AScatterGatherReadCommand)  [comp533.AHalloweenSimClientNIOSenderImpl@537f60bf]<-(7)java.nio.HeapByteBuffer[pos=26 lim=33 cap=4194304] java.nio.channels.SocketChannel[connected local=/127.0.0.1:51676 remote=localhost/127.0.0.1:9000]
+//	Command echoed FROM server: 0x00x00x0ipc
+	public static final void removeIllegalChars(File aFile, String aMessage) {
 		stringBuilder.setLength(0);
-
+		int aLineNumber = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(aFile))) {
 			boolean aChanged = false;
 
 			String anOriginal, aNew = null; // why was this initialization required by Java?
 			while ((anOriginal = br.readLine()) != null) {				
-
-				aNew = removeIllegalChars(anOriginal);
+				
+				aNew = removeIllegalChars(anOriginal, -1);
 				
 				if (!anOriginal.equals(aNew)) {
 					aChanged = true;
 				}
 				
 				stringBuilder.append(aNew + "\n");
+				aLineNumber++;
 
 			}
 		

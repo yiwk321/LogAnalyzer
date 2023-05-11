@@ -19,6 +19,7 @@ import org.eclipse.swt.layout.GridData;
 import org.json.JSONObject;
 
 import analyzer.extension.replayView.FileUtility;
+import drivers.Driver2;
 import fluorite.commands.EHICommand;
 import fluorite.commands.EclipseCommand;
 import generators.PiazzaCommandGenerator;
@@ -79,7 +80,7 @@ public class AnAssignmentReplayer extends Replayer {
 	}
 //	static Pattern fakeNamePattern = Pattern.compile("([a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]*)");
 	static String fakeNameExpression = "[a-zA-Z]+ [a-zA-Z']+";
-
+//Illegal name:Alice (Nicholas Effertz[f]) [h]
 	public static String normalizeName(String aName) {
 		String aNameStringComponents[] = aName.split(":");
 //		if (aNameStringComponents.length > 1) {
@@ -155,7 +156,10 @@ public class AnAssignmentReplayer extends Replayer {
 			if (studentLocalCheckEvents == null) {
 				studentLocalCheckEvents = new ArrayList<>();
 			}
-			boolean modifiedAppendRemaniningCommands = appendAllRemainingCommands || isSynthesized(new File(student));
+//			boolean modifiedAppendRemaniningCommands = appendAllRemainingCommands || isSynthesized(new File(student));
+
+			boolean modifiedAppendRemaniningCommands = appendAllRemainingCommands;
+
 //			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
 //					studentLocalCheckEvents, piazzaPosts, zoomChatsFolder, sessionTimeMap, appendAllRemainingCommands);
 			createChainedExtraCommandsStudent(latch, assignLog.get(student), student, surfix, mode,
@@ -182,6 +186,7 @@ public class AnAssignmentReplayer extends Replayer {
 		if (files.length > 0) {
 			return files[files.length - 1];
 		}
+		System.err.println("No folder with name:ZoomChatsAnon");
 		return null;
 	}
 
@@ -217,9 +222,13 @@ public class AnAssignmentReplayer extends Replayer {
 ////		emptyMap.put(emptyLogFile.getPath(), log);
 ////		logs.put(student.getPath(), emptyMap);
 //	}
-	
 	public static File createEmptySubmission(File assign, String aStudent) {
 		String[] aNames = aStudent.split(" ");
+		boolean isPreviousAssignmentMissing = Driver2.isMissingPreviousAssignment(aStudent);
+		Driver2.missingCurrentAssignment(aStudent);
+		if (isPreviousAssignmentMissing) {
+			return null;
+		}
 		String aSrcLogFileName
 		=  aNames[1] + ", " + aNames[0] + "(" + aStudent + ")" +
 		 "/Submission attachment(s)/Synthesized/src";
@@ -242,7 +251,9 @@ public class AnAssignmentReplayer extends Replayer {
 		List<File> retVal = new ArrayList();
 		for (String aStudent:aStudents) {
 			File aFile = createEmptySubmission(assign, aStudent);
+			if (aFile != null) {
 			retVal.add(aFile);
+			}
 		}
 		return retVal;
 	}
@@ -282,6 +293,7 @@ public class AnAssignmentReplayer extends Replayer {
 //
 //			}
 		}
+		if (Driver2.isLastAssignment()) {
 		findAllAssignmentSubmitters(logs);
 		findAllPiazzaAndZoomStudents(assign.getPath());
 		findAllNonAssignmentSubmitters();
@@ -292,6 +304,7 @@ public class AnAssignmentReplayer extends Replayer {
 				continue;
 			}
 			logs.put(anEmptySubmission.getPath(), ret);
+		}
 		}
 		
 		return logs;
