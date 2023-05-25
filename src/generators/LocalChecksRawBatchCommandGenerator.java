@@ -28,6 +28,7 @@ import fluorite.commands.EHICommand;
 import fluorite.commands.LocalCheckCommand;
 import fluorite.commands.LocalChecksRawBatchCommand;
 import fluorite.commands.PauseCommand;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.Replayer;
 // make this subclass of web generator?
 //public class LocalCheckCommandGenerator extends PauseCommandGenerator {
@@ -223,7 +224,25 @@ protected String[] previousEvent;
 // SimpleDateFormat df = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
 SimpleDateFormat df = new SimpleDateFormat("EEEE MMM dd HH:mm:ss z yyyy");
 
-
+protected void logCommand (EHICommand aCommand) {
+	if (aCommand == null) {
+		System.err.println("null command");
+		return;
+	}
+//	if (studentName.contains("Dare")) {
+//		System.out.println("Logged command " + lastAddedExternalIndex + " " +aCommand);
+//		if (lastAddedExternalIndex == 32) {
+//			System.out.println("Approaching end:");
+//		}
+//	}
+	try {
+	
+	LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numLocaCheckRawBatchCommands++;
+	} catch (Exception e) {
+		System.err.println("Could noot parse date of:" + aCommand);
+		e.printStackTrace();
+	}
+}
 
 //SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 

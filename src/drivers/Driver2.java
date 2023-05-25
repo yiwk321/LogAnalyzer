@@ -8,6 +8,7 @@ import logAnalyzer.AContextBasedReplayer;
 import logAnalyzer.ASemesterReplayer;
 import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.AnExperimentReplayer;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.RemoveCopiedLogs;
 import logAnalyzer.Replayer;
 
@@ -116,6 +117,7 @@ public class Driver2 extends Driver{
 				if (analyze) {
 				analyze();
 				}
+				LogAnalyzerLoggerFactory.closeLoggerAndMetrics();
 			}
 		}
 		

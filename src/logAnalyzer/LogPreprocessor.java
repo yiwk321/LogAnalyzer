@@ -55,6 +55,9 @@ public class LogPreprocessor {
 		}
 	
 	public static void main(String[] args) {
+		System.out.println ((int) 0x1);
+		System.out.println ((int) 0x2);
+		System.out.println ((int) 0x11);
 		String aOriginal = "" + 0x0 + '\0';
 		
 		System.out.println("original" + aOriginal);
@@ -109,7 +112,9 @@ public class LogPreprocessor {
 //				System.out.println("Found non latin at " + i + " in:" + anOriginal);
 				lineStringBuilder.append(ILLEGAL_MARKER);
 			} 
-			else if (aChar == 0x0 || aChar == 0x11 || aChar == 0xc || aChar == 0x7) {
+			else if (aChar >= 0x0 && aChar  <= 0x1b ) {
+
+//			else if (aChar == 0x0 || aChar == 0x11 || aChar == 0xc || aChar == 0x7 || aChar == 0x1 || aChar == 0x2 || aChar == 0x3 ||aChar == 0x5 || aChar == 0x13 || aChar == 0xb) {
 //				System.out.println("Found null in:" + anOriginal);
 				lineStringBuilder.append(NULL_MARKER);
 			} 
@@ -268,6 +273,8 @@ public class LogPreprocessor {
 //			e.printStackTrace();
 //		}
 
+		
 	}
+	
 
 }

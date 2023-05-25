@@ -19,8 +19,20 @@ public abstract class CommandGenerator implements Runnable {
 	Map<String, List<EHICommand>> commandMap;
 	Map<String, Map<String, Map<String, List<EHICommand>>>> commandsMaps;
 	Replayer replayer;
+	static List<EHICommand> emptyList = new ArrayList();
 	
 	
+	protected List<EHICommand> getRemainingAssignmentCommands(long minMaxTime) {
+		return emptyList;
+	}
+	Date date = new Date();
+	public  Date toDate (EHICommand aCommand) {
+//		long aStartTimeStamp = EHEventRecorder.getInstance().getStartTimestamp();
+//		long aTime = aStartTimeStamp + aCommandTimestamp;
+		date.setTime(aCommand.getStartTimestamp() + aCommand.getTimestamp());
+		return date;
+	}
+
 	protected long getLogFileCreationTime(File file) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
 		try {
@@ -125,6 +137,15 @@ public abstract class CommandGenerator implements Runnable {
 			}
 		}
 		return newCommands;
+	}
+	public static long toTimestamp(EHICommand aCommand) {
+		try {
+			return aCommand.getStartTimestamp() + aCommand.getTimestamp();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
 	}
 	
 	public abstract List<EHICommand> addCommands(int aSessionIndex, List<EHICommand> commands, long nextStartTime);

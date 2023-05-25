@@ -14,17 +14,24 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.json.JSONObject;
+
 import analyzer.extension.replayView.FileUtility;
 import fluorite.commands.EHICommand;
+import fluorite.commands.PiazzaPostCommand;
 import fluorite.commands.ZoomChatCommand;
 import fluorite.commands.ZoomSessionEndCommand;
 import fluorite.commands.ZoomSessionStartCommand;
+import fluorite.util.EHUtilities;
 import logAnalyzer.AnAssignmentReplayer;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.Replayer;
 
 public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 
 	String student;
+	String studentName;
 	List<ZoomChatCommand> zoomChats;
 	Pattern studentNamePattern = Pattern.compile(".*\\\\(.*), (.*)\\((.*)\\)");
 //	Pattern speakerPattern = Pattern.compile("(\\d\\d:\\d\\d:\\d\\d) From  (.*)  to  Everyone:");
@@ -46,6 +53,8 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 								  Map<String, List<EHICommand>> commandMap, File zoomChatsFolder, HashMap<String, List<Long>> sessionTimeMap) {
 		super(replayer, aLatch, commandMap);
 		student = aStudent;
+		studentName = PiazzaCommandGenerator.toParenthesizedStudentName(student);
+
 		zoomChats = new ArrayList<>();
 		sessionTimes = new ArrayList<>();
 		this.sessionTimeMap = sessionTimeMap;
@@ -254,7 +263,28 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		}
 		return timestamp;
 	}
-
+//	public static long toTimestamp(EHICommand aCommand) {
+//		try {
+//			return aCommand.getStartTimestamp() + aCommand.getTimestamp();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return -1;
+//		}
+//	}
+	@Override
+	protected List<EHICommand> getRemainingAssignmentCommands(long minEndTime) {
+		List<EHICommand> retVal = new ArrayList();
+		for (int anIndex = lastAddedExternalIndex;  anIndex < zoomChats.size(); anIndex++) {
+			EHICommand aCommand = zoomChats.get(anIndex);
+			long aTimeStamp = toTimestamp(aCommand);
+			if (aTimeStamp > minEndTime) {
+				break; // maybe check the previous folder
+			}
+			retVal.add(aCommand);		
+		}
+		return retVal;
+	}
 
 	@Override
 	protected boolean hasNextExternalEvent() {
@@ -293,6 +323,25 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		return super.addCommands(aSession, commands, nextStartTime);
 	}
 	
+	
+	protected void logCommand (EHICommand aCommand) {
+		String aCommandType;
+		if ((aCommand instanceof ZoomSessionStartCommand)) {
+			aCommandType = "Zoom session start";
+		} else if (((aCommand instanceof ZoomSessionEndCommand))) {
+			aCommandType = "Zoom session end";
+		} else {
+			return;
+		}
+		
+		LogAnalyzerLoggerFactory.logMessage(studentName + "-->" + 
+				toDate(aCommand)+ 
+				aCommandType +
+				"\n");
+		LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numZoomSessions++;
+	}
+
+	
 	@Override
 	protected List<EHICommand> createExternalCommands(boolean fromPreviousEvent) {
 		// TODO Auto-generated method stub
@@ -301,6 +350,12 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		}
 		EHICommand aCommand = previousEvent;
 		List<EHICommand> retVal = new ArrayList<>();
+//		if (aCommand instanceof ZoomSessionStartCommand) {
+//			LogAnalyzerLoggerFactory.logMessage(
+//					student + "-->" + EHUtilities.toDate(aCommand) + "\n");
+//			LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numZoomSessions++;
+////			System.out.println(student + "-->" + aCommand);
+//		}
 		retVal.add(aCommand);
 //		System.out.println("Adding aCommand " + aCommand + " for " + student);
 		return retVal;

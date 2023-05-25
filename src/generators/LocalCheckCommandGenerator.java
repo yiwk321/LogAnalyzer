@@ -10,6 +10,8 @@ import java.util.concurrent.CountDownLatch;
 import fluorite.commands.EHICommand;
 import fluorite.commands.LocalCheckCommand;
 import fluorite.commands.PauseCommand;
+import fluorite.util.EHUtilities;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.Replayer;
 // make this subclass of web generator?
 //public class LocalCheckCommandGenerator extends PauseCommandGenerator {
@@ -17,14 +19,20 @@ public class LocalCheckCommandGenerator extends ExternalCommandGenerator {
 
 	List<String[]> studentLC;
 	String student;
+	String studentName;
 //	int lastAddedExternalIndex = 0;
-	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 	public LocalCheckCommandGenerator(Replayer replayer, CountDownLatch aLatch, String aStudent, Map<String, List<EHICommand>> commandMap, List<String[]> events) {
 		super(replayer, aLatch, commandMap);
 		studentLC = events;
 		student = aStudent;
-	}
+		studentName = PiazzaCommandGenerator.toParenthesizedStudentName(aStudent);
+//		if (student.contains("Earlene") || student.contains("Dare")) {
+//			System.out.println("found tracked student");
+//		}
+		sortLocalCheckEvents(studentLC);
+}
 //	public static boolean hasPauseCommand(List<EHICommand> commands) {
 //		for (EHICommand aCommand:commands) {
 //			if (aCommand instanceof PauseCommand) {
@@ -35,29 +43,108 @@ public class LocalCheckCommandGenerator extends ExternalCommandGenerator {
 //	}
 
 //}
+	public  void sortLocalCheckEvents(List<String[]> anEventsList) {
+		anEventsList.sort((a,b)->Long.compare(
+				toTimestamp(a), toTimestamp(b)));
+
+	}
 protected boolean hasNextExternalEvent() {
 	return lastAddedExternalIndex < studentLC.size();
 }
 protected String[] previousEvent;
-protected long getNextExternalEventTimeStamp() {
-	String[] event = studentLC.get(lastAddedExternalIndex);
-	previousEvent = event;
-//	System.out.println("Previous event:" + System.identityHashCode(previousEvent) + event[2]);
+public  long toTimestamp(String[] event) {
 	try {
 		return df.parse(event[1]).getTime();
-	} catch (ParseException e) {
+	} catch (Exception e) {
 		// TODO Auto-generated catch block
+		System.out.println("Couldl not parse" + event[1] + " using " + df);
 		e.printStackTrace();
 		return -1;
 	}
 }
-
+@Override
+protected List<EHICommand> getRemainingAssignmentCommands(long minEndTime) {
+	List<EHICommand> retVal = new ArrayList();
+	for (int anIndex = lastAddedExternalIndex;  anIndex < studentLC.size(); anIndex++) {
+		String[] anEvent = studentLC.get(anIndex);
+		EHICommand aCommand = new LocalCheckCommand(anEvent[2]);
+		aCommand.setTimestamp(toTimestamp(anEvent));
+		retVal.add(aCommand);		
+	}
+	return retVal;
+}
+protected long getNextExternalEventTimeStamp() {
+//	if (student.contains("Earlene") || student.contains("Dare")) {
+//		System.out.println("found tracked student");
+//	}
+	String[] event = studentLC.get(lastAddedExternalIndex);
+	previousEvent = event;
+	lastAddedTimeStamp = toTimestamp(event);
+	return lastAddedTimeStamp;
+	
+	
+	
+//	System.out.println("Previous event:" + System.identityHashCode(previousEvent) + event[2]);
+//	try {
+//		return df.parse(event[1]).getTime();
+//	} catch (ParseException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//		return -1;
+//	}
+}
+public final static String TYPE = "type";
+public final static String TESTCASE = "testcase";
+public final static String STATUS = "status";
+public String extractSummary(LocalCheckCommand aCommand) {
+	Map<String, String> aDataMap = aCommand.getDataMap();
+	String aType = aDataMap.get(TYPE);
+	String aTestCase = aDataMap.get(TESTCASE);
+	String aStatus = aDataMap.get(STATUS);
+	return aType+","+aTestCase + "," + aStatus;
+	
+}
+protected void logCommand (EHICommand aCommand) {
+	if (aCommand == null) {
+		System.err.println("null command");
+		return;
+	}
+//	if (studentName.contains("Dare")) {
+//		System.out.println("Logged command " + lastAddedExternalIndex + " " +aCommand);
+//		if (lastAddedExternalIndex == 32) {
+//			System.out.println("Approaching end:");
+//		}
+//	}
+	try {
+	LogAnalyzerLoggerFactory.logMessage(studentName + "-->" + 
+			toDate(aCommand)+ 
+			" Local Check " + 
+			extractSummary((LocalCheckCommand) aCommand) + 
+			"\n");
+	LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numLocaCheckCommands++;
+	} catch (Exception e) {
+		System.err.println("Could noot parse date of:" + aCommand);
+		e.printStackTrace();
+	}
+}
 protected List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) {
+	if (student.contains("Dare")) {
+		System.out.println("Found student");
+	}
 	String[] anEvent = previousEvent;
 	if (!fromPreviousEvent) {
 	 anEvent = studentLC.get(lastAddedExternalIndex);
 	}
+	
 	EHICommand aCommand = new LocalCheckCommand(anEvent[2]);
+//	aCommand.setTimestamp(toTimestamp(anEvent));
+	if (student.contains("Dare")) {
+		System.out.println("Local check command:" + lastAddedExternalIndex + " " + aCommand);
+	}
+	
+//	LogAnalyzerLoggerFactory.logMessage(studentName + "-->" + anEvent[1] + " Local Check " + anEvent[2] + "\n");
+//	LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numLocaCheckCommands++;
+//	System.out.println(student + "-->" + aCommand);
 //	System.out.println("Local check command  " + System.identityHashCode(aCommand) + " for " + anEvent[2]);
 	List<EHICommand> retVal = new ArrayList<>();
 	retVal.add(aCommand);

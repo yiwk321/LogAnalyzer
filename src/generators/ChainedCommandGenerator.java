@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import fluorite.commands.DifficultyCommand;
 import fluorite.commands.EHICommand;
 import fluorite.commands.PauseCommand;
+import logAnalyzer.AReplayer;
 import logAnalyzer.Replayer;
 
 public class ChainedCommandGenerator extends CommandGenerator {
@@ -50,9 +51,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			System.err.println("No localcheck logs for" + aStudent + ", not adding to command generator");
 		} else {
 			System.out.println("Found localcheck logs for" + aStudent + ", not adding to command generator");
-
+			commandGenerators.add(new EndOfSessionCommandGenerator(replayer, latch, aStudentLog));
 //			commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
-//			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
+			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
 			commandGenerators.add(new CheckstyleCommandGenerator(replayer, latch, aStudent, aStudentLog));
 //			commandGenerators.add(new LocalCheckCommandGenerator(this, latch, student, studentLog, localCheckEvents));
 			commandGenerators.add(new LocalChecksRawBatchCommandGenerator(replayer, latch, aStudent, aStudentLog));
@@ -65,12 +66,94 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			}
 		}
 	}
+	
+	public static long getMaxTime(List<EHICommand> aCommands) {
+		for (int anIndex = aCommands.size() - 1; anIndex >= 0; anIndex --) {
+			EHICommand aCommand = aCommands.get(anIndex);
+			long aTimestamp = toTimestamp(aCommand);
+			if (aTimestamp != 0) {
+				return aTimestamp;
+			}
+		}
+		return 0;
+		
+	}
+	
+	public static long getStartTimestamp(List<EHICommand> aCommands) {
+		for (EHICommand aCommand:aCommands) {
+			long aStartTimestamp = aCommand.getStartTimestamp() ;
+			if (aStartTimestamp != 0) {
+				return aStartTimestamp;
+			}			
+		}
+		return 0;
+	}
 
+	public void addRemainingCommands(List<EHICommand> commands) {
+		long aStartTimestamp = getStartTimestamp(commands);
+
+		if (aStartTimestamp == 0) {
+			System.err.println("time stamp is 0 of first command");
+		}
+		long aMinEndTime = getMaxTime(commands);
+		List<EHICommand> aNextRemainingCommands;
+		List<EHICommand> anAllRemaningCommands = new ArrayList();
+		for (CommandGenerator aCommandGenerator:commandGenerators) {
+			aNextRemainingCommands = aCommandGenerator.getRemainingAssignmentCommands(aMinEndTime);
+			aMinEndTime = Math.max(aMinEndTime, getMaxTime(aNextRemainingCommands));	
+			anAllRemaningCommands.addAll(aNextRemainingCommands);
+		}
+//		AReplayer.sortCommands(anAllRemaningCommands);
+		for (EHICommand aCommand:anAllRemaningCommands) {
+			long aFullTimeStamp = toTimestamp(aCommand);
+			aCommand.setStartTimestamp(aStartTimestamp);
+			long aRelativeTimestamp = aFullTimeStamp - aStartTimestamp;
+			if (aRelativeTimestamp < 0) {
+				System.err.println("Start time stamp " + aStartTimestamp);
+				System.err.println("full time stamp " + aFullTimeStamp);
+
+			}
+			aCommand.setTimestamp(aFullTimeStamp - aStartTimestamp);
+		}
+		commands.addAll(anAllRemaningCommands);
+		AReplayer.sortCommands(commands);
+
+		
+		
+	}
 	@Override
 	public List<EHICommand> addCommands(int aSessionIndex, List<EHICommand> commands, long nextStartTime) {
+//		if (student.contains("Dare") ||student.contains("Earlene")) {
+//			System.out.println("Found tracked student");
+//			if (aSessionIndex == 7) {
+//				System.out.println("Found tracked session");
+//			}
+//		}
+
 		for (CommandGenerator aCommandGenerator:commandGenerators) {
 			commands = aCommandGenerator.addCommands(aSessionIndex, commands, nextStartTime);
 		}
+		
+//		long aStartTimestamp = getStartTimestamp(commands);
+//
+//		if (aStartTimestamp == 0) {
+//			System.err.println("time stamp is 0 of first command");
+//		}
+//		long aMinEndTime = getMaxTime(commands);
+//		List<EHICommand> aNextRemainingCommands;
+//		List<EHICommand> anAllRemaningCommands = new ArrayList();
+//		for (CommandGenerator aCommandGenerator:commandGenerators) {
+//			aNextRemainingCommands = aCommandGenerator.getRemainingAssignmentCommands(aMinEndTime);
+//			aMinEndTime = Math.max(aMinEndTime, getMaxTime(aNextRemainingCommands));	
+//			anAllRemaningCommands.addAll(aNextRemainingCommands);
+//		}
+//		AReplayer.sortCommands(anAllRemaningCommands);
+//		for (EHICommand aCommand:anAllRemaningCommands) {
+//			long aFullTimeStamp = toTimestamp(aCommand);
+//			aCommand.setStartTimestamp(aStartTimestamp);
+//			aCommand.setTimestamp(aFullTimeStamp - aStartTimestamp);
+//		}
+		
 		return commands;
 	}
 	
@@ -113,6 +196,12 @@ public class ChainedCommandGenerator extends CommandGenerator {
 							appendAllRemainingCommands ? 
 									Long.MAX_VALUE : 
 										lastCommandTime + 600000);
+					if (j == commandMap.size()-1) {
+						if (student.contains("Dare")) {
+							System.out.println("Found traced student");
+						}
+						addRemainingCommands(newCommands);
+					}
 				} else {
 					List<EHICommand> nextCommands = commandMap.get(keyset[j+1]);
 					long nextStartTime = -1;

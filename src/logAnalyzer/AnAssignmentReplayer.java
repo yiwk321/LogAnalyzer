@@ -45,7 +45,13 @@ public class AnAssignmentReplayer extends Replayer {
 
 	public void readLogs(String path) {
 		root = new File(path);
-		allLogs = readAssignment(root);
+		try {
+			LogAnalyzerLoggerFactory.createLoggerAndMetrics(root);
+		} catch (IOException e) {
+			System.err.println("Could not create logger");
+			e.fillInStackTrace();
+		}
+		allLogs = readAssignment(root);		
 	}
 
 	public int countStudents() {
@@ -139,6 +145,7 @@ public class AnAssignmentReplayer extends Replayer {
 		if (mode == LOCALCHECK) {
 			localCheckEvents = readLocalCheckEvents(assign);
 		}
+		findAllPiazzaAndZoomStudents(assign);
 //		 piazzaPostFile = findPiazzaPostFile(assign);
 //		 piazzaPosts = null;
 //		if (piazzaPostFile != null && piazzaPostFile.exists()) {

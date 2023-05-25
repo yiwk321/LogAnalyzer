@@ -16,6 +16,7 @@ public abstract class ExternalCommandGenerator extends PauseCommandGenerator {
 //	List<String[]> studentLC;
 //	String student;
 	int lastAddedExternalIndex = 0;
+	long lastAddedTimeStamp;
 //	SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 	public ExternalCommandGenerator(Replayer replayer, CountDownLatch aLatch,  Map<String, List<EHICommand>> commandMap) {
@@ -38,11 +39,14 @@ protected abstract long getNextExternalEventTimeStamp() ;
 protected List<EHICommand>  createExternalCommands() {
 	return createExternalCommands(false);
 }
+protected void logCommand (EHICommand aCommand) {
+	
+}
 
 protected abstract List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) ;
 
 public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, long nextStartTime) {
-//	if (student.contains("Beier")) {
+//	if (student.contains("Earlene")) {
 //		System.out.println("found student");
 //	}
 	long aStartTimeStamp = commands.get(0).getTimestamp2();
@@ -135,6 +139,7 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 						for (EHICommand anExternalCommand:externalCommandList) {
 
 						newCommands.add(anExternalCommand); 
+						logCommand(anExternalCommand);
 //						System.out.println ("Adding command:" + System.identityHashCode(anExternalCommand));
 
 						}
@@ -151,7 +156,8 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 //						}
 						nextExternalEventTimestamp = getNextExternalEventTimeStamp();
 					}
-				} else if (nextExternalEventTimestamp >= last.getStartTimestamp()+last.getTimestamp() && nextExternalEventTimestamp < cur.getStartTimestamp() + cur.getTimestamp()) {
+				} else if (nextExternalEventTimestamp >= last.getStartTimestamp()+last.getTimestamp() && 
+						nextExternalEventTimestamp < cur.getStartTimestamp() + cur.getTimestamp()) {
 //					LocalCheckCommand command2 = new LocalCheckCommand(event[2]);
 					List<EHICommand> anExternalCommandList = createExternalCommands(true);
 
@@ -177,6 +183,7 @@ public List<EHICommand> addCommands(int aSession, List<EHICommand> commands, lon
 						for (EHICommand anExternalCommand:anExternalCommandList) {
 
 						newCommands.add(anExternalCommand);
+						logCommand(anExternalCommand);
 //						System.out.println ("Adding command:" + System.identityHashCode(anExternalCommand));
 						}
 						lastAddedExternalIndex++;

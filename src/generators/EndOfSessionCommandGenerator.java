@@ -22,12 +22,23 @@ public class EndOfSessionCommandGenerator extends CommandGenerator{
 		List<EHICommand> newCommands = new ArrayList<>();
 		EHICommand last = null;
 		EHICommand cur = null;
+		boolean hasSessionCommand = false;
 		for (EHICommand command : commands) {
 			
 				newCommands.add(command);
+				if (command instanceof EndOfSessionCommand) {
+					hasSessionCommand = true;
+				}
+				
 			
 		}
+		if (hasSessionCommand) {
+			return newCommands;
+		}
 		EndOfSessionCommand aCommand = new EndOfSessionCommand(aSession);
+		aCommand.setStartTimestamp(ChainedCommandGenerator.getStartTimestamp(commands));
+		long aMaxTime = ChainedCommandGenerator.getMaxTime(commands);
+		aCommand.setTimestamp(aMaxTime - aCommand.getStartTimestamp());
 		newCommands.add(aCommand);
 		return newCommands;
 	}

@@ -913,8 +913,8 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		try {
 			List<EHICommand> commands = reader.readAll(path);
 //			sortCommands(commands, 0, commands.size()-1);
-			commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
-
+//			commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
+			sortCommands(commands);
 			return commands;
 		} catch (Exception e) {
 			System.out.println("Could not read file" + path);
@@ -970,7 +970,7 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 		return nestedCommands;
 	}
 
-	protected void sortNestedCommands(List<List<EHICommand>> nestedCommands){
+	public static void sortNestedCommands(List<List<EHICommand>> nestedCommands){
 		for (int i = 0; i < nestedCommands.size(); i++) {
 			List<EHICommand> commands = nestedCommands.get(i);
 			if (commands == null || commands.size() < 2) {
@@ -978,9 +978,15 @@ public class AReplayer extends ADifficultyPredictionAndStatusPrinter{
 				i--;
 			} else if (commands.size() > 2) {
 //				sortCommands(commands, 0, commands.size()-1);
-				commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
+				sortCommands(commands);
+//				commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
 			}
 		}
+	}
+	
+	public static void sortCommands(List<EHICommand> aCommands) {
+		aCommands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
+
 	}
 
 //	private void sortCommands(List<EHICommand> commands, int start, int end){

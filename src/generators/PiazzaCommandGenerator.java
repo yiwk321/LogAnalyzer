@@ -1,5 +1,6 @@
 package generators;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -15,13 +16,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import fluorite.commands.EHICommand;
+import fluorite.commands.LocalCheckCommand;
 import fluorite.commands.PiazzaPostCommand;
+import fluorite.commands.ZoomSessionStartCommand;
+import fluorite.util.EHUtilities;
 import logAnalyzer.AnAssignmentReplayer;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.Replayer;
 
 public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 
 	String student;
+	String studentName;
 	List<JSONObject> piazzaPosts;
 	Pattern studentNamePattern = Pattern.compile(".*\\\\(.*), (.*)\\((.*)\\)");
 	
@@ -29,6 +35,7 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 								  Map<String, List<EHICommand>> commandMap, JSONObject piazzaPosts) {
 		super(replayer, aLatch, commandMap);
 		student = aStudent;
+		studentName = toParenthesizedStudentName(student);
 		this.piazzaPosts = new ArrayList<>();
 		findPiazzaPosts(aStudent, piazzaPosts);
 		try {
@@ -43,6 +50,31 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 			}, this.piazzaPosts);
 			System.out.println("");
 		}
+	}
+	
+	public static String toParenthesizedStudentName(String aLongName) {
+		int aLeftParenIndex = aLongName.indexOf("(");
+		if (aLeftParenIndex < 0) {
+			return aLongName;
+		}
+		return aLongName.substring(aLeftParenIndex, aLongName.length());
+	}
+	
+	//"subject": "<p>Hi Professor, thank you for pointing out the mistake. I tried the link above and got another error. I wonder if this happened because I tried to install the plugin in China. Thank you for your help!</p>\n<p><img src=\"/redirect/s3?bucket=uploads&amp;prefix=paste%2Fjqpqwx9l2l36ng%2F2d01eb7ec7e86e20443de7cf2f5510f51f2ed8ffe939c3e64f8e7433bbb5728a%2FScreen_Shot_2021-01-23_at_3.31.38_PM.png\" alt=\"\" /></p>\n<p><img src=\"/redirect/s3?bucket=uploads&amp;prefix=paste%2Fjqpqwx9l2l36ng%2F93d55fe0e7c4c6cd289a308962bd41d728ce7dd253912ff2f8c723d854bb6c19%2FScreen_Shot_2021-01-23_at_3.40.19_PM.png\" width=\"744\" height=\"670\" alt=\"\" /></p>",
+
+	static String SUBJECT = "\"subject\":";
+	public static String toSubject (String aPost) {
+		int aSubjectIndex = aPost.indexOf(SUBJECT);
+		if (aSubjectIndex < 0) {
+			return aPost;
+		}
+		int anEndIndex = aPost.indexOf(',', aSubjectIndex);
+		if (anEndIndex < 0) {
+			anEndIndex = aPost.length();
+		}
+		String retVal = aPost.substring(aSubjectIndex, anEndIndex);
+		return retVal;
+	
 	}
 	
 	public static Set<String> findAllPiazzaPosters(JSONObject piazzaPostsJson) {
@@ -102,9 +134,48 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 	protected long getNextExternalEventTimeStamp() {
 		// TODO Auto-generated method stub
 		previousEvent = piazzaPosts.get(lastAddedExternalIndex);
-		return previousEvent.getLong("time");
+//		return previousEvent.getLong("time");
+		return toTimestamp(previousEvent);
 	}
-
+	
+	public String extractSummary(PiazzaPostCommand aCommand) {
+		Map<String, String> aDataMap = aCommand.getDataMap();
+		String aPost = aDataMap.get(aCommand.PIAZZA_POST);
+		return toSubject(aPost);
+		
+	}
+	protected void logCommand (EHICommand aCommand) {	
+		LogAnalyzerLoggerFactory.logMessage(studentName + "-->" + 
+				toDate(aCommand)+ 
+				"Piazza Post " + 
+				extractSummary((PiazzaPostCommand) aCommand) + 
+				"\n");
+		LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numPiazzaPosts++;
+	}
+	public static long toTimestamp(JSONObject event) {
+		try {
+			return event.getLong("time");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	@Override
+	protected List<EHICommand> getRemainingAssignmentCommands(long minEndTime) {
+		List<EHICommand> retVal = new ArrayList();
+		for (int anIndex = lastAddedExternalIndex;  anIndex < piazzaPosts.size(); anIndex++) {
+			JSONObject anEvent = piazzaPosts.get(anIndex);
+			long aTimeStamp = toTimestamp(anEvent);
+			if (aTimeStamp > minEndTime) {
+				break; // maybe check the previous folder
+			}
+			EHICommand aCommand = new PiazzaPostCommand(anEvent);
+			aCommand.setTimestamp(aTimeStamp);
+			retVal.add(aCommand);		
+		}
+		return retVal;
+	}
 	
 	@Override
 	protected List<EHICommand> createExternalCommands(boolean fromPreviousEvent) {
@@ -112,8 +183,14 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 		if (!fromPreviousEvent) {
 			previousEvent = piazzaPosts.get(lastAddedExternalIndex);
 		}
-		EHICommand aCommand = new PiazzaPostCommand(previousEvent);
+		PiazzaPostCommand aCommand = new PiazzaPostCommand(previousEvent);
 		List<EHICommand> retVal = new ArrayList<>();
+//		String aPost = aCommand.getDataMap().get("piazza_post");
+//		
+//		LogAnalyzerLoggerFactory.logMessage(
+//				student + "-->" + EHUtilities.toDate(aCommand) + ": Piazza " + toSubject(aPost) + "\n");
+//		LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numPiazzaPosts++;
+		
 		retVal.add(aCommand);
 //		System.out.println("Adding aCommand " + aCommand + " for " + student);
 		return retVal;

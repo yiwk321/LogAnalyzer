@@ -25,6 +25,9 @@ import fluorite.commands.CheckStyleCommand;
 import fluorite.commands.EHICommand;
 import fluorite.commands.LocalCheckCommand;
 import fluorite.commands.PauseCommand;
+import fluorite.commands.PiazzaPostCommand;
+import fluorite.util.EHUtilities;
+import logAnalyzer.LogAnalyzerLoggerFactory;
 import logAnalyzer.Replayer;
 // make this subclass of web generator?
 //public class LocalCheckCommandGenerator extends PauseCommandGenerator {
@@ -71,12 +74,14 @@ public class CheckstyleCommandGenerator extends ExternalCommandGenerator {
 	}
 	
 	protected String student;
+	protected String studentName;
 	
 	public CheckstyleCommandGenerator(Replayer replayer, CountDownLatch aLatch, String aStudent, Map<String, List<EHICommand>> commandMap) {
 		super(replayer, aLatch, commandMap);
 		checkStyleEvents = readCheckstyleEvents(aStudent);
 		student = aStudent;
-		
+		studentName = PiazzaCommandGenerator.toParenthesizedStudentName(aStudent);
+
 		
 	}
 	
@@ -167,13 +172,52 @@ protected long getNextExternalEventTimeStamp() {
 	String[] event = checkStyleEvents.get(lastAddedExternalIndex);
 	previousEvent = event;
 //	Thu May 27 12:40:29 EDT 2021
+	return toTimestamp(event);
+//	try {
+//		return df.parse(event[1]).getTime();
+//	} catch (Exception e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//		return -1;
+//	}
+}
+public  long toTimestamp(String[] event) {
 	try {
 		return df.parse(event[1]).getTime();
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
+		System.out.println("Couldl not parse" + event[1] + " using " + df);
+
 		e.printStackTrace();
 		return -1;
 	}
+}
+@Override
+protected List<EHICommand> getRemainingAssignmentCommands(long minEndTime) {
+	List<EHICommand> retVal = new ArrayList();
+	for (int anIndex = lastAddedExternalIndex;  anIndex < checkStyleEvents.size(); anIndex++) {
+		String[] anEvent = checkStyleEvents.get(anIndex);
+		EHICommand aCommand = new CheckStyleCommand(toCSVString(anEvent));
+		aCommand.setTimestamp(toTimestamp(anEvent));
+		retVal.add(aCommand);		
+	}
+	return retVal;
+}
+public final static String CSV_ROW = "CSVRow";
+
+public String extractSummary(CheckStyleCommand aCommand) {
+	Map<String, String> aDataMap = aCommand.getDataMap();
+	String aCSVRow = aDataMap.get(CSV_ROW);
+	return aCSVRow;
+	
+}
+protected void logCommandDetailed (EHICommand aCommand) {	
+	LogAnalyzerLoggerFactory.logMessage(studentName + "-->" + 
+			toDate(aCommand)+ 
+			"Checkstyle  " + 
+			extractSummary((CheckStyleCommand) aCommand) + 
+			"\n");
+	LogAnalyzerLoggerFactory.getLogAnalyzerAssignmentMetrics().numCheckstyleCommands++;
 }
 
 protected List<EHICommand>  createExternalCommands(boolean fromPreviousEvent) {
