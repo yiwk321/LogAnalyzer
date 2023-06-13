@@ -100,8 +100,8 @@ public abstract class Replayer {
 	public static final String XML_VERSION = "1.0.0.202008151525";
 	public static final String XML_START3 = "\">\r\n";
 //	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
-	public static final String XML_FILE_ENDING = "\r\n</Events>"; 
-	public static final String XML_FILE_ENDING_MATCH = "</Events>"; 
+	public static final String XML_FILE_ENDING = "\r\n</Events>";
+	public static final String XML_FILE_ENDING_MATCH = "</Events>";
 	public static final long ONE_SECOND = 1000;
 	public static final long ONE_MIN = 60 * 1000;
 	public static final long TEN_MIN = 10 * ONE_MIN;
@@ -126,7 +126,7 @@ public abstract class Replayer {
 	protected static Set<File> synthesizedStudents = new HashSet();
 
 //	protected List<CommandGenerator> commandGenerators = new ArrayList();
-	
+
 	public Replayer() {
 		logToWrite = new TreeMap<>();
 		reader = new EHLogReader();
@@ -140,6 +140,7 @@ public abstract class Replayer {
 		return retVal;
 
 	}
+
 	protected List<EHICommand> createEmptyLog() {
 		List<EHICommand> emptyLog = new ArrayList<>();
 		EclipseCommand command = new EclipseCommand("", 0);
@@ -172,10 +173,10 @@ public abstract class Replayer {
 //		emptyMap.put(emptyLogFile.getPath(), log);
 //		logs.put(student.getPath(), emptyMap);
 	}
-	
+
 	public Map<String, List<EHICommand>> readStudentCreatingPossiblyEmptyLog(File student) {
-		Map<String, List<EHICommand>>  ret = readStudent(student);
-		
+		Map<String, List<EHICommand>> ret = readStudent(student);
+
 		if (ret != null && !ret.isEmpty()) {
 			return ret;
 		} else {
@@ -190,7 +191,7 @@ public abstract class Replayer {
 			return emptyMap;
 
 		}
-	
+
 	}
 
 	public Map<String, List<EHICommand>> readStudent(File student) {
@@ -263,8 +264,8 @@ public abstract class Replayer {
 		}
 		return logs;
 	}
-	
-	public List<EHICommand> readOneLogFileWthoutAppending(File log) throws Exception{
+
+	public List<EHICommand> readOneLogFileWthoutAppending(File log) throws Exception {
 		String path = log.getPath();
 		if (path.contains("Log2021-06-20-20-25-46-388.xml")) {
 			System.out.println("Pausing");
@@ -280,66 +281,191 @@ public abstract class Replayer {
 		}
 //		try {
 //			LogPreprocessor.preProcessFileLines(log);
-			List<EHICommand> commands = reader.readAll(path);
+		List<EHICommand> commands = reader.readAll(path);
 //			sortCommands(commands);
-			commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
-			return commands;
+		commands.sort((a, b) -> Long.compare(a.getTimestamp() + a.getStartTimestamp(),
+				b.getTimestamp() + b.getStartTimestamp()));
+		return commands;
 	}
+
 	Set<File> filesAppendedEvents = new HashSet();
 	Set<File> filesSanitizedWebCommands = new HashSet();
 	Set<File> filesIllegalChars = new HashSet();
 
+	static String ROW_PREFIX = "lineNumber: ";
+	static String COLUMN_PREFIX = "columnNumber: ";
+
+//org.xml.sax.SAXParseException; lineNumber: 4454; columnNumber: 63; The value of attribute "date" associated with an element type "Command" must not contain the '<' character.
+	public static int[] extractRowColumnNumber(String aParseException) {
+		int[] retVal = { -1, -1 };
+		int aRowIndexStart = aParseException.indexOf(ROW_PREFIX);
+		if (aRowIndexStart != -1) {
+			aRowIndexStart += ROW_PREFIX.length();
+			int aRowIndexEnd = aParseException.indexOf(';', aRowIndexStart);
+			if (aRowIndexEnd < -1) {
+				return retVal;
+			}
+			String aRowIndexString = aParseException.substring(aRowIndexStart, aRowIndexEnd);
+			try {
+				retVal[0] = Integer.parseInt(aRowIndexString) - 1;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				return retVal;
+			}
+		}
+		int aColumnIndexStart = aParseException.indexOf(COLUMN_PREFIX);
+
+		if (aColumnIndexStart != -1) {
+			aColumnIndexStart += COLUMN_PREFIX.length();
+			int aColumnIndexEnd = aParseException.indexOf(';', aColumnIndexStart);
+			if (aColumnIndexEnd < 0) {
+				return retVal;
+			}
+			String aColumnnIndexString = aParseException.substring(aColumnIndexStart, aColumnIndexEnd);
+			try {
+				retVal[1] = Integer.parseInt(aColumnnIndexString) - 1;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+		return retVal;
+	}
+//Could not handle:org.xml.sax.SAXParseException; lineNumber: 4454; columnNumber: 63; The value of attribute "date" associated with an element type "Command" must not contain the '<' character.
 
 	private List<EHICommand> handleLogFileException(File log, Exception e) {
 		System.err.println("Handling " + e);
 
 		String aMessage = e.getMessage();
 		if (e.getClass().getName().equals("org.xml.sax.SAXParseException")) {
+			int[] aCellCoordinate = extractRowColumnNumber(e.toString());
+			if (aCellCoordinate[0] == 2599) {
+				System.err.println("found offending coordinate");
+			}
+//			if (aCellCoordinate[0] == 4453 || aCellCoordinate[0] == 777) {
+//				System.err.println("found offending coordinate");
+//			}
+
 			if (aMessage.contains("XML document structures must start and end within the same entity")) {
-				if (filesAppendedEvents.contains(log) ) {
-					
+				if (filesAppendedEvents.contains(log)) {
+
 					System.err.println("Already appended events, cannot handle exception");
 				} else {
 					appendEvents(log);
 					filesAppendedEvents.add(log);
-					return 	readOneLogFile(log);
+					return readOneLogFile(log);
 				}
 			} else if (
 //					aMessage.contains("An invalid XML character (Unicode: 0x0) was found in the CDATA section") ||
-					aMessage.contains("An invalid XML character") ||
-	
+			aMessage.contains("An invalid XML character") ||
+
 					(aMessage.contains("Invalid byte"))) {
 				if (filesIllegalChars.contains(log)) {
 					System.err.println("Already processed illegal chars, cannot handle exception");
 				} else {
-					LogPreprocessor.removeIllegalChars(log, aMessage);
+					LogPreprocessor.removeIllegalChars(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
 					filesIllegalChars.add(log);
-					return 	readOneLogFile(log);
+					return readOneLogFile(log);
 				}
-			} else if (aMessage.contains("must end with the ';' ") ||
-					aMessage.contains("The entity name must immediately follow the")) {
-					if (filesSanitizedWebCommands.contains(log)) {
-						System.err.println("Already sanitized web commands, cannot handle exception");
+			} else if (aMessage.contains("must end with the ';' ")
+					|| aMessage.contains("The entity name must immediately follow the")
+					|| aMessage.contains("must not contain the '<' character")
 
-					} else {
-						LogPreprocessor.escapeWebSearch(log);
-						filesSanitizedWebCommands.add(log);
-						return 	readOneLogFile(log);
+			) {
+				if (filesSanitizedWebCommands.contains(log)) {
+					System.err.println("Already sanitized web commands, cannot handle exception");
 
-					}
+				} else {
+					LogPreprocessor.escapeWebSearch(log, aCellCoordinate[0], aCellCoordinate[1]);
+					filesSanitizedWebCommands.add(log);
+					return readOneLogFile(log);
+
+				}
+			} else {
+				if (filesSanitizedWebCommands.contains(log)) {
+					System.err.println("Already sanitized web commands, cannot handle exception");
+
+				} else {
+					LogPreprocessor.commentTargetLine(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
+					filesSanitizedWebCommands.add(log);
+					return readOneLogFile(log);
+
+				}
 			}
 		}
 		System.err.println("Could not handle:" + e);
 		e.printStackTrace();
 		return null;
 	}
-	public List<EHICommand> readOneLogFile(File log){
+
+//	private List<EHICommand> handleLogFileExceptionModular(File log, Exception e) {
+//		System.err.println("Handling " + e);
+//
+//		String aMessage = e.getMessage();
+//		if (e.getClass().getName().equals("org.xml.sax.SAXParseException")) {
+//			int[] aCellCoordinate = extractRowColumnNumber(e.toString());
+////			if (aCellCoordinate[0] == 4453 || aCellCoordinate[0] == 777) {
+////				System.err.println("found offending coordinate");
+////			}
+//
+//			if (aMessage.contains("XML document structures must start and end within the same entity")) {
+//				if (filesAppendedEvents.contains(log)) {
+//
+//					System.err.println("Already appended events, cannot handle exception");
+//				} else {
+//					appendEvents(log);
+//					filesAppendedEvents.add(log);
+//					return readOneLogFile(log);
+//				}
+//			} else if (
+////					aMessage.contains("An invalid XML character (Unicode: 0x0) was found in the CDATA section") ||
+//			aMessage.contains("An invalid XML character") ||
+//
+//					(aMessage.contains("Invalid byte"))) {
+//				if (filesIllegalChars.contains(log)) {
+//					System.err.println("Already processed illegal chars, cannot handle exception");
+//				} else {
+//					LogPreprocessor.removeIllegalChars(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
+//					filesIllegalChars.add(log);
+//					return readOneLogFile(log);
+//				}
+//			} else if (aMessage.contains("must end with the ';' ")
+//					|| aMessage.contains("The entity name must immediately follow the")
+//					|| aMessage.contains("must not contain the '<' character")
+//
+//			) {
+//				if (filesSanitizedWebCommands.contains(log)) {
+//					System.err.println("Already sanitized web commands, cannot handle exception");
+//
+//				} else {
+//					LogPreprocessor.escapeWebSearch(log, aCellCoordinate[0], aCellCoordinate[1]);
+//					filesSanitizedWebCommands.add(log);
+//					return readOneLogFile(log);
+//
+//				}
+//			} else {
+//				if (filesSanitizedWebCommands.contains(log)) {
+//					System.err.println("Already sanitized web commands, cannot handle exception");
+//
+//				} else {
+//					LogPreprocessor.commentTargetLine(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
+//					filesSanitizedWebCommands.add(log);
+//					return readOneLogFile(log);
+//
+//				}
+//			}
+//		}
+//		System.err.println("Could not handle:" + e);
+//		e.printStackTrace();
+//		return null;
+//	}
+
+	public List<EHICommand> readOneLogFile(File log) {
 		try {
 //			LogPreprocessor.removeDuplicateLocalChecksLines(log);
-		List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
-		return retVal;
+			List<EHICommand> retVal = readOneLogFileWthoutAppending(log);
+			return retVal;
 		} catch (Exception e) {
-		
+
 			return handleLogFileException(log, e);
 		}
 //		if (retVal == null) {
@@ -381,7 +507,7 @@ public abstract class Replayer {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))){
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
 			if (aFileText.endsWith(System.lineSeparator())) {
 				writer.write(XML_FILE_ENDING_MATCH);
 			} else {
@@ -531,7 +657,8 @@ public abstract class Replayer {
 		}
 	}
 
-	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode, boolean appendAllRemainingCommands);
+	public abstract void createExtraCommand(CountDownLatch latch, String surfix, int mode,
+			boolean appendAllRemainingCommands);
 
 	public void createExtraCommandStudent(CountDownLatch aLatch, Map<String, List<EHICommand>> aStudentLog,
 			String aStudent, String surfix, int mode, List<String[]> localCheckEvents) {
@@ -646,7 +773,7 @@ public abstract class Replayer {
 	public void createSessionTimeMap(String assign, Map<String, List<Long>> sessionTimeMap) {
 		String folder = new File(assign).getParent();
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimesSeconds.txt")))) {
-			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+			for (Entry<String, List<Long>> studentSessions : sessionTimeMap.entrySet()) {
 				if (studentSessions.getValue().size() == 0) {
 					continue;
 				}
@@ -666,7 +793,7 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(folder, "ZoomSessionTimes.txt")))) {
-			for (Entry<String, List<Long>> studentSessions: sessionTimeMap.entrySet()) {
+			for (Entry<String, List<Long>> studentSessions : sessionTimeMap.entrySet()) {
 				if (studentSessions.getValue().size() == 0) {
 					continue;
 				}
@@ -686,7 +813,7 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void createAssignTimeline(String assign, Map<String, List<List<EHICommand>>> data) {
 		notifyNewAssignment(assign, data);
 		for (String key : data.keySet()) {
@@ -740,8 +867,7 @@ public abstract class Replayer {
 					if (command instanceof FileOpenCommand) {
 						currentFile = command;
 					}
-					if (hasDifficulty && (command instanceof CheckStyleCommand
-							|| command instanceof ConsoleOutput
+					if (hasDifficulty && (command instanceof CheckStyleCommand || command instanceof ConsoleOutput
 							|| command instanceof ConsoleInput || command instanceof WebCommand
 							|| command instanceof RunCommand || command instanceof FileOpenCommand)) {
 						difficultySessionCommands.add(command);
@@ -811,7 +937,7 @@ public abstract class Replayer {
 					}
 					if (command instanceof RunCommand
 //							&& command.getAttributesMap().get("type").equals("Run")
-						) {
+					) {
 						boolean noException = true;
 						int endIdx = i + 10 < commands.size() ? i + 10 : commands.size();
 						int j = i + 1;
@@ -845,13 +971,13 @@ public abstract class Replayer {
 					}
 					if (command instanceof LocalCheckCommand) {
 						String type = command.getDataMap().get("type");
-						if (type.equals("fail_decline")|| type.equals("fail_growth")) {
+						if (type.equals("fail_decline") || type.equals("fail_growth")) {
 							if (!hasDifficulty && currentFile != null) {
 								difficultySessionCommands.add(currentFile);
 							}
 							hasDifficulty = true;
 							difficultySessionCommands.add(command);
-							if (i + 1 < commands.size() && !(commands.get(i+1) instanceof LocalCheckCommand)) {
+							if (i + 1 < commands.size() && !(commands.get(i + 1) instanceof LocalCheckCommand)) {
 								for (EHICommand difficultyCommand : difficultySessionCommands) {
 									if (!(difficultyCommand instanceof LocalCheckCommand && hasDifficulty)) {
 										difficulties.add(difficultySessionCommands);
@@ -879,7 +1005,7 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
-	
+
 //	public void createPiazzaStats(String assign, Map<String, List<List<EHICommand>>> data) {
 //		df = new SimpleDateFormat("MM/dd/yyyy hh:mma 'ET'");
 //		TimeZone edt = TimeZone.getTimeZone("America/New_York");
@@ -1068,7 +1194,7 @@ public abstract class Replayer {
 
 	public String getCommandString(EHICommand command) {
 		long timestamp = command.getStartTimestamp() + command.getTimestamp();
-		
+
 		String retVal = df.format(timestamp) + "\t" + command.getName() + ": ";
 		if (df.format(timestamp).equals("05/26/2021 12:33PM ET")) {
 			int a = 0;
@@ -1097,13 +1223,13 @@ public abstract class Replayer {
 			return retVal + post.getString("subject") + "," + post.getString("content");
 		}
 		if (command instanceof RequestHelpCommand) {
-			return retVal + dataMap.get("error-type") + "," + dataMap.get("error-message") + "," + dataMap.get("output");
+			return retVal + dataMap.get("error-type") + "," + dataMap.get("error-message") + ","
+					+ dataMap.get("output");
 		}
 		if (command instanceof RunCommand) {
 			dataMap = command.getAttributesMap();
-			return df.format(timestamp) + "\t" + dataMap.get("type") + ": " + dataMap.get("kind") 
-					+ ", projectName: " + dataMap.get("projectName")
-					+ ", className: " + dataMap.get("className"); 
+			return df.format(timestamp) + "\t" + dataMap.get("type") + ": " + dataMap.get("kind") + ", projectName: "
+					+ dataMap.get("projectName") + ", className: " + dataMap.get("className");
 		}
 		if (command instanceof WebCommand) {
 			return retVal + dataMap.get("keyword") + ", " + dataMap.get("URL");
@@ -1413,7 +1539,7 @@ public abstract class Replayer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void commandCount(String assign, Map<String, List<List<EHICommand>>> data) {
 		File csv = new File(assign + "CommandCount.csv");
 		FileWriter fw;
@@ -1424,7 +1550,8 @@ public abstract class Replayer {
 			csv.createNewFile();
 			fw = new FileWriter(csv);
 			CSVWriter cw = new CSVWriter(fw);
-			String[] header = { "Student", "Web", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Debug", "LocalChecks"};
+			String[] header = { "Student", "Web", "Insert", "Delete", "Replace", "Copy", "Paste", "Run", "Debug",
+					"LocalChecks" };
 			cw.writeNext(header);
 
 			assign = assign.substring(assign.lastIndexOf(File.separator) + 1);
@@ -1483,7 +1610,7 @@ public abstract class Replayer {
 				}
 				retVal.add(student);
 				for (int i = 0; i < numCommands.length; i++) {
-					retVal.add(numCommands[i]+"");
+					retVal.add(numCommands[i] + "");
 				}
 				String[] nextLine = retVal.toArray(new String[1]);
 				cw.writeNext(nextLine);
@@ -1977,7 +2104,8 @@ public abstract class Replayer {
 				i--;
 			} else if (commands.size() > 2) {
 //				sortCommands(commands);
-				commands.sort((a,b)->Long.compare(a.getTimestamp()+a.getStartTimestamp(), b.getTimestamp()+b.getStartTimestamp()));
+				commands.sort((a, b) -> Long.compare(a.getTimestamp() + a.getStartTimestamp(),
+						b.getTimestamp() + b.getStartTimestamp()));
 			}
 		}
 	}
@@ -2062,7 +2190,7 @@ public abstract class Replayer {
 		return EventType.Other;
 
 	}
-	
+
 	protected Set<String> sythesizedAssignments = new HashSet();
 
 	public File getProjectFolder(File folder) {

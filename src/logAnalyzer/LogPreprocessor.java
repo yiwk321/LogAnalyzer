@@ -13,16 +13,22 @@ import util.misc.Common;
 
 public class LogPreprocessor {
 
-	private static final String ESCAPED_AMPERSAND = " &amp; ";
+//	private static final String ESCAPED_AMPERSAND = " &amp; ";
+	private static final String ESCAPED_AMPERSAND = "AMPERSAND";
+
 	private static final String SPACED_ESCAPED_AMPERSAND = " " + ESCAPED_AMPERSAND + " ";
 
 //	private static final String ESCAPED_AMPERSAND = "Amper1sand";
 
+//	private static final String ESCAPED_LT = " &lt; ";
 	private static final String ESCAPED_LT = " &lt; ";
+
 	private static final String ESCAPED_GT = " &gt; ";
 	public static final String NULL_MARKER = "0x0";
 	public static final String ILLEGAL_MARKER = "0x?";
 
+	private static final String URL_STRING_START = "url=\"";
+	private static final String URL_STRING_END = "\"";
 
 
 	private static final String SEARCH_STRING_START = "searchString=\"";
@@ -32,9 +38,55 @@ public class LogPreprocessor {
 
 	private static StringBuilder stringBuilder = new StringBuilder();
 	
-	public static final String preProcessSearchString(String anOriginal) {
+	private static final char SUBSTITUTE_CHAR = '#';
+	private static final String SUBSTITUTE_SEMICOLON = "SEMICOLON";
+	
+	private static final String SUBSTITUTE_LINE = "SEMICOLON";
+	
+	private static final String COMMENT_START = "<!--";
+	private static final String COMMENT_END = "-->";
+
+
+	
+	public static final String deleteChar(String aString, int aPosition) {
+		String aLeftOfColumn = aString.substring(0, aPosition);
+		String aRightOfColumn = aString.substring(aPosition + 1, aString.length() );
+		return aLeftOfColumn + SUBSTITUTE_CHAR + aRightOfColumn;
+	}
+	public static final String commentLine(String aString) {
+		return COMMENT_START + aString + COMMENT_END;
+	}
+	
+	public static final String preProcessURL(String anOriginal, int aLineNumber, int aColumnNumber, int aCurrentLineNumber) {
+		int aURLStart = anOriginal.indexOf(URL_STRING_START);
+		int aURLContentStart = aURLStart + URL_STRING_START.length();
+
+		int aURLEnd = anOriginal.indexOf(URL_STRING_END, aURLContentStart);
+		
+		if (aURLStart < 0 || aURLEnd < 0) {
+			return anOriginal;
+		}
+		String aURLContent = anOriginal.substring(aURLContentStart , aURLEnd);
+		String aPossiblyModifiedURL = aURLContent.replace(";", SUBSTITUTE_SEMICOLON);
+//		if (aLineNumber == aCurrentLineNumber) {
+//			System.err.println("Found target line number");
+//		}
+		 if (aURLContent.equals(aPossiblyModifiedURL)) {
+			
+				return anOriginal;
+
+			}		
+		String aPrefix = anOriginal.substring(0, aURLContentStart);
+		String aSuffix = anOriginal.substring(aURLEnd);
+		String aResult = aPrefix + aPossiblyModifiedURL + aSuffix;
+
+		return aResult;
+		}
+	
+	public static final String preProcessSearchString(String anOriginal, int aLineNumber, int aColumnNumber, int aCurrentLineNumber) {
 		int aSearchStart = anOriginal.indexOf(SEARCH_STRING_START);
 		int aSearchEnd = anOriginal.indexOf(SEARCH_STRING_END);
+		
 		if (aSearchStart < 0 || aSearchEnd < 0) {
 			return anOriginal;
 		}
@@ -43,10 +95,13 @@ public class LogPreprocessor {
 		String aPossiblyModifiedSearch = aSearchContent.replace("\"", "");
 		 aPossiblyModifiedSearch = aPossiblyModifiedSearch.replace("<", ESCAPED_LT);
 		 aPossiblyModifiedSearch = aPossiblyModifiedSearch.replace(">", ESCAPED_GT);
+		 if (aSearchContent.equals(aPossiblyModifiedSearch)) {
+//				if (aLineNumber == aCurrentLineNumber) {
+//					return deleteChar(anOriginal, aColumnNumber);
+//				}
+				return anOriginal;
 
-		if (aSearchContent.equals(aPossiblyModifiedSearch)) {
-			return anOriginal;
-		}
+			}		
 		String aPrefix = anOriginal.substring(0, aSearchContentStart);
 		String aSuffix = anOriginal.substring(aSearchEnd);
 		String aResult = aPrefix + aPossiblyModifiedSearch + aSuffix;
@@ -104,7 +159,9 @@ public class LogPreprocessor {
 			return aRemoveException;
 		}
 		lineStringBuilder.setLength(0);
+		int aCurrentLineNumber = 0;
 		for (int i = 0; i < anOriginal.length(); i++) {
+
 			char aChar = anOriginal.charAt(i);
 			
 			if (//((anOriginal.contains("<WebVisit") || anOriginal.contains("<text>")) && 
@@ -118,23 +175,37 @@ public class LogPreprocessor {
 //				System.out.println("Found null in:" + anOriginal);
 				lineStringBuilder.append(NULL_MARKER);
 			} 
+			else if (aColumnNumber == i) {
+				lineStringBuilder.append(ILLEGAL_MARKER);
+			}
 			else {
 				lineStringBuilder.append(aChar);
 
 
 			}
+			aCurrentLineNumber++;
 		}
+
+		
+				
 		return lineStringBuilder.toString();
 	}
 
-	public static final void escapeWebSearch(File aFile) {
+	public static final void escapeWebSearch(File aFile, int aLineNumber, int aColumnNumber) {
 		stringBuilder.setLength(0);
+		int aCurrentLineNumber = 0;
 
 		try (BufferedReader br = new BufferedReader(new FileReader(aFile))) {
 			boolean aChanged = false;
+			if (aCurrentLineNumber == aLineNumber) {
+				System.out.println ("found target line");
+			}
 
 			String anOriginal, aNew = null; // why was this initialization required by Java?
-			while ((anOriginal = br.readLine()) != null) {				
+			while ((anOriginal = br.readLine()) != null) {
+//				if (aCurrentLineNumber == 4453 || aCurrentLineNumber == 777) {
+//					System.err.println("Found offending line");
+//				}
 				aNew = anOriginal;
 //				if (anOriginal.contains("&")) {
 //					System.out.println("Found &") ;
@@ -149,14 +220,21 @@ public class LogPreprocessor {
 						
 						aNew = aNew.replace("&", ESCAPED_AMPERSAND);
 					}
-					aNew = preProcessSearchString(aNew);
+					aNew = preProcessSearchString(aNew, aLineNumber, aColumnNumber, aCurrentLineNumber);
+					aNew = preProcessURL(aNew, aLineNumber, aColumnNumber, aCurrentLineNumber);
 					
+				}
+				if (anOriginal.equals(aNew)) {
+					if (aCurrentLineNumber == aLineNumber) {
+						aNew = commentLine(aNew);
+					}
 				}
 				if (!anOriginal.equals(aNew)) {
 					aChanged = true;
 				}
 				
 				stringBuilder.append(aNew + "\n");
+				aCurrentLineNumber++;
 
 			}
 		
@@ -189,23 +267,34 @@ public class LogPreprocessor {
 //   <exceptionString><![CDATA[Exception in thread "main" java.nio.file.InvalidPathException: Illegal char <"> at index 37: C:\Users\hello\21workspace\524a5Java\"fake.lisp"
 //I***@25150325951300 {Selecting Thread}(SocketChannelFullMessageRead) EvtSrc(AScatterGatherReadCommand)  [comp533.AHalloweenSimClientNIOSenderImpl@537f60bf]<-(7)java.nio.HeapByteBuffer[pos=26 lim=33 cap=4194304] java.nio.channels.SocketChannel[connected local=/127.0.0.1:51676 remote=localhost/127.0.0.1:9000]
 //	Command echoed FROM server: 0x00x00x0ipc
-	public static final void removeIllegalChars(File aFile, String aMessage) {
+	public static final void removeIllegalChars(File aFile, String aMessage, int aLineNumber, int aColumnNumber) {
 		stringBuilder.setLength(0);
-		int aLineNumber = 0;
+		int aCurrentLineNumber = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(aFile))) {
 			boolean aChanged = false;
 
 			String anOriginal, aNew = null; // why was this initialization required by Java?
 			while ((anOriginal = br.readLine()) != null) {				
 				
-				aNew = removeIllegalChars(anOriginal, -1);
+				aNew = removeIllegalChars(anOriginal, aColumnNumber);
 				
+				if (anOriginal.equals(aNew)) {
+					if (aCurrentLineNumber == aLineNumber) {
+						aNew = commentLine(aNew);
+					}
+				}
 				if (!anOriginal.equals(aNew)) {
 					aChanged = true;
 				}
 				
+//				if (!anOriginal.equals(aNew)) {
+//					aChanged = true;
+//				} else if (aCurrentLineNumber == aLineNumber) {
+//					aNew = commentLine(aNew);
+//				}
+				
 				stringBuilder.append(aNew + "\n");
-				aLineNumber++;
+				aCurrentLineNumber++;
 
 			}
 		
@@ -214,6 +303,56 @@ public class LogPreprocessor {
 				System.out.println("writing file:" + aFile);
 				Common.writeText(aFile, toWrite);
 			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+//		String anOriginal = Common.toText(aFile);
+//		if (anOriginal.contains(ESCAPED_AMPERSAND)) {
+//			return; // we have already preprocessed
+//		}
+//		String aNew = anOriginal.replace("&", ESCAPED_AMPERSAND);
+//		int anIndex = anOriginal.indexOf("&");
+//		if (aNew.equals(anOriginal)) {;
+//			return;
+//		}
+//		Common.writeText(aFile, aNew);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+
+	}
+	public static final void commentTargetLine(File aFile, String aMessage, int aLineNumber, int aColumnNumber) {
+		stringBuilder.setLength(0);
+		int aCurrentLineNumber = 0;
+		try (BufferedReader br = new BufferedReader(new FileReader(aFile))) {
+
+			String anOriginal, aNew = null; // why was this initialization required by Java?
+			while ((anOriginal = br.readLine()) != null) {	
+				aNew = anOriginal;
+				
+					if (aCurrentLineNumber == aLineNumber) {
+						aNew = commentLine(aNew);
+					}
+				
+				
+//				if (!anOriginal.equals(aNew)) {
+//					aChanged = true;
+//				} else if (aCurrentLineNumber == aLineNumber) {
+//					aNew = commentLine(aNew);
+//				}
+				
+				stringBuilder.append(aNew + "\n");
+				aCurrentLineNumber++;
+
+			}
+		
+			
+				String toWrite = stringBuilder.toString();
+				System.out.println("writing file:" + aFile);
+				Common.writeText(aFile, toWrite);
+			
 
 		} catch (IOException e) {
 			e.printStackTrace();
