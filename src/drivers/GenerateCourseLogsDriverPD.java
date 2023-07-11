@@ -12,9 +12,9 @@ public class GenerateCourseLogsDriverPD  {
 //			"H:\\CompPaper\\401f16",
 //			"H:\\CompPaper\\401f17",
 //			"H:\\CompPaper\\401f18",
-//			"D:\\sakaidownloads_anonymyzed\\Comp524\\F22"
+			"D:\\sakaidownloads_anonymyzed\\Comp524\\F22"
 //			"D:\\sakaidownloads_anonymyzed\\Comp524\\F21"
-			"D:\\sakaidownloads_anonymyzed\\Comp533\\S21"
+//			"D:\\sakaidownloads_anonymyzed\\Comp533\\S21"
 //			"D:\\sakaidownloads_anonymyzed\\Comp533\\S20"
 //			"D:\\sakaidownloads_anonymyzed\\Comp401\\ss21"
 

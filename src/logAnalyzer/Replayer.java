@@ -289,8 +289,14 @@ public abstract class Replayer {
 	}
 
 	Set<File> filesAppendedEvents = new HashSet();
-	Set<File> filesSanitizedWebCommands = new HashSet();
-	Set<File> filesIllegalChars = new HashSet();
+	Set<String> filesSanitizedWebCommands = new HashSet();
+	
+	Set<String> filesCommentedLines = new HashSet();
+
+//	Set<File> filesSanitizedWebCommands = new HashSet();
+//	Set<File> filesIllegalChars = new HashSet();
+	Set<String> filesIllegalChars = new HashSet();
+
 
 	static String ROW_PREFIX = "lineNumber: ";
 	static String COLUMN_PREFIX = "columnNumber: ";
@@ -338,14 +344,20 @@ public abstract class Replayer {
 		String aMessage = e.getMessage();
 		if (e.getClass().getName().equals("org.xml.sax.SAXParseException")) {
 			int[] aCellCoordinate = extractRowColumnNumber(e.toString());
-			if (aCellCoordinate[0] == 2599) {
-				System.err.println("found offending coordinate");
-			}
+//			if (log.toString().contains("Log2022-09-25-15-33-44-271.xml") ||
+//					log.toString().contains("Log2022-09-16-15-16-55-944.xml")) {
+//				System.err.println("found offending file");
+//			}
+//			if (aCellCoordinate[0] == 2420) {
+//				System.err.println("found offending coordinate");
+//			}
+//			String aLoggedEntry = log+" line " + aCellCoordinate[0];
 //			if (aCellCoordinate[0] == 4453 || aCellCoordinate[0] == 777) {
 //				System.err.println("found offending coordinate");
 //			}
 
 			if (aMessage.contains("XML document structures must start and end within the same entity")) {
+//				if (filesAppendedEvents.contains(log)) {
 				if (filesAppendedEvents.contains(log)) {
 
 					System.err.println("Already appended events, cannot handle exception");
@@ -359,11 +371,15 @@ public abstract class Replayer {
 			aMessage.contains("An invalid XML character") ||
 
 					(aMessage.contains("Invalid byte"))) {
-				if (filesIllegalChars.contains(log)) {
-					System.err.println("Already processed illegal chars, cannot handle exception");
+				String aLoggedEntry = log+" line " + aCellCoordinate[0];
+				if (filesIllegalChars.contains(aLoggedEntry)) {
+//				if (filesIllegalChars.contains(log)) {
+					System.err.println("Already processed illegal chars, cannot handle exception:" + aLoggedEntry);
 				} else {
 					LogPreprocessor.removeIllegalChars(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
-					filesIllegalChars.add(log);
+//					filesIllegalChars.add(log);
+					filesIllegalChars.add(aLoggedEntry);
+
 					return readOneLogFile(log);
 				}
 			} else if (aMessage.contains("must end with the ';' ")
@@ -371,27 +387,35 @@ public abstract class Replayer {
 					|| aMessage.contains("must not contain the '<' character")
 
 			) {
-				if (filesSanitizedWebCommands.contains(log)) {
-					System.err.println("Already sanitized web commands, cannot handle exception");
+				String aLoggedEntry = log+" line " + aCellCoordinate[0];
+				if (filesSanitizedWebCommands.contains(aLoggedEntry)) {
+
+//				if (filesSanitizedWebCommands.contains(log)) {
+					System.err.println("Already sanitized web commands, cannot handle exception:" + aLoggedEntry);
 
 				} else {
 					LogPreprocessor.escapeWebSearch(log, aCellCoordinate[0], aCellCoordinate[1]);
-					filesSanitizedWebCommands.add(log);
+					filesSanitizedWebCommands.add(aLoggedEntry);
+//					filesSanitizedWebCommands.add(log);
+
 					return readOneLogFile(log);
 
 				}
 			} else {
-				if (filesSanitizedWebCommands.contains(log)) {
-					System.err.println("Already sanitized web commands, cannot handle exception");
+				String aLoggedEntry = log+" line " + aCellCoordinate[0];
+
+				if (filesCommentedLines.contains(aLoggedEntry)) {
+					System.err.println("Already commented line, cannot handle exception:" + aLoggedEntry);
 
 				} else {
 					LogPreprocessor.commentTargetLine(log, aMessage, aCellCoordinate[0], aCellCoordinate[1]);
-					filesSanitizedWebCommands.add(log);
+					filesCommentedLines.add(aLoggedEntry);
 					return readOneLogFile(log);
 
 				}
 			}
 		}
+//		The markup in the document following the root element must be well-formed
 		System.err.println("Could not handle:" + e);
 		e.printStackTrace();
 		return null;
@@ -736,9 +760,9 @@ public abstract class Replayer {
 				if (file.getParentFile().getName().contains("Eclipse")) {
 					file = new File(file.getParent() + File.separator + surfix + File.separator + file.getName());
 				}
-				if (fileName.contains("Genaro")) {
-					System.out.println("Found student");
-				}
+//				if (fileName.contains("Genaro")) {
+//					System.out.println("Found student");
+//				}
 				System.out.println("Writing to file " + file.getPath());
 				if (file.exists()) {
 					file.delete();

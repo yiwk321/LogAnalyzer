@@ -94,6 +94,8 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 		return retVal;
 	}
 	
+	
+	
 	private void findPiazzaPosts(String student, JSONObject piazzaPostsJson) {
 		Matcher matcher = studentNamePattern.matcher(student);
 		if (!matcher.matches()) {
@@ -104,7 +106,8 @@ public class PiazzaCommandGenerator extends ExternalCommandGenerator {
 //			System.out.println("found author");
 //		}
 //		String author = onyen+ "(" + onyen + "@live.unc.edu)";
-		String author = onyen;
+//		String author = onyen;
+		String author = ChainedCommandGenerator.capitalizeNames(onyen);
 
 		if (!piazzaPostsJson.has(author)) {
 			return;

@@ -7,6 +7,7 @@ import logAnalyzer.ASemesterReplayer;
 import logAnalyzer.AnAssignmentReplayer;
 import logAnalyzer.AnExperimentReplayer;
 import logAnalyzer.Replayer;
+import mains.LogAnalyzerMain;
 import mains.Main;
 
 public class Driver {
@@ -65,6 +66,7 @@ public class Driver {
 		String[] args = {path};
 		try {
 		Main.main(args); // Andrew's code
+//		LogAnalyzerMain.main(args);	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

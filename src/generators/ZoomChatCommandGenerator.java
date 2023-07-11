@@ -183,7 +183,8 @@ public class ZoomChatCommandGenerator extends ExternalCommandGenerator {
 		while (matcher.find()) {
 			chatMatcher = chatPattern.matcher(matcher.group(groupIdx));
 			if (chatMatcher.matches()) {
-				String speaker = chatMatcher.group(1);
+//				String speaker = chatMatcher.group(1);
+				String speaker = chatMatcher.group(1).toLowerCase();
 				if (speaker.equals(name)) {
 					if (!hasSession) {
 						session++;

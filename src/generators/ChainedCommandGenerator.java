@@ -25,6 +25,19 @@ public class ChainedCommandGenerator extends CommandGenerator {
 	boolean appendAllRemainingCommands;
 	protected boolean foundTracedStudent = false;
 //	private Map<String, String> logToWrite;
+	
+	public static String capitalizeNames (String aLowerCaseName) {
+		String[] aNames = aLowerCaseName.split(" ");
+		StringBuilder retVal = new StringBuilder();
+		
+		for (String aName:aNames) {
+			String anUpperName = Character.toUpperCase(aName.charAt(0)) + aName.substring(1);
+			retVal.append(anUpperName);
+			retVal.append(" ");
+		}
+		retVal.deleteCharAt(retVal.length() - 1);
+		return retVal.toString();
+	}
 
 	public ChainedCommandGenerator(Replayer aReplayer, CountDownLatch aLatch, 
 			String aStudent, Map<String, List<EHICommand>> aStudentLog, 
