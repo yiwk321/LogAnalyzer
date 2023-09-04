@@ -115,6 +115,7 @@ public class AggregateAnalyzer {
 		String line1 = lines[0];
 		String[] assignments = line1.substring(line1.indexOf("\"")).split("\",\"");
 		
+		
 		for (int i = 1; i < lines.length; i++) {
 			String[] line = lines[i].split(",");
 			String onyen = line[2];
@@ -154,11 +155,19 @@ public class AggregateAnalyzer {
 	}
 	
 	public File getGrades(File course) {
-		File grades = new File(course, "gradebook_exportAnon.csv");
-		if (grades.exists()) {
-			return grades;
+		File[] aGradeFiles = course.listFiles((file)->{
+			return file.getName().startsWith("gradebook") &&
+					file.getName().endsWith("Anon.csv");});
+		if (aGradeFiles.length == 0) {
+			return null;
 		}
-		return null;
+//		File grades = new File(course, "gradebook_exportAnon.csv");
+		File grades = aGradeFiles[0];
+		return grades;
+//		if (grades.exists()) {
+//			return grades;
+//		}
+//		return null;
 	}
 
 	public File[] getAssigns(File course) {
