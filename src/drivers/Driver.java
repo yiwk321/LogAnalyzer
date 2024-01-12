@@ -65,8 +65,8 @@ public class Driver {
 		System.out.println("Generating LocalChecks log, appending remaining commands:" + appendAllRemainingCommands);
 		String[] args = {path};
 		try {
-//		Main.main(args); // Andrew's code
-		LogAnalyzerMain.main(args);	
+		Main.main(args); // Andrew's code
+//		LogAnalyzerMain.main(args);	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
