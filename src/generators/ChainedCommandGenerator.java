@@ -64,6 +64,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 			System.err.println("No localcheck logs for" + aStudent + ", not adding to command generator");
 		} else {
 			System.out.println("Found localcheck logs for" + aStudent + ", not adding to command generator");
+			
+			commandGenerators.add(new DifficultyPredictionCommandGenerator(replayer, latch, aStudentLog));
+
 			commandGenerators.add(new EndOfSessionCommandGenerator(replayer, latch, aStudentLog));
 //			commandGenerators.add(new PauseCommandGenerator(this, null, aStudentLog));
 			commandGenerators.add(new LocalCheckCommandGenerator(replayer, latch, aStudent, aStudentLog, localCheckEvents));
@@ -210,9 +213,9 @@ public class ChainedCommandGenerator extends CommandGenerator {
 									Long.MAX_VALUE : 
 										lastCommandTime + 600000);
 					if (j == commandMap.size()-1) {
-						if (student.contains("Dare")) {
-							System.out.println("Found traced student");
-						}
+//						if (student.contains("Dare")) {
+//							System.out.println("Found traced student");
+//						}
 						addRemainingCommands(newCommands);
 					}
 				} else {
